@@ -3,19 +3,20 @@
 
 @section('content')
 
-    <div class="tw-pb-6 tw-bg-gradient-to-r tw-from-@if(!empty(session('business.theme_color'))){{session('business.theme_color')}}@else{{'primary'}}@endif-800 tw-to-@if(!empty(session('business.theme_color'))){{session('business.theme_color')}}@else{{'primary'}}@endif-900 xl:tw-pb-0 ">
-        <div class="tw-px-5 tw-pt-3">
-            {{-- <div class="sm:tw-flex sm:tw-items-center sm:tw-justify-between sm:tw-gap-12">
-                <h1 class="tw-text-2xl tw-font-medium tw-tracking-tight tw-text-white">
-                    {{ __('home.welcome_message', ['name' => Session::get('user.first_name')]) }}
-                </h1>
-            </div> --}}
-                    <div class="sm:tw-flex sm:tw-items-center sm:tw-justify-between sm:tw-gap-12">
+    <!-- Ambient Background Header with Aurora Effect -->
+    <div class="tw-relative tw-pb-8 tw-pt-6 tw-overflow-hidden xl:tw-pb-0">
+        <!-- Animated Aurora Background -->
+        <div class="tw-absolute tw-inset-0 tw-bg-gradient-to-br tw-from-violet-600 tw-via-blue-600 tw-to-cyan-600 tw-opacity-90"></div>
+        <div class="aurora-effect tw-absolute tw-inset-0"></div>
+        
+        <!-- Content -->
+        <div class="tw-relative tw-z-10 tw-px-5 tw-pt-3">
+                    <div class="sm:tw-flex sm:tw-items-center sm:tw-justify-between sm:tw-gap-12 tw-animate-fade-in">
                         <div class="tw-mt-2 sm:tw-w-1/2 md:tw-w-1/2">
-                            <h1
-                                class="tw-text-2xl md:tw-text-4xl tw-tracking-tight tw-text-primary-800 tw-font-semibold text-white tw-mb-10 md:tw-mb-0">
+                            <h1 class="tw-text-2xl md:tw-text-4xl tw-tracking-tight tw-font-bold tw-text-white tw-mb-10 md:tw-mb-0 tw-drop-shadow-lg">
                                 {{ __('home.welcome_message', ['name' => Session::get('user.first_name')]) }}
                             </h1>
+                            <p class="tw-text-white/80 tw-text-sm md:tw-text-base tw-mt-2">Manage your business with modern, interactive dashboard</p>
                         </div>
     
                         @if (auth()->user()->can('dashboard.data'))
@@ -33,7 +34,7 @@
                                 <div class="tw-mt-2 sm:tw-w-1/3 md:tw-w-1/4 tw-text-right">
                                     @if ($is_admin)
                                         <button type="button" id="dashboard_date_filter"
-                                            class="tw-inline-flex tw-items-center tw-justify-center tw-w-full tw-gap-1 tw-px-3 tw-py-2 tw-text-sm tw-font-medium tw-text-gray-900 tw-transition-all tw-duration-200 tw-bg-white tw-rounded-lg sm:tw-w-auto hover:tw-bg-primary-50">
+                                            class="glass-card tw-inline-flex tw-items-center tw-justify-center tw-w-full tw-gap-2 tw-px-4 tw-py-2.5 tw-text-sm tw-font-medium tw-text-white tw-transition-all tw-duration-300 tw-rounded-xl sm:tw-w-auto hover:tw-scale-105 tw-shadow-lg hover:tw-shadow-ambient">
                                             <svg aria-hidden="true" class="tw-size-5" xmlns="http://www.w3.org/2000/svg"
                                                 viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" fill="none"
                                                 stroke-linecap="round" stroke-linejoin="round">
@@ -68,15 +69,15 @@
                     </div>
                     @if (auth()->user()->can('dashboard.data'))
                         @if ($is_admin)
-                            <div class="tw-grid tw-grid-cols-1 tw-gap-4 tw-mt-6 sm:tw-grid-cols-2 xl:tw-grid-cols-4 sm:tw-gap-5">
+                            <!-- Modern Stats Grid with Staggered Animation -->
+                            <div class="tw-grid tw-grid-cols-1 tw-gap-4 tw-mt-6 sm:tw-grid-cols-2 xl:tw-grid-cols-4 sm:tw-gap-5 tw-animate-slide-up">
                             
-                                <div
-                                    class="tw-transition-all tw-duration-200 tw-bg-white tw-shadow-sm hover:tw-shadow-md tw-rounded-xl  tw-ring-1 tw-ring-gray-200">
-                                    <div class="tw-p-4 sm:tw-p-5">
+                                <!-- Total Sell Card with Ambient Effect -->
+                                <div class="modern-card tw-group interactive-shadow ambient-border">
+                                    <div class="tw-p-5 sm:tw-p-6">
                                         <div class="tw-flex tw-items-center tw-gap-4">
-                                            <div
-                                                class="tw-inline-flex tw-items-center tw-justify-center tw-w-10 tw-h-10 tw-rounded-full sm:tw-w-12 sm:tw-h-12 tw-shrink-0 tw-bg-sky-100 tw-text-sky-500">
-                                                <svg aria-hidden="true" class="tw-w-6 tw-h-6" xmlns="http://www.w3.org/2000/svg"
+                                            <div class="icon-gradient tw-from-sky-400 tw-to-blue-600 tw-inline-flex tw-items-center tw-justify-center tw-w-14 tw-h-14 tw-rounded-2xl tw-shrink-0 tw-shadow-lg group-hover:tw-scale-110 tw-transition-transform tw-duration-300">
+                                                <svg aria-hidden="true" class="tw-w-7 tw-h-7 tw-text-white tw-drop-shadow" xmlns="http://www.w3.org/2000/svg"
                                                     viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none"
                                                     stroke-linecap="round" stroke-linejoin="round">
                                                     <path stroke="none" d="M0 0h24v24H0z" fill="none" />
@@ -88,66 +89,53 @@
                                             </div>
 
                                             <div class="tw-flex-1 tw-min-w-0">
-                                                <p
-                                                    class="tw-text-sm tw-font-medium tw-text-gray-500 tw-truncate tw-whitespace-nowrap">
+                                                <p class="tw-text-xs tw-font-semibold tw-text-gray-500 tw-uppercase tw-tracking-wider tw-truncate">
                                                     {{ __('home.total_sell') }}
                                                 </p>
-                                                <p
-                                                    class="total_sell tw-mt-0.5 tw-text-gray-900 tw-text-xl tw-truncate tw-font-semibold tw-tracking-tight tw-font-mono">
+                                                <p class="total_sell tw-mt-1.5 tw-text-gray-900 tw-text-2xl tw-truncate tw-font-bold tw-tracking-tight stat-number">
                                                 </p>
                                             </div>
                                         </div>
                                     </div>
                                 </div>
 
-                                <div
-                                    class="tw-transition-all tw-duration-200 tw-bg-white tw-shadow-sm hover:tw-shadow-md tw-rounded-xl hover:tw--translate-y-0.5 tw-ring-1 tw-ring-gray-200">
-                                    <div class="tw-p-4 sm:tw-p-5">
+                                <!-- Net Card -->
+                                <div class="modern-card tw-group interactive-shadow ambient-border">
+                                    <div class="tw-p-5 sm:tw-p-6">
                                         <div class="tw-flex tw-items-center tw-gap-4">
-                                            <div
-                                                class="tw-inline-flex tw-items-center tw-justify-center tw-w-10 tw-h-10 tw-text-green-500 tw-bg-green-100 tw-rounded-full sm:tw-w-12 sm:tw-h-12 tw-shrink-0">
-                                                <svg aria-hidden="true" class="tw-w-6 tw-h-6" xmlns="http://www.w3.org/2000/svg"
+                                            <div class="icon-gradient tw-from-emerald-400 tw-to-green-600 tw-inline-flex tw-items-center tw-justify-center tw-w-14 tw-h-14 tw-rounded-2xl tw-shrink-0 tw-shadow-lg group-hover:tw-scale-110 tw-transition-transform tw-duration-300">
+                                                <svg aria-hidden="true" class="tw-w-7 tw-h-7 tw-text-white tw-drop-shadow" xmlns="http://www.w3.org/2000/svg"
                                                     viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none"
                                                     stroke-linecap="round" stroke-linejoin="round">
                                                     <path stroke="none" d="M0 0h24v24H0z" fill="none"></path>
-                                                    <path stroke="none" d="M0 0h24v24H0z" fill="none"></path>
-                                                    <path
-                                                        d="M5 21v-16a2 2 0 0 1 2 -2h10a2 2 0 0 1 2 2v16l-3 -2l-2 2l-2 -2l-2 2l-2 -2l-3 2">
-                                                    </path>
-                                                    <path
-                                                        d="M14.8 8a2 2 0 0 0 -1.8 -1h-2a2 2 0 1 0 0 4h2a2 2 0 1 1 0 4h-2a2 2 0 0 1 -1.8 -1">
-                                                    </path>
+                                                    <path d="M5 21v-16a2 2 0 0 1 2 -2h10a2 2 0 0 1 2 2v16l-3 -2l-2 2l-2 -2l-2 2l-2 -2l-3 2"></path>
+                                                    <path d="M14.8 8a2 2 0 0 0 -1.8 -1h-2a2 2 0 1 0 0 4h2a2 2 0 1 1 0 4h-2a2 2 0 0 1 -1.8 -1"></path>
                                                     <path d="M12 6v10"></path>
                                                 </svg>
                                             </div>
 
                                             <div class="tw-flex-1 tw-min-w-0">
-                                                <p
-                                                    class="tw-text-sm tw-font-medium tw-text-gray-500 tw-truncate tw-whitespace-nowrap">
+                                                <p class="tw-text-xs tw-font-semibold tw-text-gray-500 tw-uppercase tw-tracking-wider tw-truncate">
                                                     {{ __('lang_v1.net') }} @show_tooltip(__('lang_v1.net_home_tooltip'))
                                                 </p>
-                                                <p
-                                                    class="net tw-mt-0.5 tw-text-gray-900 tw-text-xl tw-truncate tw-font-semibold tw-tracking-tight tw-font-mono">
+                                                <p class="net tw-mt-1.5 tw-text-gray-900 tw-text-2xl tw-truncate tw-font-bold tw-tracking-tight stat-number">
                                                 </p>
                                             </div>
                                         </div>
                                     </div>
                                 </div>
 
-                                <div
-                                    class="tw-transition-all tw-duration-200 tw-bg-white tw-shadow-sm hover:tw-shadow-md tw-rounded-xl hover:tw--translate-y-0.5 tw-ring-1 tw-ring-gray-200">
-                                    <div class="tw-p-4 sm:tw-p-5">
+                                <!-- Invoice Due Card -->
+                                <div class="modern-card tw-group interactive-shadow ambient-border">
+                                    <div class="tw-p-5 sm:tw-p-6">
                                         <div class="tw-flex tw-items-center tw-gap-4">
-                                            <div
-                                                class="tw-inline-flex tw-items-center tw-justify-center tw-w-10 tw-h-10 tw-text-yellow-500 tw-bg-yellow-100 tw-rounded-full sm:tw-w-12 sm:tw-h-12 shrink-0">
-                                                <svg aria-hidden="true" class="tw-w-6 tw-h-6" xmlns="http://www.w3.org/2000/svg"
+                                            <div class="icon-gradient tw-from-amber-400 tw-to-orange-600 tw-inline-flex tw-items-center tw-justify-center tw-w-14 tw-h-14 tw-rounded-2xl tw-shrink-0 tw-shadow-lg group-hover:tw-scale-110 tw-transition-transform tw-duration-300">
+                                                <svg aria-hidden="true" class="tw-w-7 tw-h-7 tw-text-white tw-drop-shadow" xmlns="http://www.w3.org/2000/svg"
                                                     viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none"
                                                     stroke-linecap="round" stroke-linejoin="round">
                                                     <path stroke="none" d="M0 0h24v24H0z" fill="none" />
-                                                    <path stroke="none" d="M0 0h24v24H0z" fill="none" />
                                                     <path d="M14 3v4a1 1 0 0 0 1 1h4" />
-                                                    <path
-                                                        d="M17 21h-10a2 2 0 0 1 -2 -2v-14a2 2 0 0 1 2 -2h7l5 5v11a2 2 0 0 1 -2 2z" />
+                                                    <path d="M17 21h-10a2 2 0 0 1 -2 -2v-14a2 2 0 0 1 2 -2h7l5 5v11a2 2 0 0 1 -2 2z" />
                                                     <path d="M9 7l1 0" />
                                                     <path d="M9 13l6 0" />
                                                     <path d="M13 17l2 0" />
@@ -155,28 +143,24 @@
                                             </div>
 
                                             <div class="tw-flex-1 tw-min-w-0">
-                                                <p
-                                                    class="tw-text-sm tw-font-medium tw-text-gray-500 tw-truncate tw-whitespace-nowrap">
+                                                <p class="tw-text-xs tw-font-semibold tw-text-gray-500 tw-uppercase tw-tracking-wider tw-truncate">
                                                     {{ __('home.invoice_due') }}
                                                 </p>
-                                                <p
-                                                    class="invoice_due tw-mt-0.5 tw-text-gray-900 tw-text-xl tw-truncate tw-font-semibold tw-tracking-tight tw-font-mono">
+                                                <p class="invoice_due tw-mt-1.5 tw-text-gray-900 tw-text-2xl tw-truncate tw-font-bold tw-tracking-tight stat-number">
                                                 </p>
                                             </div>
                                         </div>
                                     </div>
                                 </div>
 
-                                <div
-                                    class="tw-transition-all tw-duration-200 tw-bg-white tw-shadow-sm hover:tw-shadow-md tw-rounded-xl hover:tw--translate-y-0.5 tw-ring-1 tw-ring-gray-200">
-                                    <div class="tw-p-4 sm:tw-p-5">
+                                <!-- Total Sell Return Card -->
+                                <div class="modern-card tw-group interactive-shadow ambient-border">
+                                    <div class="tw-p-5 sm:tw-p-6">
                                         <div class="tw-flex tw-items-center tw-gap-4">
-                                            <div
-                                                class="tw-inline-flex tw-items-center tw-justify-center tw-w-10 tw-h-10 tw-text-red-500 tw-bg-red-100 tw-rounded-full sm:tw-w-12 sm:tw-h-12 shrink-0">
-                                                <svg aria-hidden="true" class="tw-w-6 tw-h-6" xmlns="http://www.w3.org/2000/svg"
+                                            <div class="icon-gradient tw-from-rose-400 tw-to-red-600 tw-inline-flex tw-items-center tw-justify-center tw-w-14 tw-h-14 tw-rounded-2xl tw-shrink-0 tw-shadow-lg group-hover:tw-scale-110 tw-transition-transform tw-duration-300">
+                                                <svg aria-hidden="true" class="tw-w-7 tw-h-7 tw-text-white tw-drop-shadow" xmlns="http://www.w3.org/2000/svg"
                                                     viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none"
                                                     stroke-linecap="round" stroke-linejoin="round">
-                                                    <path stroke="none" d="M0 0h24v24H0z" fill="none" />
                                                     <path stroke="none" d="M0 0h24v24H0z" fill="none" />
                                                     <path d="M21 7l-18 0" />
                                                     <path d="M18 10l3 -3l-3 -3" />
@@ -186,20 +170,15 @@
                                             </div>
 
                                             <div class="tw-flex-1 tw-min-w-0">
-                                                <p
-                                                    class="tw-text-sm tw-font-medium tw-text-gray-500 tw-truncate tw-whitespace-nowrap">
+                                                <p class="tw-text-xs tw-font-semibold tw-text-gray-500 tw-uppercase tw-tracking-wider tw-truncate">
                                                     {{ __('lang_v1.total_sell_return') }}
-                                                    <i class="fa fa-info-circle text-info hover-q no-print" aria-hidden="true" data-container="body"
+                                                    <i class="fa fa-info-circle text-info hover-q no-print tw-ml-1" aria-hidden="true" data-container="body"
                                                     data-toggle="popover" data-placement="auto bottom" id="total_srp"
                                                     data-value="{{ __('lang_v1.total_sell_return') }}-{{ __('lang_v1.total_sell_return_paid') }}"
                                                     data-content="" data-html="true" data-trigger="hover"></i>
                                                 </p>
-                                                <p
-                                                    class="total_sell_return tw-mt-0.5 tw-text-gray-900 tw-text-xl tw-truncate tw-font-semibold tw-tracking-tight tw-font-mono">
+                                                <p class="total_sell_return tw-mt-1.5 tw-text-gray-900 tw-text-2xl tw-truncate tw-font-bold tw-tracking-tight stat-number">
                                                 </p>
-                                                {{-- <p class="mb-0 text-muted fs-10 mt-5">{{ __('lang_v1.total_sell_return') }}: <span
-                                                        class="total_sr"></span><br>
-                                                    {{ __('lang_v1.total_sell_return_paid') }}<span class="total_srp"></span></p> --}}
                                             </div>
                                         </div>
                                     </div>

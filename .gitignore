@@ -26,3 +26,11 @@ npm-debug.log
 /public/docs
 /public/js/skins/
 /public/js/icons/
+# Modern UI Build Files
+/node_modules
+/public/hot
+/public/storage
+/public/css/tailwind/*.css
+package-lock.json
+build-css.sh
+compile-tailwind.js

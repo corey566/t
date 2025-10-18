@@ -3,8 +3,256 @@
 @tailwind utilities;
 
 @layer base {
+  :root {
+    --ambient-violet: #8b5cf6;
+    --ambient-blue: #3b82f6;
+    --ambient-cyan: #06b6d4;
+    --ambient-teal: #14b8a6;
+  }
+
+  html {
+    scroll-behavior: smooth;
+  }
+  
+  body {
+    @apply tw-antialiased;
+  }
 }
+
 @layer components {
+  /* Aceternity-style Glass Card */
+  .glass-card {
+    @apply tw-backdrop-blur-md tw-bg-white/70 dark:tw-bg-gray-900/70;
+    @apply tw-border tw-border-white/20;
+    @apply tw-shadow-glass;
+    @apply tw-transition-all tw-duration-300;
+  }
+
+  .glass-card:hover {
+    @apply tw-shadow-ambient-lg tw-backdrop-blur-lg;
+    @apply tw-scale-[1.02] tw--translate-y-1;
+  }
+
+  /* Ambient Gradient Background */
+  .ambient-bg {
+    background: linear-gradient(
+      135deg,
+      rgba(139, 92, 246, 0.1) 0%,
+      rgba(59, 130, 246, 0.1) 25%,
+      rgba(6, 182, 212, 0.1) 50%,
+      rgba(20, 184, 166, 0.1) 75%,
+      rgba(16, 185, 129, 0.1) 100%
+    );
+    background-size: 400% 400%;
+    animation: gradient-xy 15s ease infinite;
+  }
+
+  /* Modern Card with Hover Effect */
+  .modern-card {
+    @apply tw-relative tw-overflow-hidden;
+    @apply tw-bg-white tw-rounded-2xl;
+    @apply tw-shadow-sm tw-border tw-border-gray-100;
+    @apply tw-transition-all tw-duration-300 tw-ease-out;
+    @apply hover:tw-shadow-xl hover:tw--translate-y-1;
+  }
+
+  .modern-card::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: linear-gradient(135deg, rgba(139, 92, 246, 0.05), rgba(59, 130, 246, 0.05));
+    opacity: 0;
+    transition: opacity 0.3s ease;
+    pointer-events: none;
+  }
+
+  .modern-card:hover::before {
+    opacity: 1;
+  }
+
+  /* Icon Container with Gradient */
+  .icon-gradient {
+    @apply tw-relative tw-overflow-hidden;
+    background: linear-gradient(135deg, var(--tw-gradient-from), var(--tw-gradient-to));
+  }
+
+  .icon-gradient::after {
+    content: '';
+    position: absolute;
+    top: -50%;
+    left: -50%;
+    width: 200%;
+    height: 200%;
+    background: radial-gradient(circle, rgba(255,255,255,0.3) 0%, transparent 70%);
+    opacity: 0;
+    transition: opacity 0.3s ease;
+  }
+
+  .icon-gradient:hover::after {
+    opacity: 1;
+  }
+
+  /* Ambient Button */
+  .btn-ambient {
+    @apply tw-relative tw-px-6 tw-py-3 tw-rounded-xl;
+    @apply tw-font-semibold tw-text-white;
+    @apply tw-transition-all tw-duration-300;
+    background: linear-gradient(135deg, #8b5cf6, #3b82f6);
+    background-size: 200% 200%;
+  }
+
+  .btn-ambient:hover {
+    background-position: right center;
+    @apply tw-shadow-ambient-lg tw-scale-105;
+  }
+
+  /* Ambient Border Effect */
+  .ambient-border {
+    @apply tw-relative;
+  }
+
+  .ambient-border::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    border-radius: inherit;
+    padding: 1px;
+    background: linear-gradient(135deg, #8b5cf6, #3b82f6, #06b6d4);
+    -webkit-mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
+    -webkit-mask-composite: xor;
+    mask-composite: exclude;
+    opacity: 0.5;
+    transition: opacity 0.3s ease;
+  }
+
+  .ambient-border:hover::before {
+    opacity: 1;
+  }
+
+  /* Smooth Hover Scale */
+  .hover-scale {
+    @apply tw-transition-transform tw-duration-300 tw-ease-out;
+  }
+
+  .hover-scale:hover {
+    @apply tw-scale-105;
+  }
+
+  /* Loading Shimmer Effect */
+  .shimmer {
+    background: linear-gradient(90deg, #f0f0f0 25%, #e0e0e0 50%, #f0f0f0 75%);
+    background-size: 200% 100%;
+    animation: shimmer 1.5s infinite;
+  }
+
+  @keyframes shimmer {
+    0% { background-position: -200% 0; }
+    100% { background-position: 200% 0; }
+  }
+
+  /* Stat Card Number Animation */
+  .stat-number {
+    @apply tw-font-mono tw-font-bold;
+    @apply tw-bg-gradient-to-r tw-from-gray-900 tw-to-gray-700 tw-bg-clip-text tw-text-transparent;
+  }
+
+  /* Minimalist Divider */
+  .divider-ambient {
+    height: 1px;
+    background: linear-gradient(90deg, transparent, rgba(139, 92, 246, 0.3), transparent);
+  }
+
+  /* Glassmorphism Sidebar */
+  .sidebar-glass {
+    @apply tw-backdrop-blur-xl;
+    background: rgba(255, 255, 255, 0.8);
+    border-right: 1px solid rgba(255, 255, 255, 0.2);
+  }
+
+  /* Aurora Effect */
+  .aurora-effect {
+    position: relative;
+    overflow: hidden;
+  }
+
+  .aurora-effect::before {
+    content: '';
+    position: absolute;
+    top: -50%;
+    left: -50%;
+    width: 200%;
+    height: 200%;
+    background: linear-gradient(
+      45deg,
+      rgba(139, 92, 246, 0.1),
+      rgba(59, 130, 246, 0.1),
+      rgba(6, 182, 212, 0.1),
+      rgba(20, 184, 166, 0.1)
+    );
+    background-size: 400% 400%;
+    animation: aurora 20s linear infinite;
+    filter: blur(40px);
+  }
+
+  /* Interactive Card Shadow */
+  .interactive-shadow {
+    transition: box-shadow 0.3s ease;
+  }
+
+  .interactive-shadow:hover {
+    box-shadow: 
+      0 10px 40px -10px rgba(139, 92, 246, 0.3),
+      0 0 0 1px rgba(139, 92, 246, 0.1);
+  }
 }
+
 @layer utilities {
+  /* Text Gradient */
+  .text-gradient-ambient {
+    @apply tw-bg-gradient-to-r tw-from-violet-600 tw-via-blue-500 tw-to-cyan-500;
+    @apply tw-bg-clip-text tw-text-transparent;
+  }
+
+  /* Responsive Grid Gap */
+  .gap-responsive {
+    @apply tw-gap-3 sm:tw-gap-4 md:tw-gap-5 lg:tw-gap-6;
+  }
+
+  /* Hide Scrollbar */
+  .hide-scrollbar {
+    -ms-overflow-style: none;
+    scrollbar-width: none;
+  }
+
+  .hide-scrollbar::-webkit-scrollbar {
+    display: none;
+  }
+
+  /* Smooth Transitions */
+  .transition-smooth {
+    @apply tw-transition-all tw-duration-300 tw-ease-in-out;
+  }
+}
+
+/* Custom Scrollbar */
+::-webkit-scrollbar {
+  width: 8px;
+  height: 8px;
+}
+
+::-webkit-scrollbar-track {
+  background: #f1f1f1;
+  border-radius: 10px;
+}
+
+::-webkit-scrollbar-thumb {
+  background: linear-gradient(135deg, #8b5cf6, #3b82f6);
+  border-radius: 10px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: linear-gradient(135deg, #7c3aed, #2563eb);
 }
