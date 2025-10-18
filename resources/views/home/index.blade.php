@@ -3,10 +3,10 @@
 
 @section('content')
 
-    <!-- Ambient Background Header with Aurora Effect -->
+    <!-- Ambient Background Header with Aurora Effect - Blue Theme -->
     <div class="tw-relative tw-pb-8 tw-pt-6 tw-overflow-hidden xl:tw-pb-0">
-        <!-- Animated Aurora Background -->
-        <div class="tw-absolute tw-inset-0 tw-bg-gradient-to-br tw-from-violet-600 tw-via-blue-600 tw-to-cyan-600 tw-opacity-90"></div>
+        <!-- Animated Aurora Background - Blue Gradient -->
+        <div class="tw-absolute tw-inset-0 tw-bg-gradient-to-br tw-from-blue-600 tw-via-sky-500 tw-to-indigo-600 tw-opacity-90"></div>
         <div class="aurora-effect tw-absolute tw-inset-0"></div>
         
         <!-- Content -->
@@ -103,7 +103,7 @@
                                 <div class="modern-card tw-group interactive-shadow ambient-border">
                                     <div class="tw-p-5 sm:tw-p-6">
                                         <div class="tw-flex tw-items-center tw-gap-4">
-                                            <div class="icon-gradient tw-from-emerald-400 tw-to-green-600 tw-inline-flex tw-items-center tw-justify-center tw-w-14 tw-h-14 tw-rounded-2xl tw-shrink-0 tw-shadow-lg group-hover:tw-scale-110 tw-transition-transform tw-duration-300">
+                                            <div class="icon-gradient tw-from-blue-400 tw-to-blue-700 tw-inline-flex tw-items-center tw-justify-center tw-w-14 tw-h-14 tw-rounded-2xl tw-shrink-0 tw-shadow-lg group-hover:tw-scale-110 tw-transition-transform tw-duration-300">
                                                 <svg aria-hidden="true" class="tw-w-7 tw-h-7 tw-text-white tw-drop-shadow" xmlns="http://www.w3.org/2000/svg"
                                                     viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none"
                                                     stroke-linecap="round" stroke-linejoin="round">
@@ -129,7 +129,7 @@
                                 <div class="modern-card tw-group interactive-shadow ambient-border">
                                     <div class="tw-p-5 sm:tw-p-6">
                                         <div class="tw-flex tw-items-center tw-gap-4">
-                                            <div class="icon-gradient tw-from-amber-400 tw-to-orange-600 tw-inline-flex tw-items-center tw-justify-center tw-w-14 tw-h-14 tw-rounded-2xl tw-shrink-0 tw-shadow-lg group-hover:tw-scale-110 tw-transition-transform tw-duration-300">
+                                            <div class="icon-gradient tw-from-sky-400 tw-to-cyan-600 tw-inline-flex tw-items-center tw-justify-center tw-w-14 tw-h-14 tw-rounded-2xl tw-shrink-0 tw-shadow-lg group-hover:tw-scale-110 tw-transition-transform tw-duration-300">
                                                 <svg aria-hidden="true" class="tw-w-7 tw-h-7 tw-text-white tw-drop-shadow" xmlns="http://www.w3.org/2000/svg"
                                                     viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none"
                                                     stroke-linecap="round" stroke-linejoin="round">
@@ -157,7 +157,7 @@
                                 <div class="modern-card tw-group interactive-shadow ambient-border">
                                     <div class="tw-p-5 sm:tw-p-6">
                                         <div class="tw-flex tw-items-center tw-gap-4">
-                                            <div class="icon-gradient tw-from-rose-400 tw-to-red-600 tw-inline-flex tw-items-center tw-justify-center tw-w-14 tw-h-14 tw-rounded-2xl tw-shrink-0 tw-shadow-lg group-hover:tw-scale-110 tw-transition-transform tw-duration-300">
+                                            <div class="icon-gradient tw-from-indigo-400 tw-to-indigo-700 tw-inline-flex tw-items-center tw-justify-center tw-w-14 tw-h-14 tw-rounded-2xl tw-shrink-0 tw-shadow-lg group-hover:tw-scale-110 tw-transition-transform tw-duration-300">
                                                 <svg aria-hidden="true" class="tw-w-7 tw-h-7 tw-text-white tw-drop-shadow" xmlns="http://www.w3.org/2000/svg"
                                                     viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none"
                                                     stroke-linecap="round" stroke-linejoin="round">
