@@ -1,0 +1,11 @@
+{
+    "name": "Gallface",
+    "alias": "gallface",
+    "description": "",
+    "keywords": [],
+    "priority": 0,
+    "providers": [
+        "Modules\\Gallface\\Providers\\GallfaceServiceProvider"
+    ],
+    "files": []
+}
