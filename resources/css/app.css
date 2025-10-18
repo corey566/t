@@ -4,10 +4,11 @@
 
 @layer base {
   :root {
-    --ambient-violet: #8b5cf6;
+    --ambient-blue-light: #60a5fa;
     --ambient-blue: #3b82f6;
-    --ambient-cyan: #06b6d4;
-    --ambient-teal: #14b8a6;
+    --ambient-blue-dark: #1e40af;
+    --ambient-sky: #0ea5e9;
+    --ambient-indigo: #6366f1;
   }
 
   html {
@@ -33,15 +34,14 @@
     @apply tw-scale-[1.02] tw--translate-y-1;
   }
 
-  /* Ambient Gradient Background */
+  /* Ambient Gradient Background - Blue Theme */
   .ambient-bg {
     background: linear-gradient(
       135deg,
-      rgba(139, 92, 246, 0.1) 0%,
-      rgba(59, 130, 246, 0.1) 25%,
-      rgba(6, 182, 212, 0.1) 50%,
-      rgba(20, 184, 166, 0.1) 75%,
-      rgba(16, 185, 129, 0.1) 100%
+      rgba(59, 130, 246, 0.1) 0%,
+      rgba(14, 165, 233, 0.1) 33%,
+      rgba(99, 102, 241, 0.1) 66%,
+      rgba(96, 165, 250, 0.1) 100%
     );
     background-size: 400% 400%;
     animation: gradient-xy 15s ease infinite;
@@ -63,7 +63,7 @@
     left: 0;
     width: 100%;
     height: 100%;
-    background: linear-gradient(135deg, rgba(139, 92, 246, 0.05), rgba(59, 130, 246, 0.05));
+    background: linear-gradient(135deg, rgba(59, 130, 246, 0.05), rgba(14, 165, 233, 0.05));
     opacity: 0;
     transition: opacity 0.3s ease;
     pointer-events: none;
@@ -95,12 +95,12 @@
     opacity: 1;
   }
 
-  /* Ambient Button */
+  /* Ambient Button - Blue Theme */
   .btn-ambient {
     @apply tw-relative tw-px-6 tw-py-3 tw-rounded-xl;
     @apply tw-font-semibold tw-text-white;
     @apply tw-transition-all tw-duration-300;
-    background: linear-gradient(135deg, #8b5cf6, #3b82f6);
+    background: linear-gradient(135deg, #3b82f6, #0ea5e9);
     background-size: 200% 200%;
   }
 
@@ -109,7 +109,7 @@
     @apply tw-shadow-ambient-lg tw-scale-105;
   }
 
-  /* Ambient Border Effect */
+  /* Ambient Border Effect - Blue Theme */
   .ambient-border {
     @apply tw-relative;
   }
@@ -120,7 +120,7 @@
     inset: 0;
     border-radius: inherit;
     padding: 1px;
-    background: linear-gradient(135deg, #8b5cf6, #3b82f6, #06b6d4);
+    background: linear-gradient(135deg, #3b82f6, #0ea5e9, #6366f1);
     -webkit-mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
     -webkit-mask-composite: xor;
     mask-composite: exclude;
@@ -159,10 +159,10 @@
     @apply tw-bg-gradient-to-r tw-from-gray-900 tw-to-gray-700 tw-bg-clip-text tw-text-transparent;
   }
 
-  /* Minimalist Divider */
+  /* Minimalist Divider - Blue Theme */
   .divider-ambient {
     height: 1px;
-    background: linear-gradient(90deg, transparent, rgba(139, 92, 246, 0.3), transparent);
+    background: linear-gradient(90deg, transparent, rgba(59, 130, 246, 0.3), transparent);
   }
 
   /* Glassmorphism Sidebar */
@@ -172,7 +172,7 @@
     border-right: 1px solid rgba(255, 255, 255, 0.2);
   }
 
-  /* Aurora Effect */
+  /* Aurora Effect - Blue Theme */
   .aurora-effect {
     position: relative;
     overflow: hidden;
@@ -187,32 +187,32 @@
     height: 200%;
     background: linear-gradient(
       45deg,
-      rgba(139, 92, 246, 0.1),
       rgba(59, 130, 246, 0.1),
-      rgba(6, 182, 212, 0.1),
-      rgba(20, 184, 166, 0.1)
+      rgba(14, 165, 233, 0.1),
+      rgba(99, 102, 241, 0.1),
+      rgba(96, 165, 250, 0.1)
     );
     background-size: 400% 400%;
     animation: aurora 20s linear infinite;
     filter: blur(40px);
   }
 
-  /* Interactive Card Shadow */
+  /* Interactive Card Shadow - Blue Theme */
   .interactive-shadow {
     transition: box-shadow 0.3s ease;
   }
 
   .interactive-shadow:hover {
     box-shadow: 
-      0 10px 40px -10px rgba(139, 92, 246, 0.3),
-      0 0 0 1px rgba(139, 92, 246, 0.1);
+      0 10px 40px -10px rgba(59, 130, 246, 0.3),
+      0 0 0 1px rgba(59, 130, 246, 0.1);
   }
 }
 
 @layer utilities {
-  /* Text Gradient */
+  /* Text Gradient - Blue Theme */
   .text-gradient-ambient {
-    @apply tw-bg-gradient-to-r tw-from-violet-600 tw-via-blue-500 tw-to-cyan-500;
+    @apply tw-bg-gradient-to-r tw-from-blue-600 tw-via-sky-500 tw-to-indigo-500;
     @apply tw-bg-clip-text tw-text-transparent;
   }
 
@@ -237,7 +237,7 @@
   }
 }
 
-/* Custom Scrollbar */
+/* Custom Scrollbar - Blue Theme */
 ::-webkit-scrollbar {
   width: 8px;
   height: 8px;
@@ -249,10 +249,10 @@
 }
 
 ::-webkit-scrollbar-thumb {
-  background: linear-gradient(135deg, #8b5cf6, #3b82f6);
+  background: linear-gradient(135deg, #3b82f6, #0ea5e9);
   border-radius: 10px;
 }
 
 ::-webkit-scrollbar-thumb:hover {
-  background: linear-gradient(135deg, #7c3aed, #2563eb);
+  background: linear-gradient(135deg, #2563eb, #0369a1);
 }
