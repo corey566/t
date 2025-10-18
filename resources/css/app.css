@@ -1,6 +1,4 @@
-@tailwind base;
-@tailwind components;
-@tailwind utilities;
+@import "tailwindcss";
 
 @layer base {
   :root {
@@ -16,22 +14,26 @@
   }
   
   body {
-    @apply tw-antialiased;
+    font-family: system-ui, -apple-system, sans-serif;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
   }
 }
 
 @layer components {
   /* Aceternity-style Glass Card */
   .glass-card {
-    @apply tw-backdrop-blur-md tw-bg-white/70 dark:tw-bg-gray-900/70;
-    @apply tw-border tw-border-white/20;
-    @apply tw-shadow-glass;
-    @apply tw-transition-all tw-duration-300;
+    backdrop-filter: blur(12px);
+    background: rgba(255, 255, 255, 0.7);
+    border: 1px solid rgba(255, 255, 255, 0.2);
+    box-shadow: 0 8px 32px 0 rgba(59, 130, 246, 0.15);
+    transition: all 0.3s ease;
   }
 
   .glass-card:hover {
-    @apply tw-shadow-ambient-lg tw-backdrop-blur-lg;
-    @apply tw-scale-[1.02] tw--translate-y-1;
+    box-shadow: 0 20px 60px -15px rgba(59, 130, 246, 0.5);
+    backdrop-filter: blur(16px);
+    transform: scale(1.02) translateY(-4px);
   }
 
   /* Ambient Gradient Background - Blue Theme */
@@ -49,11 +51,18 @@
 
   /* Modern Card with Hover Effect */
   .modern-card {
-    @apply tw-relative tw-overflow-hidden;
-    @apply tw-bg-white tw-rounded-2xl;
-    @apply tw-shadow-sm tw-border tw-border-gray-100;
-    @apply tw-transition-all tw-duration-300 tw-ease-out;
-    @apply hover:tw-shadow-xl hover:tw--translate-y-1;
+    position: relative;
+    overflow: hidden;
+    background: white;
+    border-radius: 1rem;
+    box-shadow: 0 1px 3px 0 rgb(0 0 0 / 0.1);
+    border: 1px solid rgb(243 244 246);
+    transition: all 0.3s ease-out;
+  }
+
+  .modern-card:hover {
+    box-shadow: 0 20px 25px -5px rgb(0 0 0 / 0.1);
+    transform: translateY(-4px);
   }
 
   .modern-card::before {
@@ -75,7 +84,8 @@
 
   /* Icon Container with Gradient */
   .icon-gradient {
-    @apply tw-relative tw-overflow-hidden;
+    position: relative;
+    overflow: hidden;
     background: linear-gradient(135deg, var(--tw-gradient-from), var(--tw-gradient-to));
   }
 
@@ -97,21 +107,25 @@
 
   /* Ambient Button - Blue Theme */
   .btn-ambient {
-    @apply tw-relative tw-px-6 tw-py-3 tw-rounded-xl;
-    @apply tw-font-semibold tw-text-white;
-    @apply tw-transition-all tw-duration-300;
+    position: relative;
+    padding: 0.75rem 1.5rem;
+    border-radius: 0.75rem;
+    font-weight: 600;
+    color: white;
+    transition: all 0.3s ease;
     background: linear-gradient(135deg, #3b82f6, #0ea5e9);
     background-size: 200% 200%;
   }
 
   .btn-ambient:hover {
     background-position: right center;
-    @apply tw-shadow-ambient-lg tw-scale-105;
+    box-shadow: 0 20px 60px -15px rgba(59, 130, 246, 0.5);
+    transform: scale(1.05);
   }
 
   /* Ambient Border Effect - Blue Theme */
   .ambient-border {
-    @apply tw-relative;
+    position: relative;
   }
 
   .ambient-border::before {
@@ -134,11 +148,11 @@
 
   /* Smooth Hover Scale */
   .hover-scale {
-    @apply tw-transition-transform tw-duration-300 tw-ease-out;
+    transition: transform 0.3s ease-out;
   }
 
   .hover-scale:hover {
-    @apply tw-scale-105;
+    transform: scale(1.05);
   }
 
   /* Loading Shimmer Effect */
@@ -155,8 +169,12 @@
 
   /* Stat Card Number Animation */
   .stat-number {
-    @apply tw-font-mono tw-font-bold;
-    @apply tw-bg-gradient-to-r tw-from-gray-900 tw-to-gray-700 tw-bg-clip-text tw-text-transparent;
+    font-family: ui-monospace, monospace;
+    font-weight: 700;
+    background: linear-gradient(to right, rgb(17 24 39), rgb(55 65 81));
+    background-clip: text;
+    -webkit-background-clip: text;
+    color: transparent;
   }
 
   /* Minimalist Divider - Blue Theme */
@@ -167,7 +185,7 @@
 
   /* Glassmorphism Sidebar */
   .sidebar-glass {
-    @apply tw-backdrop-blur-xl;
+    backdrop-filter: blur(24px);
     background: rgba(255, 255, 255, 0.8);
     border-right: 1px solid rgba(255, 255, 255, 0.2);
   }
@@ -212,13 +230,10 @@
 @layer utilities {
   /* Text Gradient - Blue Theme */
   .text-gradient-ambient {
-    @apply tw-bg-gradient-to-r tw-from-blue-600 tw-via-sky-500 tw-to-indigo-500;
-    @apply tw-bg-clip-text tw-text-transparent;
-  }
-
-  /* Responsive Grid Gap */
-  .gap-responsive {
-    @apply tw-gap-3 sm:tw-gap-4 md:tw-gap-5 lg:tw-gap-6;
+    background: linear-gradient(to right, rgb(37 99 235), rgb(14 165 233), rgb(99 102 241));
+    background-clip: text;
+    -webkit-background-clip: text;
+    color: transparent;
   }
 
   /* Hide Scrollbar */
@@ -233,7 +248,7 @@
 
   /* Smooth Transitions */
   .transition-smooth {
-    @apply tw-transition-all tw-duration-300 tw-ease-in-out;
+    transition: all 0.3s ease-in-out;
   }
 }
 
@@ -255,4 +270,22 @@
 
 ::-webkit-scrollbar-thumb:hover {
   background: linear-gradient(135deg, #2563eb, #0369a1);
+}
+
+/* Animations */
+@keyframes aurora {
+  0% { background-position: 0% 50%; }
+  50% { background-position: 100% 50%; }
+  100% { background-position: 0% 50%; }
+}
+
+@keyframes gradient-xy {
+  0%, 100% {
+    background-size: 400% 400%;
+    background-position: left center;
+  }
+  50% {
+    background-size: 400% 400%;
+    background-position: right center;
+  }
 }
