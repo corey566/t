@@ -71,11 +71,11 @@ class Business extends Model
     }
 
     /**
-     * Get the Business currency.
+     * Get the Business locations.
      */
     public function locations()
     {
-        return $this->hasMany(\App\BusinessLocation::class);
+        return $this->hasMany(\App\BusinessLocation::class, 'business_id');
     }
 
     /**

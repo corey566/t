@@ -63,19 +63,13 @@ class GallfaceController extends Controller
             // Get locations and stats for the view
             $locations = \App\BusinessLocation::where('business_id', $business_id)
                 ->where('is_active', true)
-                ->with(['credentials' => function($query) {
-                    $query->where('mall_code', 'gallface');
-                }])
                 ->get();
 
-            // Debug log to verify credentials are loaded
+            // Load credentials for each location
             foreach ($locations as $location) {
-                \Log::info('Location credentials check', [
-                    'location_id' => $location->id,
-                    'location_name' => $location->name,
-                    'credentials_count' => $location->credentials->count(),
-                    'credentials' => $location->credentials->toArray()
-                ]);
+                $location->load(['credentials' => function($query) {
+                    $query->where('mall_code', 'gallface');
+                }]);
             }
 
             // Get statistics
