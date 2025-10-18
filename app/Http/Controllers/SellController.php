@@ -100,8 +100,8 @@ class SellController extends Controller
             // only display sell invoice we add it because project invoive show in sell list
             if($sale_type == 'sell'){
                 $sells->where(function ($query) {
-                    $query->where('transactions.sub_type', '!=', 'project_invoice')
-                          ->orWhereNull('transactions.sub_type');
+                    $query->whereNull('transactions.sub_type')
+                          ->orWhere('transactions.sub_type', '!=', 'project_invoice');
                 });
             }         
 
