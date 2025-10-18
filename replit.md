@@ -51,9 +51,10 @@ Preferred communication style: Simple, everyday language.
 
 **Design System**
 - Custom Tailwind configuration with `tw-` prefix to avoid conflicts with existing styles
-- Ambient color palette: violet → blue → cyan → teal gradients
+- Blue ambient color palette: blue → sky → indigo gradients (October 2025 update)
 - Glass-morphism cards with backdrop blur effects
 - Smooth hover animations and transitions
+- Aceternity-inspired modern UI with minimalist design
 
 ### Data Storage
 
