@@ -146,7 +146,7 @@ class SellPosController extends Controller
         $is_types_service_enabled = $this->moduleUtil->isModuleEnabled('types_of_service');
 
         $shipping_statuses = $this->transactionUtil->shipping_statuses();
-        
+
         $is_woocommerce = $this->moduleUtil->isModuleInstalled('Woocommerce');
 
         return view('sale_pos.index')->with(compact('business_locations', 'customers', 'sales_representative', 'is_cmsn_agent_enabled', 'commission_agents', 'service_staffs', 'is_tables_enabled', 'is_service_staff_enabled', 'is_types_service_enabled', 'shipping_statuses', 'is_woocommerce'));
@@ -303,7 +303,7 @@ class SellPosController extends Controller
      * Display the POS screen.
      * @return \Illuminate\View\View
      */
-    
+
     public function posDisplay(){
         $business_id = request()->session()->get('user.business_id');
         $business_details = $this->businessUtil->getDetails($business_id);
@@ -382,6 +382,11 @@ class SellPosController extends Controller
                 }
 
                 $user_id = $request->session()->get('user.id');
+
+                // Ensure location_id is set and valid
+                if (empty($input['location_id'])) {
+                    return ['success' => 0, 'msg' => __('lang_v1.please_select_location')];
+                }
 
                 $discount = ['discount_type' => $input['discount_type'],
                     'discount_amount' => $input['discount_amount'],
@@ -613,7 +618,7 @@ class SellPosController extends Controller
 
                 $this->transactionUtil->activityLog($transaction, 'added');
 
-                
+
 
                 DB::commit();
 
@@ -1904,7 +1909,7 @@ class SellPosController extends Controller
 
         // Retrieve the limit for displaying recent transactions from the configuration
         $limit = config('constants.pos_recent_transactions_display_limit', 10);
-        
+
         $transactions = $query->orderBy('transactions.created_at', 'desc')
             ->groupBy('transactions.id')
             ->select('transactions.*')
@@ -2795,7 +2800,7 @@ class SellPosController extends Controller
             $invoice_no = $this->transactionUtil->getInvoiceNumber($business_id, 'final', $transaction->location_id);
 
             $transaction->invoice_no = $invoice_no;
-            $transaction->transaction_date = \Carbon::now();
+            $transaction->transaction_date = \Carbon::now()->format('Y-m-d H:i:s');
             $transaction->status = 'final';
             $transaction->sub_status = null;
             $transaction->is_quotation = 0;
