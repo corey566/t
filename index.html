@@ -1,0 +1,505 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Albayan Travel and Tours - Discover Your Journey</title>
+    <link rel="stylesheet" href="style.css">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Playfair+Display:wght@400;600;700&display=swap" rel="stylesheet">
+</head>
+<body>
+    <div class="ambient-bg"></div>
+    
+    <nav class="navbar" id="navbar">
+        <div class="container nav-container">
+            <div class="logo">
+                <h1>Albayan <span class="accent">Travel</span></h1>
+            </div>
+            <div class="nav-links" id="navLinks">
+                <a href="#home" class="nav-link active">Home</a>
+                <a href="#destinations" class="nav-link">Destinations</a>
+                <a href="#services" class="nav-link">Services</a>
+                <a href="#about" class="nav-link">About</a>
+                <a href="#contact" class="nav-link">Contact</a>
+            </div>
+            <button class="menu-toggle" id="menuToggle">
+                <span></span>
+                <span></span>
+                <span></span>
+            </button>
+        </div>
+    </nav>
+
+    <section class="hero" id="home">
+        <div class="hero-content">
+            <div class="container">
+                <div class="hero-text">
+                    <span class="hero-badge">Explore the World</span>
+                    <h1 class="hero-title">
+                        Your Journey to
+                        <span class="gradient-text">Extraordinary</span>
+                        Begins Here
+                    </h1>
+                    <p class="hero-description">
+                        Experience curated travel packages, seamless planning, and unforgettable memories with Albayan Travel and Tours
+                    </p>
+                    <div class="hero-buttons">
+                        <button class="btn btn-primary" onclick="scrollToSection('destinations')">
+                            <span>Explore Destinations</span>
+                            <div class="btn-glow"></div>
+                        </button>
+                        <button class="btn btn-secondary" onclick="scrollToSection('contact')">
+                            <span>Plan Your Trip</span>
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="hero-visual">
+            <div class="floating-card card-1"></div>
+            <div class="floating-card card-2"></div>
+            <div class="floating-card card-3"></div>
+        </div>
+    </section>
+
+    <section class="stats-section">
+        <div class="container">
+            <div class="stats-grid">
+                <div class="stat-card">
+                    <div class="stat-icon">🌍</div>
+                    <div class="stat-number" data-target="150">0</div>
+                    <div class="stat-label">Destinations</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-icon">✈️</div>
+                    <div class="stat-number" data-target="5000">0</div>
+                    <div class="stat-label">Happy Travelers</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-icon">⭐</div>
+                    <div class="stat-number" data-target="98">0</div>
+                    <div class="stat-label">Satisfaction Rate</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-icon">🎯</div>
+                    <div class="stat-number" data-target="15">0</div>
+                    <div class="stat-label">Years Experience</div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <section class="destinations" id="destinations">
+        <div class="container">
+            <div class="section-header">
+                <span class="section-badge">Popular Choices</span>
+                <h2 class="section-title">Featured Destinations</h2>
+                <p class="section-description">Handpicked destinations that offer unforgettable experiences</p>
+            </div>
+            
+            <div class="destinations-grid">
+                <div class="destination-card">
+                    <div class="destination-image">
+                        <div class="destination-overlay"></div>
+                        <div class="destination-badge">TRENDING</div>
+                    </div>
+                    <div class="destination-content">
+                        <h3>Maldives Paradise</h3>
+                        <p>Crystal clear waters, luxury resorts, and pristine beaches await you</p>
+                        <div class="destination-details">
+                            <span class="detail-item">
+                                <span class="icon">📅</span> 5-7 Days
+                            </span>
+                            <span class="detail-item">
+                                <span class="icon">💰</span> From $1,299
+                            </span>
+                        </div>
+                        <button class="btn-link">
+                            View Package
+                            <span class="arrow">→</span>
+                        </button>
+                    </div>
+                </div>
+
+                <div class="destination-card">
+                    <div class="destination-image">
+                        <div class="destination-overlay"></div>
+                        <div class="destination-badge">POPULAR</div>
+                    </div>
+                    <div class="destination-content">
+                        <h3>Dubai Luxury</h3>
+                        <p>Modern marvels, desert adventures, and world-class shopping</p>
+                        <div class="destination-details">
+                            <span class="detail-item">
+                                <span class="icon">📅</span> 4-6 Days
+                            </span>
+                            <span class="detail-item">
+                                <span class="icon">💰</span> From $899
+                            </span>
+                        </div>
+                        <button class="btn-link">
+                            View Package
+                            <span class="arrow">→</span>
+                        </button>
+                    </div>
+                </div>
+
+                <div class="destination-card">
+                    <div class="destination-image">
+                        <div class="destination-overlay"></div>
+                        <div class="destination-badge">NEW</div>
+                    </div>
+                    <div class="destination-content">
+                        <h3>European Heritage</h3>
+                        <p>Explore historic cities, cultural landmarks, and scenic landscapes</p>
+                        <div class="destination-details">
+                            <span class="detail-item">
+                                <span class="icon">📅</span> 10-14 Days
+                            </span>
+                            <span class="detail-item">
+                                <span class="icon">💰</span> From $2,499
+                            </span>
+                        </div>
+                        <button class="btn-link">
+                            View Package
+                            <span class="arrow">→</span>
+                        </button>
+                    </div>
+                </div>
+
+                <div class="destination-card">
+                    <div class="destination-image">
+                        <div class="destination-overlay"></div>
+                    </div>
+                    <div class="destination-content">
+                        <h3>Asian Discovery</h3>
+                        <p>Ancient temples, vibrant cultures, and exotic cuisines</p>
+                        <div class="destination-details">
+                            <span class="detail-item">
+                                <span class="icon">📅</span> 7-10 Days
+                            </span>
+                            <span class="detail-item">
+                                <span class="icon">💰</span> From $1,599
+                            </span>
+                        </div>
+                        <button class="btn-link">
+                            View Package
+                            <span class="arrow">→</span>
+                        </button>
+                    </div>
+                </div>
+
+                <div class="destination-card">
+                    <div class="destination-image">
+                        <div class="destination-overlay"></div>
+                    </div>
+                    <div class="destination-content">
+                        <h3>African Safari</h3>
+                        <p>Wildlife encounters, stunning landscapes, and adventure</p>
+                        <div class="destination-details">
+                            <span class="detail-item">
+                                <span class="icon">📅</span> 6-8 Days
+                            </span>
+                            <span class="detail-item">
+                                <span class="icon">💰</span> From $1,899
+                            </span>
+                        </div>
+                        <button class="btn-link">
+                            View Package
+                            <span class="arrow">→</span>
+                        </button>
+                    </div>
+                </div>
+
+                <div class="destination-card">
+                    <div class="destination-image">
+                        <div class="destination-overlay"></div>
+                    </div>
+                    <div class="destination-content">
+                        <h3>Island Hopping</h3>
+                        <p>Discover tropical paradises across multiple islands</p>
+                        <div class="destination-details">
+                            <span class="detail-item">
+                                <span class="icon">📅</span> 8-12 Days
+                            </span>
+                            <span class="detail-item">
+                                <span class="icon">💰</span> From $1,799
+                            </span>
+                        </div>
+                        <button class="btn-link">
+                            View Package
+                            <span class="arrow">→</span>
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <section class="services" id="services">
+        <div class="container">
+            <div class="section-header">
+                <span class="section-badge">What We Offer</span>
+                <h2 class="section-title">Our Services</h2>
+                <p class="section-description">Comprehensive travel solutions tailored to your needs</p>
+            </div>
+
+            <div class="services-grid">
+                <div class="service-card">
+                    <div class="service-icon">🎫</div>
+                    <h3>Tour Packages</h3>
+                    <p>Customized itineraries designed to match your preferences and budget</p>
+                    <ul class="service-features">
+                        <li>All-inclusive packages</li>
+                        <li>Flexible scheduling</li>
+                        <li>Expert guides</li>
+                    </ul>
+                </div>
+
+                <div class="service-card">
+                    <div class="service-icon">✈️</div>
+                    <h3>Flight Booking</h3>
+                    <p>Best deals on domestic and international flights from major airlines</p>
+                    <ul class="service-features">
+                        <li>Competitive prices</li>
+                        <li>24/7 support</li>
+                        <li>Easy modifications</li>
+                    </ul>
+                </div>
+
+                <div class="service-card">
+                    <div class="service-icon">🏨</div>
+                    <h3>Hotel Reservations</h3>
+                    <p>Handpicked accommodations from budget-friendly to luxury resorts</p>
+                    <ul class="service-features">
+                        <li>Verified properties</li>
+                        <li>Best rate guarantee</li>
+                        <li>Special amenities</li>
+                    </ul>
+                </div>
+
+                <div class="service-card">
+                    <div class="service-icon">📋</div>
+                    <h3>Visa Assistance</h3>
+                    <p>Complete guidance and support for visa applications and processing</p>
+                    <ul class="service-features">
+                        <li>Document preparation</li>
+                        <li>Application tracking</li>
+                        <li>Quick processing</li>
+                    </ul>
+                </div>
+
+                <div class="service-card">
+                    <div class="service-icon">🚗</div>
+                    <h3>Transportation</h3>
+                    <p>Reliable ground transportation including car rentals and transfers</p>
+                    <ul class="service-features">
+                        <li>Airport transfers</li>
+                        <li>Private vehicles</li>
+                        <li>Professional drivers</li>
+                    </ul>
+                </div>
+
+                <div class="service-card">
+                    <div class="service-icon">🎯</div>
+                    <h3>Travel Insurance</h3>
+                    <p>Comprehensive coverage to protect your journey and give you peace of mind</p>
+                    <ul class="service-features">
+                        <li>Medical coverage</li>
+                        <li>Trip cancellation</li>
+                        <li>Emergency assistance</li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <section class="about" id="about">
+        <div class="container">
+            <div class="about-grid">
+                <div class="about-content">
+                    <span class="section-badge">About Us</span>
+                    <h2 class="section-title">Creating Memorable Journeys Since 2010</h2>
+                    <p class="about-text">
+                        Albayan Travel and Tours has been crafting exceptional travel experiences for over a decade. 
+                        We specialize in creating personalized journeys that transform ordinary trips into extraordinary adventures.
+                    </p>
+                    <p class="about-text">
+                        Our team of travel experts brings extensive knowledge and passion to every itinerary, ensuring 
+                        that each destination reveals its unique charm and beauty to our travelers.
+                    </p>
+                    
+                    <div class="about-features">
+                        <div class="about-feature">
+                            <div class="feature-icon">✓</div>
+                            <div class="feature-content">
+                                <h4>Expert Planning</h4>
+                                <p>Meticulously crafted itineraries by experienced travel specialists</p>
+                            </div>
+                        </div>
+                        <div class="about-feature">
+                            <div class="feature-icon">✓</div>
+                            <div class="feature-content">
+                                <h4>24/7 Support</h4>
+                                <p>Round-the-clock assistance throughout your journey</p>
+                            </div>
+                        </div>
+                        <div class="about-feature">
+                            <div class="feature-icon">✓</div>
+                            <div class="feature-content">
+                                <h4>Best Value</h4>
+                                <p>Premium experiences at competitive prices</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="about-visual">
+                    <div class="visual-card card-primary">
+                        <div class="card-glow"></div>
+                        <h3>Our Mission</h3>
+                        <p>To inspire and enable travelers to explore the world with confidence, comfort, and cultural appreciation</p>
+                    </div>
+                    <div class="visual-card card-secondary">
+                        <h3>Our Vision</h3>
+                        <p>To be the most trusted travel partner, known for creating transformative experiences</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <section class="contact" id="contact">
+        <div class="container">
+            <div class="section-header">
+                <span class="section-badge">Get in Touch</span>
+                <h2 class="section-title">Start Planning Your Journey</h2>
+                <p class="section-description">Our travel experts are ready to help you create your perfect trip</p>
+            </div>
+
+            <div class="contact-grid">
+                <div class="contact-info">
+                    <div class="info-card">
+                        <div class="info-icon">📞</div>
+                        <h3>Phone</h3>
+                        <p>+1 (555) 123-4567</p>
+                        <p>Mon-Sat: 9:00 AM - 6:00 PM</p>
+                    </div>
+                    
+                    <div class="info-card">
+                        <div class="info-icon">📧</div>
+                        <h3>Email</h3>
+                        <p>info@albayantravel.com</p>
+                        <p>We'll respond within 24 hours</p>
+                    </div>
+                    
+                    <div class="info-card">
+                        <div class="info-icon">📍</div>
+                        <h3>Office</h3>
+                        <p>123 Travel Street</p>
+                        <p>Downtown, City 12345</p>
+                    </div>
+
+                    <div class="info-card">
+                        <div class="info-icon">⏰</div>
+                        <h3>Business Hours</h3>
+                        <p>Monday - Friday: 9 AM - 6 PM</p>
+                        <p>Saturday: 10 AM - 4 PM</p>
+                    </div>
+                </div>
+
+                <div class="contact-form-wrapper">
+                    <form class="contact-form" id="contactForm">
+                        <div class="form-group">
+                            <label for="name">Full Name</label>
+                            <input type="text" id="name" name="name" required>
+                        </div>
+                        
+                        <div class="form-group">
+                            <label for="email">Email Address</label>
+                            <input type="email" id="email" name="email" required>
+                        </div>
+                        
+                        <div class="form-group">
+                            <label for="phone">Phone Number</label>
+                            <input type="tel" id="phone" name="phone" required>
+                        </div>
+                        
+                        <div class="form-group">
+                            <label for="destination">Preferred Destination</label>
+                            <select id="destination" name="destination">
+                                <option value="">Select a destination</option>
+                                <option value="maldives">Maldives Paradise</option>
+                                <option value="dubai">Dubai Luxury</option>
+                                <option value="europe">European Heritage</option>
+                                <option value="asia">Asian Discovery</option>
+                                <option value="africa">African Safari</option>
+                                <option value="islands">Island Hopping</option>
+                                <option value="other">Other</option>
+                            </select>
+                        </div>
+                        
+                        <div class="form-group">
+                            <label for="message">Your Message</label>
+                            <textarea id="message" name="message" rows="4" required></textarea>
+                        </div>
+                        
+                        <button type="submit" class="btn btn-primary btn-submit">
+                            <span>Send Message</span>
+                            <div class="btn-glow"></div>
+                        </button>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <footer class="footer">
+        <div class="container">
+            <div class="footer-content">
+                <div class="footer-section">
+                    <h3>Albayan Travel</h3>
+                    <p>Your trusted partner in creating unforgettable travel experiences around the world.</p>
+                </div>
+                
+                <div class="footer-section">
+                    <h4>Quick Links</h4>
+                    <ul>
+                        <li><a href="#home">Home</a></li>
+                        <li><a href="#destinations">Destinations</a></li>
+                        <li><a href="#services">Services</a></li>
+                        <li><a href="#about">About Us</a></li>
+                    </ul>
+                </div>
+                
+                <div class="footer-section">
+                    <h4>Services</h4>
+                    <ul>
+                        <li><a href="#services">Tour Packages</a></li>
+                        <li><a href="#services">Flight Booking</a></li>
+                        <li><a href="#services">Hotel Reservations</a></li>
+                        <li><a href="#services">Visa Assistance</a></li>
+                    </ul>
+                </div>
+                
+                <div class="footer-section">
+                    <h4>Contact</h4>
+                    <ul>
+                        <li>📞 +1 (555) 123-4567</li>
+                        <li>📧 info@albayantravel.com</li>
+                        <li>📍 123 Travel Street, City</li>
+                    </ul>
+                </div>
+            </div>
+            
+            <div class="footer-bottom">
+                <p>&copy; 2025 Albayan Travel and Tours. All rights reserved.</p>
+            </div>
+        </div>
+    </footer>
+
+    <script src="script.js"></script>
+</body>
+</html>
