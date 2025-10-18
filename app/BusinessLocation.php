@@ -172,7 +172,8 @@ class BusinessLocation extends Model
      */
     public function credentials()
     {
-        return $this->hasMany(\Modules\Gallface\Models\LocationApiCredential::class, 'business_location_id');
+        return $this->hasMany(\Modules\Gallface\Models\LocationApiCredential::class, 'business_location_id')
+                    ->where('is_active', true);
     }
 
     /**

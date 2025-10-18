@@ -385,7 +385,22 @@ class SellPosController extends Controller
 
                 // Ensure location_id is set and valid
                 if (empty($input['location_id'])) {
+                    \Log::error('POS Sale Error: No location_id provided', ['input' => $input]);
                     return ['success' => 0, 'msg' => __('lang_v1.please_select_location')];
+                }
+                
+                // Verify location exists and belongs to business
+                $location_exists = \App\BusinessLocation::where('id', $input['location_id'])
+                    ->where('business_id', $business_id)
+                    ->where('is_active', 1)
+                    ->exists();
+                    
+                if (!$location_exists) {
+                    \Log::error('POS Sale Error: Invalid location_id', [
+                        'location_id' => $input['location_id'],
+                        'business_id' => $business_id
+                    ]);
+                    return ['success' => 0, 'msg' => 'Invalid location selected. Please refresh the page and try again.'];
                 }
 
                 $discount = ['discount_type' => $input['discount_type'],
