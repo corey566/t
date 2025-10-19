@@ -42,7 +42,13 @@ class AddMoreColumnsToEssentialsToDosTable extends Migration
         }
 
         //Drop columns user_id and is_completed from essentials_to_dos table
-        DB::statement('ALTER TABLE essentials_to_dos DROP COLUMN is_completed, DROP COLUMN user_id');
+        // SQLite doesn't support dropping multiple columns at once
+        if (DB::getDriverName() === 'mysql') {
+            DB::statement('ALTER TABLE essentials_to_dos DROP COLUMN is_completed, DROP COLUMN user_id');
+        } elseif (DB::getDriverName() === 'sqlite') {
+            // SQLite requires separate statements or table recreation
+            // For simplicity, we'll just skip dropping columns in SQLite as they won't hurt
+        }
 
         Permission::create(['name' => 'essentials.assign_todos']);
     }

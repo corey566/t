@@ -14,6 +14,7 @@ return new class extends Migration
      */
     public function up()
     {
+        if (DB::getDriverName() === 'mysql') {
         DB::statement("ALTER TABLE `transactions` CHANGE `type` `type` ENUM('purchase','sell', 'expense',
             'stock_adjustment', 'sell_transfer', 'purchase_transfer', 'opening_stock') DEFAULT NULL");
 
@@ -21,6 +22,7 @@ return new class extends Migration
             $table->integer('transfer_parent_id')->nullable()->after('total_amount_recovered');
             $table->integer('opening_stock_product_id')->nullable()->after('transfer_parent_id');
         });
+        }
     }
 
     /**

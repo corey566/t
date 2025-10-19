@@ -12,7 +12,9 @@ return new class extends Migration
      */
     public function up()
     {
+        if (DB::getDriverName() === 'mysql') {
         DB::statement("ALTER TABLE invoice_layouts MODIFY COLUMN design VARCHAR(190) DEFAULT 'classic'");
+        }
     }
 
     /**

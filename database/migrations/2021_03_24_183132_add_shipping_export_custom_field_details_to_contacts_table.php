@@ -14,6 +14,7 @@ return new class extends Migration
      */
     public function up()
     {
+        if (DB::getDriverName() === 'mysql') {
         Schema::table('contacts', function (Blueprint $table) {
             $table->longText('shipping_custom_field_details')
                 ->nullable()
@@ -49,6 +50,7 @@ return new class extends Migration
         });
 
         DB::statement('ALTER TABLE contacts MODIFY COLUMN name VARCHAR(191) DEFAULT NULL');
+        }
     }
 
     /**

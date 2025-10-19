@@ -12,7 +12,9 @@ return new class extends Migration
      */
     public function up()
     {
+        if (DB::getDriverName() === 'mysql') {
         DB::statement('ALTER TABLE products MODIFY COLUMN alert_quantity DECIMAL(22, 4) DEFAULT NULL');
+        }
     }
 
     /**

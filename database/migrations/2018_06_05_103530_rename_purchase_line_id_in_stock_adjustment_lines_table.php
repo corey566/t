@@ -12,7 +12,9 @@ return new class extends Migration
      */
     public function up()
     {
+        if (DB::getDriverName() === 'mysql') {
         DB::statement('ALTER TABLE stock_adjustment_lines CHANGE COLUMN purchase_line_id removed_purchase_line INT(11) DEFAULT NULL');
+        }
     }
 
     /**

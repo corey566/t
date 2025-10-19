@@ -14,8 +14,10 @@ return new class extends Migration
      */
     public function up()
     {
+        if (DB::getDriverName() === 'mysql') {
         DB::statement('ALTER TABLE business MODIFY COLUMN tax_number_1 VARCHAR(100)');
         DB::statement('ALTER TABLE business MODIFY COLUMN tax_label_1 VARCHAR(10)');
+        }
     }
 
     /**

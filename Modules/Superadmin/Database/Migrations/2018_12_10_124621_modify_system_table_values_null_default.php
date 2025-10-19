@@ -12,7 +12,9 @@ class ModifySystemTableValuesNullDefault extends Migration
      */
     public function up()
     {
+        if (DB::getDriverName() === 'mysql') {
         // DB::statement("ALTER TABLE system MODIFY COLUMN value VARCHAR(191) DEFAULT NULL");
+        }
     }
 
     /**

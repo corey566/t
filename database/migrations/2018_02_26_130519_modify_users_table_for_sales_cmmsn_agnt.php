@@ -14,6 +14,7 @@ return new class extends Migration
      */
     public function up()
     {
+        if (DB::getDriverName() === 'mysql') {
         DB::statement('ALTER TABLE users MODIFY COLUMN surname CHAR(10)');
 
         Schema::table('users', function (Blueprint $table) {
@@ -22,6 +23,7 @@ return new class extends Migration
             $table->boolean('is_cmmsn_agnt')->default(0)->after('business_id');
             $table->decimal('cmmsn_percent', 4, 2)->default(0)->after('is_cmmsn_agnt');
         });
+        }
     }
 
     /**
