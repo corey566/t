@@ -11,9 +11,7 @@ return new class extends Migration
      */
     public function up()
     {
-        if (DB::getDriverName() === 'mysql') {
         DB::statement('ALTER TABLE transactions MODIFY COLUMN exchange_rate DECIMAL(20,3) NOT NULL DEFAULT 0');
-        }
     }
 
     /**

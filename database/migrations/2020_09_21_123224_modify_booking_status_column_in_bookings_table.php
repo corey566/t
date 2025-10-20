@@ -14,12 +14,10 @@ return new class extends Migration
      */
     public function up()
     {
-        if (DB::getDriverName() === 'mysql') {
         DB::statement('ALTER TABLE bookings MODIFY COLUMN `booking_status` VARCHAR(191) NOT NULL;');
         Schema::table('bookings', function (Blueprint $table) {
             $table->index('booking_status');
         });
-        }
     }
 
     /**

@@ -12,9 +12,7 @@ return new class extends Migration
      */
     public function up()
     {
-        if (DB::getDriverName() === 'mysql') {
         // DB::statement("ALTER TABLE system MODIFY COLUMN value TEXT DEFAULT NULL");
-        }
     }
 
     /**

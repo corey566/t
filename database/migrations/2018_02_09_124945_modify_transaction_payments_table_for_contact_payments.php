@@ -13,14 +13,12 @@ return new class extends Migration
      */
     public function up()
     {
-        if (DB::getDriverName() === 'mysql') {
         DB::statement('ALTER TABLE transaction_payments MODIFY COLUMN transaction_id INT(11) UNSIGNED DEFAULT NULL');
 
         Schema::table('transaction_payments', function (Blueprint $table) {
             $table->integer('payment_for')->after('created_by')->nullable()->comment('stores the contact id');
             $table->integer('parent_id')->after('payment_for')->nullable();
         });
-        }
     }
 
     /**

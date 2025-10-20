@@ -12,7 +12,6 @@ return new class extends Migration
      */
     public function up()
     {
-        if (DB::getDriverName() === 'mysql') {
         //Get all columns with type decimal(20, 2)
         $db_name = env('DB_DATABASE');
 
@@ -33,7 +32,6 @@ return new class extends Migration
 
                 DB::statement("ALTER TABLE $table_name MODIFY COLUMN $col_name DECIMAL(22, 4) DEFAULT $default");
             }
-        }
         }
     }
 

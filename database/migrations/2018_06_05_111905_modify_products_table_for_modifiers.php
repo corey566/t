@@ -12,10 +12,8 @@ return new class extends Migration
      */
     public function up()
     {
-        if (DB::getDriverName() === 'mysql') {
         DB::statement("ALTER TABLE products MODIFY COLUMN type ENUM('single','variable', 'modifier')");
         DB::statement('ALTER TABLE products MODIFY COLUMN unit_id INT(11) UNSIGNED DEFAULT NULL');
-        }
     }
 
     /**

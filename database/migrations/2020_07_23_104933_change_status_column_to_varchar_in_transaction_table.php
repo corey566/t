@@ -13,7 +13,6 @@ return new class extends Migration
      */
     public function up()
     {
-        if (DB::getDriverName() === 'mysql') {
         DB::statement('ALTER TABLE transactions MODIFY COLUMN `status` VARCHAR(191) NOT NULL;');
 
         Transaction::where('type', 'sell_transfer')
@@ -21,7 +20,6 @@ return new class extends Migration
 
         Transaction::where('type', 'purchase_transfer')
                 ->update(['status' => 'received']);
-        }
     }
 
     /**

@@ -14,7 +14,6 @@ return new class extends Migration
      */
     public function up()
     {
-        if (DB::getDriverName() === 'mysql') {
         Schema::table('variations', function (Blueprint $table) {
             $table->text('combo_variations')->nullable()->comment('Contains the combo variation details');
         });
@@ -32,7 +31,6 @@ return new class extends Migration
         });
 
         DB::statement("UPDATE transaction_sell_lines SET children_type='modifier' WHERE parent_sell_line_id IS NOT NULL");
-        }
     }
 
     /**

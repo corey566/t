@@ -14,14 +14,12 @@ return new class extends Migration
      */
     public function up()
     {
-        if (DB::getDriverName() === 'mysql') {
         Schema::table('users', function (Blueprint $table) {
             $table->boolean('allow_login')->default(1)->after('business_id');
         });
 
         DB::statement('ALTER TABLE users CHANGE username username VARCHAR(191) NULL;');
         DB::statement('ALTER TABLE users CHANGE password password VARCHAR(191) NULL;');
-        }
     }
 
     /**

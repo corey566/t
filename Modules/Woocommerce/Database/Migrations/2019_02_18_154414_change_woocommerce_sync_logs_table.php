@@ -12,9 +12,7 @@ class ChangeWoocommerceSyncLogsTable extends Migration
      */
     public function up()
     {
-        if (DB::getDriverName() === 'mysql') {
         DB::statement('ALTER TABLE woocommerce_sync_logs MODIFY operation_type VARCHAR(191) DEFAULT NULL');
-        }
     }
 
     /**

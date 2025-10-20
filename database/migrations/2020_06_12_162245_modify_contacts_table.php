@@ -14,7 +14,6 @@ return new class extends Migration
      */
     public function up()
     {
-        if (DB::getDriverName() === 'mysql') {
         Schema::table('contacts', function (Blueprint $table) {
             $table->string('prefix')->after('name')->nullable();
             $table->string('first_name')->after('prefix')->nullable();
@@ -28,7 +27,6 @@ return new class extends Migration
         DB::statement('ALTER TABLE contacts CHANGE landmark address_line_1 text;');
 
         DB::statement('UPDATE contacts SET first_name=name;');
-        }
     }
 
     /**

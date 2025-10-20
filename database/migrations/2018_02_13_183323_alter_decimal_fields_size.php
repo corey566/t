@@ -12,7 +12,6 @@ return new class extends Migration
      */
     public function up()
     {
-        if (DB::getDriverName() === 'mysql') {
         // DB::statement("ALTER TABLE business MODIFY COLUMN default_sales_discount DECIMAL(20,2)");
 
         // DB::statement("ALTER TABLE transactions MODIFY COLUMN total_before_tax DECIMAL(20,2) NOT NULL DEFAULT 0");
@@ -46,7 +45,6 @@ return new class extends Migration
         // DB::statement("ALTER TABLE transaction_payments MODIFY COLUMN amount DECIMAL(20,2) NOT NULL DEFAULT 0");
 
         // DB::statement("ALTER TABLE cash_register_transactions MODIFY COLUMN amount DECIMAL(20,2) NOT NULL DEFAULT 0");
-        }
     }
 
     /**
