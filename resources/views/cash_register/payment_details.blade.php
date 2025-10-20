@@ -193,11 +193,11 @@
           @if($register_details->total_cash_refund != 0)
             Cash: <span class="display_currency" data-currency_symbol="true">{{ $register_details->total_cash_refund }}</span><br>
           @endif
-          @if($register_details->total_cheque_refund != 0) 
+          @if($register_details->total_cheque_refund != 0)
             Cheque: <span class="display_currency" data-currency_symbol="true">{{ $register_details->total_cheque_refund }}</span><br>
           @endif
-          @if($register_details->total_card_refund != 0) 
-            Card: <span class="display_currency" data-currency_symbol="true">{{ $register_details->total_card_refund }}</span><br> 
+          @if($register_details->total_card_refund != 0)
+            Card: <span class="display_currency" data-currency_symbol="true">{{ $register_details->total_card_refund }}</span><br>
           @endif
           @if($register_details->total_bank_transfer_refund != 0)
             Bank Transfer: <span class="display_currency" data-currency_symbol="true">{{ $register_details->total_bank_transfer_refund }}</span><br>
@@ -252,11 +252,11 @@
     </table>
     <hr>
     <span>
-        @lang('sale.total') = 
-        @format_currency($register_details->cash_in_hand) (@lang('messages.opening')) + 
-        @format_currency($register_details->total_sale + $register_details->total_refund) (@lang('business.sale')) - 
-        @format_currency($register_details->total_refund) (@lang('lang_v1.refund')) - 
-        @format_currency($register_details->total_expense) (@lang('lang_v1.expense')) 
+        @lang('sale.total') =
+        @format_currency($register_details->cash_in_hand) (@lang('messages.opening')) +
+        @format_currency($register_details->total_sale + $register_details->total_refund) (@lang('business.sale')) -
+        @format_currency($register_details->total_refund) (@lang('lang_v1.refund')) -
+        @format_currency($register_details->total_expense) (@lang('lang_v1.expense'))
         = @format_currency($register_details->cash_in_hand + $register_details->total_sale - $register_details->total_expense)
     </span>
   </div>
