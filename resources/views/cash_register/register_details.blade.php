@@ -6,6 +6,14 @@
     </div>
 
     <div class="modal-body">
+      <div class="row mini_print">
+        <div class="col-xs-12">
+          <p><strong>@lang('report.user'):</strong> {{ $register_details->user_name}}</p>
+          <p><strong>@lang('business.email'):</strong> {{ $register_details->email}}</p>
+          <p><strong>@lang('business.business_location'):</strong> {{ $register_details->location_name}}</p>
+        </div>
+      </div>
+      <hr>
       @include('cash_register.payment_details')
       <hr>
       @if(!empty($register_details->denominations))
@@ -52,19 +60,14 @@
         </div>
       @endif
       
-      <div class="row">
-        <div class="col-xs-6">
-          <b>@lang('report.user'):</b> {{ $register_details->user_name}}<br>
-          <b>@lang('business.email'):</b> {{ $register_details->email}}<br>
-          <b>@lang('business.business_location'):</b> {{ $register_details->location_name}}<br>
-        </div>
-        @if(!empty($register_details->closing_note))
-          <div class="col-xs-6">
+      @if(!empty($register_details->closing_note))
+        <div class="row mini_print">
+          <div class="col-xs-12">
             <strong>@lang('cash_register.closing_note'):</strong><br>
             {{$register_details->closing_note}}
           </div>
-        @endif
-      </div>
+        </div>
+      @endif
     </div>
 
     <div class="modal-footer">
