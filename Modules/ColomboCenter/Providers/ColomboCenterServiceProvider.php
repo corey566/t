@@ -17,11 +17,56 @@ class ColomboCenterServiceProvider extends ServiceProvider
         $this->registerConfig();
         $this->registerViews();
         $this->loadMigrationsFrom(module_path('ColomboCenter', 'Database/Migrations'));
+        $this->registerCommands();
+        $this->scheduleAutoSync();
+        $this->registerEventListeners();
     }
 
     public function register(): void
     {
         $this->app->register(RouteServiceProvider::class);
+    }
+
+    protected function registerCommands()
+    {
+        // Register commands when they are created
+        // Example: $this->commands([
+        //     \Modules\ColomboCenter\Console\SyncCommand::class,
+        // ]);
+    }
+
+    protected function scheduleAutoSync(): void
+    {
+        $this->app->booted(function () {
+            $schedule = $this->app->make(Schedule::class);
+            
+            // Add scheduled tasks here when needed
+            // Example: $schedule->command('colombocenter:sync --auto')
+            //     ->everyMinute()
+            //     ->withoutOverlapping()
+            //     ->runInBackground();
+        });
+    }
+
+    protected function registerEventListeners(): void
+    {
+        $events = $this->app->make('events');
+        
+        // Listen for transaction/sale created events
+        $events->listen(
+            'eloquent.created: App\Transaction',
+            function ($transaction) {
+                // Handle transaction sync if needed
+            }
+        );
+        
+        // Listen for user login event
+        $events->listen(
+            'Illuminate\Auth\Events\Login',
+            function ($event) {
+                // Handle user login event if needed
+            }
+        );
     }
 
     protected function registerConfig()
