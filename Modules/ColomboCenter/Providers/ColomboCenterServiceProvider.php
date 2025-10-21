@@ -30,21 +30,13 @@ class ColomboCenterServiceProvider extends ServiceProvider
     protected function registerCommands()
     {
         // Register commands when they are created
-        // Example: $this->commands([
-        //     \Modules\ColomboCenter\Console\SyncCommand::class,
-        // ]);
     }
 
     protected function scheduleAutoSync(): void
     {
         $this->app->booted(function () {
             $schedule = $this->app->make(Schedule::class);
-            
             // Add scheduled tasks here when needed
-            // Example: $schedule->command('colombocenter:sync --auto')
-            //     ->everyMinute()
-            //     ->withoutOverlapping()
-            //     ->runInBackground();
         });
     }
 
@@ -52,7 +44,6 @@ class ColomboCenterServiceProvider extends ServiceProvider
     {
         $events = $this->app->make('events');
         
-        // Listen for transaction/sale created events
         $events->listen(
             'eloquent.created: App\Transaction',
             function ($transaction) {
@@ -60,7 +51,6 @@ class ColomboCenterServiceProvider extends ServiceProvider
             }
         );
         
-        // Listen for user login event
         $events->listen(
             'Illuminate\Auth\Events\Login',
             function ($event) {
