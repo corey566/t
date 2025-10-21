@@ -20,7 +20,12 @@ class TransactionSellLine extends Model
 
     public function product()
     {
-        return $this->belongsTo(\App\Product::class, 'product_id');
+        return $this->belongsTo(\App\Product::class);
+    }
+
+    public function service_staff()
+    {
+        return $this->belongsTo(\App\User::class, 'res_service_staff_id');
     }
 
     public function variations()
@@ -84,11 +89,6 @@ class TransactionSellLine extends Model
             'cooked',
             'served',
         ];
-    }
-
-    public function service_staff()
-    {
-        return $this->belongsTo(\App\User::class, 'res_service_staff_id');
     }
 
     /**

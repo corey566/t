@@ -490,61 +490,6 @@ class TransactionUtil extends Util
         return true;
     }
 
-    private function updateSalesOrderLine($so_line_id, $new_qty, $old_qty = 0)
-    {
-        $diff = $new_qty - $old_qty;
-        if (! empty($so_line_id) && ! empty($diff)) {
-            $so_line = TransactionSellLine::find($so_line_id);
-            $so_line->so_quantity_invoiced += ($diff);
-            $so_line->save();
-        }
-    }
-
-    /**
-     * Returns the line for combo product
-     *
-     * @param  array  $combo_items
-     * @param  object  $parent_sell_line
-     * @return array
-     */
-    private function __makeLinesForComboProduct($combo_items, $parent_sell_line)
-    {
-        $combo_lines = [];
-
-        //Calculate the percentage change in price.
-        $combo_total_price = 0;
-        foreach ($combo_items as $key => $value) {
-            $sell_price_inc_tax = Variation::findOrFail($value['variation_id'])->sell_price_inc_tax;
-
-            $combo_items[$key]['unit_price_inc_tax'] = $sell_price_inc_tax;
-            $combo_total_price += $value['quantity'] * $sell_price_inc_tax;
-        }
-        $change_percent = $this->get_percent($combo_total_price, $parent_sell_line->unit_price_inc_tax * $parent_sell_line->quantity);
-
-        foreach ($combo_items as $value) {
-            $price = $this->calc_percentage($value['unit_price_inc_tax'], $change_percent, $value['unit_price_inc_tax']);
-
-            $combo_lines[] = new TransactionSellLine([
-                'product_id' => $value['product_id'],
-                'variation_id' => $value['variation_id'],
-                'quantity' => $value['quantity'],
-                'unit_price_before_discount' => $price,
-                'unit_price' => $price,
-                'line_discount_type' => null,
-                'line_discount_amount' => 0,
-                'item_tax' => 0,
-                'tax_id' => null,
-                'unit_price_inc_tax' => $price,
-                'sub_unit_id' => null,
-                'discount_id' => null,
-                'parent_sell_line_id' => $parent_sell_line->id,
-                'children_type' => 'combo',
-            ]);
-        }
-
-        return $combo_lines;
-    }
-
     /**
      * Edit transaction sell line
      *
@@ -1292,7 +1237,11 @@ class TransactionUtil extends Util
                 $sell_line_relations[] = 'lot_details';
             }
 
-            $lines = $transaction->sell_lines()->whereNull('parent_sell_line_id')->with($sell_line_relations)->get();
+            $lines = $transaction->sell_lines()
+                        ->whereNull('parent_sell_line_id')
+                        ->with($sell_line_relations)
+                        ->with('service_staff') // Add eager loading for service_staff
+                        ->get();
 
             foreach ($lines as $key => $value) {
                 if (! empty($value->sub_unit_id)) {
@@ -2041,7 +1990,7 @@ class TransactionUtil extends Util
             $base_unit_price = $line->unit_price_inc_tax / $base_unit_multiplier;
 
             $show_product_description = $il->common_settings['show_product_description'] ?? null;
-            $line_array = [
+            $output_line = [
                 //Field for 1st column
                 'name' => $product->name,
                 'product_description' => ! empty($show_product_description) ? $product->product_description : null,
@@ -2098,7 +2047,7 @@ class TransactionUtil extends Util
                 $temp[] = $product->product_custom_field4;
             }
             if (! empty($temp)) {
-                $line_array['product_custom_fields'] = implode(',', $temp);
+                $output_line['product_custom_fields'] = implode(',', $temp);
             }
 
             //Group product taxes by name.
@@ -2106,7 +2055,7 @@ class TransactionUtil extends Util
                 if ($tax_details->is_tax_group) {
                     $group_tax_details = $this->groupTaxDetails($tax_details, $line->quantity * $line->item_tax);
 
-                    $line_array['group_tax_details'] = $group_tax_details;
+                    $output_line['group_tax_details'] = $group_tax_details;
 
                     foreach ($group_tax_details as $value) {
                         if (! isset($output_taxes['taxes'][$value['name']])) {
@@ -2123,59 +2072,59 @@ class TransactionUtil extends Util
                 }
             }
 
-            $line_array['line_discount'] = method_exists($line, 'get_discount_amount') ? $this->num_f($line->get_discount_amount(), false, $business_details) : 0;
-            $line_array['line_discount_uf'] = method_exists($line, 'get_discount_amount') ? $line->get_discount_amount() : 0;
+            $output_line['line_discount'] = method_exists($line, 'get_discount_amount') ? $this->num_f($line->get_discount_amount(), false, $business_details) : 0;
+            $output_line['line_discount_uf'] = method_exists($line, 'get_discount_amount') ? $line->get_discount_amount() : 0;
 
             if ($line->line_discount_type == 'percentage') {
-                $line_array['line_discount'] .= ' ('.$this->num_f($line->line_discount_amount, false, $business_details).'%)';
+                $output_line['line_discount'] .= ' ('.$this->num_f($line->line_discount_amount, false, $business_details).'%)';
 
-                $line_array['line_discount_percent'] = $this->num_f($line->line_discount_amount, false, $business_details);
+                $output_line['line_discount_percent'] = $this->num_f($line->line_discount_amount, false, $business_details);
             }
 
-            $line_array['total_line_discount'] = $this->num_f($line_array['line_discount_uf'] * $line_array['quantity_uf'], false, $business_details);
+            $output_line['total_line_discount'] = $this->num_f($output_line['line_discount_uf'] * $output_line['quantity_uf'], false, $business_details);
 
             if ($il->show_brand == 1) {
-                $line_array['brand'] = ! empty($brand->name) ? $brand->name : '';
+                $output_line['brand'] = ! empty($brand->name) ? $brand->name : '';
             }
             if ($il->show_sku == 1) {
-                $line_array['sub_sku'] = ! empty($variation->sub_sku) ? $variation->sub_sku : '';
+                $output_line['sub_sku'] = ! empty($variation->sub_sku) ? $variation->sub_sku : '';
             }
             if ($il->show_image == 1) {
                 $media = $variation->media;
                 if (count($media)) {
                     $first_img = $media->first();
-                    $line_array['image'] = ! empty($first_img->display_url) ? $first_img->display_url : asset('/img/default.png');
+                    $output_line['image'] = ! empty($first_img->display_url) ? $first_img->display_url : asset('/img/default.png');
                 } else {
-                    $line_array['image'] = $product->image_url;
+                    $output_line['image'] = $product->image_url;
                 }
             }
             if ($il->show_cat_code == 1) {
-                $line_array['cat_code'] = ! empty($cat->short_code) ? $cat->short_code : '';
+                $output_line['cat_code'] = ! empty($cat->short_code) ? $cat->short_code : '';
             }
             if ($il->show_sale_description == 1) {
-                $line_array['sell_line_note'] = ! empty($line->sell_line_note) ? nl2br($line->sell_line_note) : '';
+                $output_line['sell_line_note'] = ! empty($line->sell_line_note) ? nl2br($line->sell_line_note) : '';
             }
             if ($is_lot_number_enabled == 1 && $il->show_lot == 1) {
-                $line_array['lot_number'] = ! empty($line->lot_details->lot_number) ? $line->lot_details->lot_number : null;
-                $line_array['lot_number_label'] = __('lang_v1.lot');
+                $output_line['lot_number'] = ! empty($line->lot_details->lot_number) ? $line->lot_details->lot_number : null;
+                $output_line['lot_number_label'] = __('lang_v1.lot');
             }
 
             if ($is_product_expiry_enabled == 1 && $il->show_expiry == 1) {
-                $line_array['product_expiry'] = ! empty($line->lot_details->exp_date) ? $this->format_date($line->lot_details->exp_date, false, $business_details) : null;
-                $line_array['product_expiry_label'] = __('lang_v1.expiry');
+                $output_line['product_expiry'] = ! empty($line->lot_details->exp_date) ? $this->format_date($line->lot_details->exp_date, false, $business_details) : null;
+                $output_line['product_expiry_label'] = __('lang_v1.expiry');
             }
 
             //Set warranty data if enabled
             if ($is_warranty_enabled && ! empty($line->warranties->first())) {
                 $warranty = $line->warranties->first();
                 if (! empty($il->common_settings['show_warranty_name'])) {
-                    $line_array['warranty_name'] = $warranty->name;
+                    $output_line['warranty_name'] = $warranty->name;
                 }
                 if (! empty($il->common_settings['show_warranty_description'])) {
-                    $line_array['warranty_description'] = $warranty->description;
+                    $output_line['warranty_description'] = $warranty->description;
                 }
                 if (! empty($il->common_settings['show_warranty_exp_date'])) {
-                    $line_array['warranty_exp_date'] = $warranty->getEndDate($line->transaction->transaction_date);
+                    $output_line['warranty_exp_date'] = $warranty->getEndDate($line->transaction->transaction_date);
                 }
             }
 
@@ -2215,11 +2164,18 @@ class TransactionUtil extends Util
                         $modifier_line_array['sell_line_note'] = ! empty($line->sell_line_note) ? nl2br($line->sell_line_note) : '';
                     }
 
-                    $line_array['modifiers'][] = $modifier_line_array;
+                    $output_line['modifiers'][] = $modifier_line_array;
                 }
             }
 
-            $output_lines[] = $line_array;
+            // Add service staff information for the line
+            if (!empty($line->res_service_staff_id) && !empty($line->service_staff)) {
+                $output_line['service_staff_name'] = $line->service_staff->first_name . ' ' . $line->service_staff->last_name;
+            } else {
+                $output_line['service_staff_name'] = '';
+            }
+
+            $output_lines[] = $output_line;
         }
 
         return ['lines' => $output_lines];
@@ -2280,6 +2236,7 @@ class TransactionUtil extends Util
                 'unit_price' => $this->num_f($line->unit_price, false, $business_details),
                 'tax' => $this->num_f($line->item_tax, false, $business_details),
                 'tax_name' => ! empty($tax_details) ? $tax_details->name : null,
+                'tax_percent' => ! empty($tax_details) ? $tax_details->amount : null,
 
                 //Field for 3rd column
                 'unit_price_inc_tax' => $this->num_f($line->unit_price_inc_tax, false, $business_details),
@@ -3992,7 +3949,7 @@ class TransactionUtil extends Util
         }
 
         if (! empty($commission_agent)) {
-            $query->where('sale.commission_agent', $commission_agent);
+           $query->where('sale.commission_agent', $commission_agent);
         }
 
         $sell_details = $query->get();
