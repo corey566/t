@@ -29,9 +29,12 @@ class GallfaceServiceProvider extends ServiceProvider
         $this->registerConfig();
         $this->registerViews();
         $this->loadMigrationsFrom(module_path('Gallface', 'Database/Migrations'));
-        $this->registerCommands();
-        $this->scheduleAutoSync();
-        $this->registerEventListeners();
+
+        // Register event listener for auto-sync
+        $this->app['events']->listen(
+            \App\Events\SellCreatedOrModified::class,
+            \Modules\Gallface\Listeners\GallfaceSaleCreatedListener::class
+        );
     }
 
     /**
@@ -136,19 +139,19 @@ class GallfaceServiceProvider extends ServiceProvider
     {
         // Listen for transaction/sale created events
         $events = $this->app->make('events');
-        
+
         // Listen for sale created event
         $events->listen(
             'App\Events\TransactionCreated',
             'Modules\Gallface\Listeners\SaleCreatedListener@handle'
         );
-        
+
         // Also listen for eloquent created event on Transaction model
         $events->listen(
             'eloquent.created: App\Transaction',
             'Modules\Gallface\Listeners\SaleCreatedListener@handle'
         );
-        
+
         // Listen for user login event
         $events->listen(
             'Illuminate\Auth\Events\Login',
