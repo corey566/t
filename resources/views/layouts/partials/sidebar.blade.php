@@ -9,7 +9,7 @@
 
     <a href="{{route('home')}}"
         class="tw-flex tw-items-center tw-justify-center tw-w-full tw-border-r tw-h-15 tw-bg-@if(!empty(session('business.theme_color'))){{session('business.theme_color')}}@else{{'primary'}}@endif-800 tw-shrink-0 tw-border-primary-500/30 tw-px-3">
-        <img src="{{ asset('modules/gallface/images/one-gallface-logo.png') }}" alt="One Gallface Logo" style="height: 35px; max-width: 100%; object-fit: contain;">
+        <img src="{{ asset('modules/gallface/images/one-gallface-logo.svg') }}" alt="One Gallface Logo" style="height: 35px; max-width: 100%; object-fit: contain;">
     </a>
 
     <!-- Sidebar Menu -->
