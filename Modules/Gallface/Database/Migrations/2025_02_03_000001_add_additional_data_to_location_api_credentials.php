@@ -1,4 +1,3 @@
-
 <?php
 
 use Illuminate\Database\Migrations\Migration;
@@ -14,13 +13,18 @@ class AddAdditionalDataToLocationApiCredentials extends Migration
      */
     public function up()
     {
-        if (Schema::hasTable('location_api_credentials')) {
-            Schema::table('location_api_credentials', function (Blueprint $table) {
-                if (!Schema::hasColumn('location_api_credentials', 'additional_data')) {
-                    $table->text('additional_data')->nullable()->after('pos_id');
-                }
-            });
+        if (!Schema::hasTable('location_api_credentials')) {
+            return;
         }
+
+        Schema::table('location_api_credentials', function (Blueprint $table) {
+            if (Schema::hasColumn('location_api_credentials', 'property_code')) {
+                return;
+            }
+            if (!Schema::hasColumn('location_api_credentials', 'additional_data')) {
+                $table->text('additional_data')->nullable()->after('pos_id');
+            }
+        });
     }
 
     /**

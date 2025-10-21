@@ -1,4 +1,3 @@
-
 <?php
 
 use Illuminate\Database\Migrations\Migration;
@@ -12,7 +11,14 @@ return new class extends Migration
      */
     public function up(): void
     {
+        if (!Schema::hasTable('location_api_credentials')) {
+            return;
+        }
+
         Schema::table('location_api_credentials', function (Blueprint $table) {
+            if (Schema::hasColumn('location_api_credentials', 'auto_sync_enabled')) {
+                return;
+            }
             $table->boolean('auto_sync_enabled')->default(false)->after('is_active');
         });
     }
@@ -22,7 +28,13 @@ return new class extends Migration
      */
     public function down(): void
     {
+        if (!Schema::hasTable('location_api_credentials')) {
+            return;
+        }
         Schema::table('location_api_credentials', function (Blueprint $table) {
+            if (!Schema::hasColumn('location_api_credentials', 'auto_sync_enabled')) {
+                return;
+            }
             $table->dropColumn('auto_sync_enabled');
         });
     }
