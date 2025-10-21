@@ -256,6 +256,144 @@
                     <div class="text-left">{{$receipt_details->customer_label}}</div>
                 </div>
             @endif
+
+            @if(!empty($receipt_details->commission_agent_label))
+                <div class="detail-row">
+                    <div>{{$receipt_details->commission_agent_label}}</div>
+                    <div>{{$receipt_details->commission_agent}}</div>
+                </div>
+            @endif
+
+            @if(!empty($receipt_details->brand_label) || !empty($receipt_details->repair_brand))
+                <div class="detail-row">
+                    <div>{{$receipt_details->brand_label}}</div>
+                    <div>{{$receipt_details->repair_brand}}</div>
+                </div>
+            @endif
+
+            @if(!empty($receipt_details->device_label) || !empty($receipt_details->repair_device))
+                <div class="detail-row">
+                    <div>{{$receipt_details->device_label}}</div>
+                    <div>{{$receipt_details->repair_device}}</div>
+                </div>
+            @endif
+
+            @if(!empty($receipt_details->model_no_label) || !empty($receipt_details->repair_model_no))
+                <div class="detail-row">
+                    <div>{{$receipt_details->model_no_label}}</div>
+                    <div>{{$receipt_details->repair_model_no}}</div>
+                </div>
+            @endif
+
+            @if(!empty($receipt_details->serial_no_label) || !empty($receipt_details->repair_serial_no))
+                <div class="detail-row">
+                    <div>{{$receipt_details->serial_no_label}}</div>
+                    <div>{{$receipt_details->repair_serial_no}}</div>
+                </div>
+            @endif
+
+            @if(!empty($receipt_details->repair_status_label) || !empty($receipt_details->repair_status))
+                <div class="detail-row">
+                    <div>{!! $receipt_details->repair_status_label !!}</div>
+                    <div>{{$receipt_details->repair_status}}</div>
+                </div>
+            @endif
+
+            @if(!empty($receipt_details->repair_warranty_label) || !empty($receipt_details->repair_warranty))
+                <div class="detail-row">
+                    <div>{!! $receipt_details->repair_warranty_label !!}</div>
+                    <div>{{$receipt_details->repair_warranty}}</div>
+                </div>
+            @endif
+
+            @if(!empty($receipt_details->service_staff_label) || !empty($receipt_details->service_staff))
+                <div class="detail-row">
+                    <div>{!! $receipt_details->service_staff_label !!}</div>
+                    <div>{{$receipt_details->service_staff}}</div>
+                </div>
+            @endif
+
+            @if(!empty($receipt_details->table_label) || !empty($receipt_details->table))
+                <div class="detail-row">
+                    <div>{!! $receipt_details->table_label !!}</div>
+                    <div>{{$receipt_details->table}}</div>
+                </div>
+            @endif
+
+            @if (!empty($receipt_details->sell_custom_field_1_value))
+                <div class="detail-row">
+                    <div>{!! $receipt_details->sell_custom_field_1_label !!}</div>
+                    <div>{{$receipt_details->sell_custom_field_1_value}}</div>
+                </div>
+            @endif
+            @if (!empty($receipt_details->sell_custom_field_2_value))
+                <div class="detail-row">
+                    <div>{!! $receipt_details->sell_custom_field_2_label !!}</div>
+                    <div>{{$receipt_details->sell_custom_field_2_value}}</div>
+                </div>
+            @endif
+            @if (!empty($receipt_details->sell_custom_field_3_value))
+                <div class="detail-row">
+                    <div>{!! $receipt_details->sell_custom_field_3_label !!}</div>
+                    <div>{{$receipt_details->sell_custom_field_3_value}}</div>
+                </div>
+            @endif
+            @if (!empty($receipt_details->sell_custom_field_4_value))
+                <div class="detail-row">
+                    <div>{!! $receipt_details->sell_custom_field_4_label !!}</div>
+                    <div>{{$receipt_details->sell_custom_field_4_value}}</div>
+                </div>
+            @endif
+
+            @if(!empty($receipt_details->customer_rp_label))
+                <div class="detail-row">
+                    <div>{{ $receipt_details->customer_rp_label }}</div>
+                    <div>{{ $receipt_details->customer_total_rp }}</div>
+                </div>
+            @endif
+
+            @if(!empty($receipt_details->shipping_custom_field_1_label))
+                <div class="detail-row">
+                    <div>{!!$receipt_details->shipping_custom_field_1_label!!}</div>
+                    <div>{!!$receipt_details->shipping_custom_field_1_value ?? ''!!}</div>
+                </div>
+            @endif
+            @if(!empty($receipt_details->shipping_custom_field_2_label))
+                <div class="detail-row">
+                    <div>{!!$receipt_details->shipping_custom_field_2_label!!}</div>
+                    <div>{!!$receipt_details->shipping_custom_field_2_value ?? ''!!}</div>
+                </div>
+            @endif
+            @if(!empty($receipt_details->shipping_custom_field_3_label))
+                <div class="detail-row">
+                    <div>{!!$receipt_details->shipping_custom_field_3_label!!}</div>
+                    <div>{!!$receipt_details->shipping_custom_field_3_value ?? ''!!}</div>
+                </div>
+            @endif
+            @if(!empty($receipt_details->shipping_custom_field_4_label))
+                <div class="detail-row">
+                    <div>{!!$receipt_details->shipping_custom_field_4_label!!}</div>
+                    <div>{!!$receipt_details->shipping_custom_field_4_value ?? ''!!}</div>
+                </div>
+            @endif
+            @if(!empty($receipt_details->shipping_custom_field_5_label))
+                <div class="detail-row">
+                    <div>{!!$receipt_details->shipping_custom_field_5_label!!}</div>
+                    <div>{!!$receipt_details->shipping_custom_field_5_value ?? ''!!}</div>
+                </div>
+            @endif
+            @if(!empty($receipt_details->sale_orders_invoice_no))
+                <div class="detail-row">
+                    <div>@lang('restaurant.order_no')</div>
+                    <div>{!!$receipt_details->sale_orders_invoice_no ?? ''!!}</div>
+                </div>
+            @endif
+            @if(!empty($receipt_details->sale_orders_invoice_date))
+                <div class="detail-row">
+                    <div>@lang('lang_v1.order_dates')</div>
+                    <div>{!!$receipt_details->sale_orders_invoice_date ?? ''!!}</div>
+                </div>
+            @endif
         </div>
 
         <div class="divider"></div>
