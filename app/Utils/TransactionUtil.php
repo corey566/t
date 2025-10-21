@@ -1728,7 +1728,7 @@ class TransactionUtil extends Util
             //Waiter label & info
             $output['service_staff_label'] = null;
             $output['service_staff'] = null;
-            ifisset($il->module_info['service_staff']['show_service_staff'])) {
+            if (isset($il->module_info['service_staff']['show_service_staff'])) {
                 $output['service_staff_label'] = ! empty($il->module_info['service_staff']['service_staff_label']) ? $il->module_info['service_staff']['service_staff_label'] : '';
                 if (! empty($transaction->res_waiter_id)) {
                     $waiter = \App\User::find($transaction->res_waiter_id);
