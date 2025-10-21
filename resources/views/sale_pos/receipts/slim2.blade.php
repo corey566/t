@@ -273,15 +273,28 @@
 				</div>
 			@endif
 
-			@if(!empty($receipt_details->customer_rp_label))
-				<div class="textbox-info">
-					<p class="f-left"><strong>
-						{{ $receipt_details->customer_rp_label }}
-					</strong></p>
-					<p class="f-right">
-						{{ $receipt_details->customer_total_rp }}
-					</p>
+			@if(!empty($receipt_details->reward_point_label))
+				<div class="border-top textbox-info" style="margin-top: 10px; padding-top: 10px;">
+					<p class="centered"><strong>Points Status</strong></p>
 				</div>
+				<table class="width-100" style="text-align: center; border-collapse: collapse;">
+					<thead>
+						<tr style="border-bottom: 1px dashed #000;">
+							<th style="padding: 5px;">Before</th>
+							<th style="padding: 5px;">Used</th>
+							<th style="padding: 5px;">Earned</th>
+							<th style="padding: 5px;">Balance</th>
+						</tr>
+					</thead>
+					<tbody>
+						<tr>
+							<td style="padding: 5px;">{{ $receipt_details->rp_before ?? 0 }}</td>
+							<td style="padding: 5px;">{{ $receipt_details->rp_used ?? 0 }}</td>
+							<td style="padding: 5px;">{{ $receipt_details->rp_earned ?? 0 }}</td>
+							<td style="padding: 5px;">{{ $receipt_details->rp_available ?? 0 }}</td>
+						</tr>
+					</tbody>
+				</table>
 			@endif
 			@if(!empty($receipt_details->shipping_custom_field_1_label))
 				<div class="textbox-info">
