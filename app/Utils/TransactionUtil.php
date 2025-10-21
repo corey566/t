@@ -150,6 +150,46 @@ class TransactionUtil extends Util
     }
 
     /**
+     * Get reward redeem details for a customer
+     *
+     * @param  int  $business_id
+     * @param  int  $contact_id
+     * @return array
+     */
+    public function getRewardRedeemDetails($business_id, $contact_id)
+    {
+        $reward_details = [
+            'points' => 0,
+            'amount' => 0
+        ];
+
+        if (empty($contact_id)) {
+            return $reward_details;
+        }
+
+        $business = Business::find($business_id);
+        
+        if (empty($business) || $business->enable_rp != 1) {
+            return $reward_details;
+        }
+
+        $contact = Contact::find($contact_id);
+        
+        if (empty($contact)) {
+            return $reward_details;
+        }
+
+        $reward_details['points'] = $contact->total_rp ?? 0;
+        
+        // Calculate redemption amount based on business settings
+        if (!empty($business->rp_redeem_point) && $business->rp_redeem_point > 0) {
+            $reward_details['amount'] = ($reward_details['points'] / $business->rp_redeem_point) * $business->rp_redeem_amount;
+        }
+
+        return $reward_details;
+    }
+
+    /**
      * Add Sell transaction
      *
      * @param  int  $business_id
