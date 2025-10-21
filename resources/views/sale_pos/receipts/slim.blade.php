@@ -359,6 +359,33 @@
 					</p>
 				</div>
 			@endif
+
+			@if(!empty($receipt_details->customer_rp_label) && ($receipt_details->rp_earned > 0 || $receipt_details->rp_redeemed > 0))
+			<div class="text-box">
+				<table class="border-bottom width-100" style="margin-top: 10px;">
+					<thead>
+						<tr>
+							<th colspan="4" class="text-center"><strong>Points status</strong></th>
+						</tr>
+						<tr style="border-top: 1px dashed #000;">
+							<th class="text-center" width="25%">Before</th>
+							<th class="text-center" width="25%">Used</th>
+							<th class="text-center" width="25%">Earned</th>
+							<th class="text-center" width="25%">Balance</th>
+						</tr>
+					</thead>
+					<tbody>
+						<tr>
+							<td class="text-center">{{ $receipt_details->customer_total_rp ?? 0 }}</td>
+							<td class="text-center">{{ $receipt_details->rp_redeemed ?? 0 }}</td>
+							<td class="text-center">{{ $receipt_details->rp_earned ?? 0 }}</td>
+							<td class="text-center">{{ ($receipt_details->customer_total_rp ?? 0) - ($receipt_details->rp_redeemed ?? 0) + ($receipt_details->rp_earned ?? 0) }}</td>
+						</tr>
+					</tbody>
+				</table>
+			</div>
+			@endif
+
             <table style="margin-top: 25px !important" class="border-bottom width-100 table-f-12 mb-10">
                 <thead class="border-bottom-dotted">
                     <tr>
