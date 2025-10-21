@@ -278,15 +278,24 @@
 				</div>
 			@endif
 
-			@if(!empty($receipt_details->customer_rp_label))
-				<div class="textbox-info">
-					<p class="f-left"><strong>
-						{{ $receipt_details->customer_rp_label }}
-					</strong></p>
-					<p class="f-right">
-						{{ $receipt_details->customer_total_rp }}
-					</p>
+			@if(!empty($receipt_details->reward_point_label))
+				<div class="border-top textbox-info" style="margin-top: 10px;">
+					<p class="centered"><strong>{{ $receipt_details->reward_point_label }}</strong></p>
 				</div>
+				<table class="width-100" style="border-collapse: collapse;">
+					<tr style="border-bottom: 1px dashed #000;">
+						<td style="padding: 3px; text-align: left; width: 25%;"><strong>Before:</strong></td>
+						<td style="padding: 3px; text-align: left; width: 25%;"><strong>Used:</strong></td>
+						<td style="padding: 3px; text-align: left; width: 25%;"><strong>Earned:</strong></td>
+						<td style="padding: 3px; text-align: left; width: 25%;"><strong>Available:</strong></td>
+					</tr>
+					<tr>
+						<td style="padding: 3px; text-align: left;">{{ $receipt_details->rp_before ?? 0 }}</td>
+						<td style="padding: 3px; text-align: left;">{{ $receipt_details->rp_used ?? 0 }}</td>
+						<td style="padding: 3px; text-align: left;">{{ $receipt_details->rp_earned ?? 0 }}</td>
+						<td style="padding: 3px; text-align: left;">{{ $receipt_details->rp_available ?? 0 }}</td>
+					</tr>
+				</table>
 			@endif
 			@if(!empty($receipt_details->shipping_custom_field_1_label))
 				<div class="textbox-info">
@@ -697,26 +706,26 @@
 
 			@if(!empty($receipt_details->rp_earned) || !empty($receipt_details->rp_redeemed) || !empty($receipt_details->rp_balance))
 				<div class="border-top textbox-info" style="margin-top: 10px; padding-top: 10px;">
-					<p class="centered"><strong>Points Status</strong></p>
+					<p class="centered"><strong>@lang('lang_v1.reward_point_details')</strong></p>
+					@if(!empty($receipt_details->rp_earned))
+						<div class="textbox-info">
+							<p class="f-left"><strong>@lang('lang_v1.reward_points_earned'):</strong></p>
+							<p class="f-right">{{$receipt_details->rp_earned}}</p>
+						</div>
+					@endif
+					@if(!empty($receipt_details->rp_redeemed))
+						<div class="textbox-info">
+							<p class="f-left"><strong>@lang('lang_v1.reward_points_redeemed'):</strong></p>
+							<p class="f-right">{{$receipt_details->rp_redeemed}}</p>
+						</div>
+					@endif
+					@if(!empty($receipt_details->rp_balance))
+						<div class="textbox-info">
+							<p class="f-left"><strong>@lang('lang_v1.available_reward_points'):</strong></p>
+							<p class="f-right">{{$receipt_details->rp_balance}}</p>
+						</div>
+					@endif
 				</div>
-				<table class="width-100" style="text-align: center; border-collapse: collapse;">
-					<thead>
-						<tr style="border-bottom: 1px dashed #000;">
-							<th style="padding: 5px;">Before</th>
-							<th style="padding: 5px;">Used</th>
-							<th style="padding: 5px;">Earned</th>
-							<th style="padding: 5px;">Balance</th>
-						</tr>
-					</thead>
-					<tbody>
-						<tr>
-							<td style="padding: 5px;">{{ $receipt_details->rp_before ?? 0 }}</td>
-							<td style="padding: 5px;">{{ $receipt_details->rp_used ?? 0 }}</td>
-							<td style="padding: 5px;">{{ $receipt_details->rp_earned ?? 0 }}</td>
-							<td style="padding: 5px;">{{ $receipt_details->rp_available ?? 0 }}</td>
-						</tr>
-					</tbody>
-				</table>
 			@endif
 
             <div class="border-bottom width-100">&nbsp;</div>

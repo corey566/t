@@ -144,29 +144,9 @@
 					<br/>
 					<strong>{{ $receipt_details->commission_agent_label }}</strong> {{ $receipt_details->commission_agent }}
 				@endif
-				@if(!empty($receipt_details->reward_point_label))
+				@if(!empty($receipt_details->customer_rp_label))
 					<br/>
-					<div style="margin-top: 10px;">
-						<strong>Points Status</strong>
-						<table class="table table-bordered" style="width:100%; text-align:center; margin-top: 5px;">
-							<thead>
-								<tr>
-									<th>Before</th>
-									<th>Used</th>
-									<th>Earned</th>
-									<th>Balance</th>
-								</tr>
-							</thead>
-							<tbody>
-								<tr>
-									<td>{{ $receipt_details->rp_before ?? 0 }}</td>
-									<td>{{ $receipt_details->rp_used ?? 0 }}</td>
-									<td>{{ $receipt_details->rp_earned ?? 0 }}</td>
-									<td>{{ $receipt_details->rp_available ?? 0 }}</td>
-								</tr>
-							</tbody>
-						</table>
-					</div>
+					<strong>{{ $receipt_details->customer_rp_label }}</strong> {{ $receipt_details->customer_total_rp }}
 				@endif
 			</span>
 
