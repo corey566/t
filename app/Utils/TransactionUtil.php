@@ -111,7 +111,7 @@ class TransactionUtil extends Util
             'recur_repetitions' => ! empty($input['recur_repetitions']) ? $input['recur_repetitions'] : 0,
             'order_addresses' => ! empty($input['order_addresses']) ? $input['order_addresses'] : null,
             'sub_type' => ! empty($input['sub_type']) ? $input['sub_type'] : null,
-            'rp_earned' => $input['status'] == 'final' ? $this->calculateRewardPoints($business_id, $final_total) : 0,
+            'rp_earned' => $input['status'] == 'final' ? $this->calculateRewardPoints($input['contact_id'], $final_total) : 0,
             'rp_redeemed' => ! empty($input['rp_redeemed']) ? $input['rp_redeemed'] : 0,
             'rp_redeemed_amount' => ! empty($input['rp_redeemed_amount']) ? $input['rp_redeemed_amount'] : 0,
             'is_created_from_api' => ! empty($input['is_created_from_api']) ? 1 : 0,
@@ -143,7 +143,6 @@ class TransactionUtil extends Util
             'additional_expense_key_3' => ! empty($input['additional_expense_key_3']) ? $input['additional_expense_key_3'] : null,
             'additional_expense_key_4' => ! empty($input['additional_expense_key_4']) ? $input['additional_expense_key_4'] : null,
             'is_kitchen_order' => ! empty($input['is_kitchen_order']) ? 1 : 0,
-
         ]);
 
         return $transaction;
@@ -231,7 +230,7 @@ class TransactionUtil extends Util
             'subscription_repeat_on' => ! empty($input['subscription_repeat_on']) ? $input['subscription_repeat_on'] : null,
             'recur_repetitions' => ! empty($input['recur_repetitions']) ? $input['recur_repetitions'] : 0,
             'order_addresses' => ! empty($input['order_addresses']) ? $input['order_addresses'] : null,
-            'rp_earned' => $input['status'] == 'final' ? $this->calculateRewardPoints($business_id, $final_total) : 0,
+            'rp_earned' => $input['status'] == 'final' ? $this->calculateRewardPoints($input['contact_id'], $final_total) : 0,
             'rp_redeemed' => ! empty($input['rp_redeemed']) ? $input['rp_redeemed'] : 0,
             'rp_redeemed_amount' => ! empty($input['rp_redeemed_amount']) ? $input['rp_redeemed_amount'] : 0,
             'types_of_service_id' => ! empty($input['types_of_service_id']) ? $input['types_of_service_id'] : null,
@@ -1044,8 +1043,8 @@ class TransactionUtil extends Util
             $output['customer_mobile'] = $customer->mobile;
 
             if ($receipt_printer_type != 'printer') {
-                $output['customer_info'] .= $customer->contact_address;
-                if (! empty($customer->contact_address)) {
+                $output['customer_info'] .= $customer->address_line_1;
+                if (! empty($customer->address_line_1)) {
                     $output['customer_info'] .= '<br>';
                 }
                 $output['customer_info'] .= '<b>'.__('contact.mobile').'</b>: '.$customer->mobile;
@@ -2982,7 +2981,8 @@ class TransactionUtil extends Util
                             ->whereIn('type', ['expense', 'expense_refund']);
         // ->where('payment_status', 'paid');
 
-
+        //Check for permitted locations of a user
+        $permitted_locations = auth()->user()->permitted_locations();
         if(!empty($permitted_locations)){
             if ($permitted_locations != 'all') {
                 $query->whereIn('transactions.location_id', $permitted_locations);
@@ -3372,7 +3372,7 @@ class TransactionUtil extends Util
                             'updated_at' => \Carbon::now(),
                         ];
                         //Update purchase line
-                        PurchaseLine::where('id', $row->purchase_lines_id)
+                        PurchaseLine::where('id', $row->purchase_line_id)
                             ->update(['quantity_sold' => $row->quantity_sold + $qty_allocated]);
                     }
                 } elseif ($mapping_type == 'production_purchase') {
@@ -3386,7 +3386,7 @@ class TransactionUtil extends Util
                         ];
 
                         //Update purchase line
-                        PurchaseLine::where('id', $row->purchase_lines_id)
+                        PurchaseLine::where('id', $row->purchase_line_id)
                             ->update(['mfg_quantity_used' => $row->mfg_quantity_used + $qty_allocated]);
                     }
                 }
@@ -4879,12 +4879,6 @@ class TransactionUtil extends Util
         return $data;
     }
 
-    /**
-     * Creates recurring expense from existing expense
-     *
-     * @param  obj  $transaction
-     * @return obj $recurring_invoice
-     */
     public function createRecurringExpense($transaction)
     {
         $data = $transaction->toArray();
@@ -5248,7 +5242,7 @@ class TransactionUtil extends Util
             $is_reward_expired = $this->isRewardExpired($sell->transaction_date, $business_id);
             if (! $is_reward_expired) {
                 $diff = $sell->final_total - $sell_return->final_total;
-                $new_reward_point = $this->calculateRewardPoints($business_id, $diff);
+                $new_reward_point = $this->calculateRewardPoints($sell->contact_id, $diff);
                 $this->updateCustomerRewardPoints($sell->contact_id, $new_reward_point, $sell->rp_earned);
 
                 $sell->rp_earned = $new_reward_point;
