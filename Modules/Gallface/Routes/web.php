@@ -62,19 +62,7 @@ Route::middleware('web', 'SetSessionData', 'auth', 'language', 'timezone', 'Admi
 		Route::get('invoices', [\Modules\Gallface\Http\Controllers\GallfaceController::class, 'getGallfaceInvoices'])->name('invoices');
 	});
 
-	// Integra (Colombo City Center) Integration Routes - Independent endpoints
-	Route::prefix('integra')->name('integra.')->group(function () {
-		Route::get('credentials', [\Modules\Gallface\Http\Controllers\IntegraController::class, 'credentials'])->name('credentials');
-		Route::post('save-credentials', [\Modules\Gallface\Http\Controllers\IntegraController::class, 'saveCredentials'])->name('save.credentials');
-		Route::get('api-logs', [\Modules\Gallface\Http\Controllers\IntegraController::class, 'getApiLogs'])->name('api.logs');
-	});
-
-	// Integra API Configuration Routes (Colombo City Center)
-	Route::prefix('integra')->group(function () {
-		Route::get('credentials', [\Modules\Gallface\Http\Controllers\IntegraController::class, 'credentials']);
-		Route::post('save-credentials', [\Modules\Gallface\Http\Controllers\IntegraController::class, 'saveCredentials']);
-		Route::get('api-logs', [\Modules\Gallface\Http\Controllers\IntegraController::class, 'getApiLogs']);
-	});
+	// Integra/Colombo routes moved to ColomboCity module
 
 	Route::get('/install', [Modules\Gallface\Http\Controllers\InstallController::class, 'index']);
     Route::post('/install', [Modules\Gallface\Http\Controllers\InstallController::class, 'install']);

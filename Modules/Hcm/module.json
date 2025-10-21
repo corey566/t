@@ -1,8 +1,7 @@
-
 {
     "name": "Hcm",
     "alias": "hcm",
-    "description": "Havelock City Mall Integration - Connects Ultimate Forester POS with HCM API for real-time invoice sync and reporting",
+    "description": "Havelock City Mall (HCM) API integration for POS sales syncing and monitoring",
     "keywords": ["hcm", "mall", "pos", "sync", "invoice"],
     "active": 1,
     "order": 0,
@@ -16,7 +15,7 @@
 {
     "name": "Hcm",
     "alias": "hcm",
-    "description": "Havelock City Mall Integration Module",
+    "description": "Havelock City Mall (HCM) API integration for POS sales syncing and monitoring",
     "keywords": [],
     "priority": 0,
     "providers": [

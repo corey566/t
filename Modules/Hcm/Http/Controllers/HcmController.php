@@ -1,458 +1,278 @@
-
 <?php
 
 namespace Modules\Hcm\Http\Controllers;
 
-use App\Business;
-use App\BusinessLocation;
-use App\System;
-use App\Transaction;
-use App\Utils\ModuleUtil;
-use DB;
 use Illuminate\Http\Request;
-use Illuminate\Http\Response;
 use Illuminate\Routing\Controller;
+use Illuminate\Support\Facades\Validator;
 use Modules\Hcm\Entities\HcmTenantConfig;
-use Modules\Hcm\Entities\HcmInvoiceLog;
-use Modules\Hcm\Entities\HcmPingLog;
-use Modules\Hcm\Entities\HcmSyncLog;
 use Modules\Hcm\Utils\HcmUtil;
-use Yajra\DataTables\Facades\DataTables;
+use Maatwebsite\Excel\Facades\Excel;
+use Modules\Gallface\Exports\HcmSalesExport;
+use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Log;
 
 class HcmController extends Controller
 {
     /**
-     * All Utils instance.
+     * View invoice history for HCM sync
      */
-    protected $hcmUtil;
-    protected $moduleUtil;
-
-    /**
-     * Constructor
-     *
-     * @param  HcmUtil  $hcmUtil
-     * @return void
-     */
-    public function __construct(HcmUtil $hcmUtil, ModuleUtil $moduleUtil)
+    public function viewInvoiceHistory(Request $request, $location_id)
     {
-        $this->hcmUtil = $hcmUtil;
-        $this->moduleUtil = $moduleUtil;
-    }
-
-    /**
-     * Display a listing of the resource.
-     *
-     * @return Response
-     */
-    public function index()
-    {
-        $business_id = request()->session()->get('business.id');
-
-        if (! (auth()->user()->can('superadmin') || $this->moduleUtil->hasThePermissionInSubscription($business_id, 'hcm_module'))) {
-            abort(403, 'Unauthorized action.');
-        }
-
-        $alerts = [];
-
-        // Get pending invoices count
-        $pending_invoices = HcmInvoiceLog::where('business_id', $business_id)
-                                      ->where('status', 'pending')
-                                      ->count();
-
-        if ($pending_invoices > 0) {
-            $alerts['pending_invoices'] = $pending_invoices . ' invoices pending sync';
-        }
-
-        // Get failed invoices count
-        $failed_invoices = HcmInvoiceLog::where('business_id', $business_id)
-                                     ->where('status', 'failed')
-                                     ->count();
-
-        if ($failed_invoices > 0) {
-            $alerts['failed_invoices'] = $failed_invoices . ' invoices failed to sync';
-        }
-
-        // Get last sync status
-        $last_sync = $this->hcmUtil->getLastSync($business_id, 'invoices', false);
-
-        return view('hcm::hcm.index')
-                ->with(compact('alerts', 'last_sync'));
-    }
-
-    /**
-     * Displays form to configure tenant settings.
-     *
-     * @return Response
-     */
-    public function tenantConfig()
-    {
-        $business_id = request()->session()->get('business.id');
-
-        if (! (auth()->user()->can('superadmin') || $this->moduleUtil->hasThePermissionInSubscription($business_id, 'hcm_module'))) {
-            abort(403, 'Unauthorized action.');
-        }
-
-        $locations = BusinessLocation::forDropdown($business_id);
-        $configs = HcmTenantConfig::where('business_id', $business_id)->get();
-        $module_version = System::getProperty('hcm_version');
-
-        return view('hcm::hcm.tenant_config')
-                ->with(compact('locations', 'configs', 'module_version'));
-    }
-
-    /**
-     * Updates tenant configuration.
-     *
-     * @return Response
-     */
-    public function updateTenantConfig(Request $request)
-    {
-        $business_id = request()->session()->get('business.id');
-
-        if (! (auth()->user()->can('superadmin') || $this->moduleUtil->hasThePermissionInSubscription($business_id, 'hcm_module'))) {
-            abort(403, 'Unauthorized action.');
-        }
-
         try {
-            $input = $request->all();
+            $business_id = request()->session()->get('user.business_id');
 
-            foreach ($input['configs'] as $location_id => $config) {
-                HcmTenantConfig::updateOrCreate(
-                    [
-                        'business_id' => $business_id,
-                        'location_id' => $location_id
-                    ],
-                    [
-                        'tenant_id' => $config['tenant_id'],
-                        'tenant_secret' => $config['tenant_secret'],
-                        'api_url' => $config['api_url'] ?? config('hcm.api.base_url'),
-                        'pos_id' => $config['pos_id'],
-                        'stall_no' => $config['stall_no'] ?? null,
-                        'active' => isset($config['active']) ? 1 : 0,
-                        'auto_sync' => isset($config['auto_sync']) ? 1 : 0,
-                        'retry_attempts' => $config['retry_attempts'] ?? 3,
-                    ]
-                );
+            // Get filter parameters
+            $syncStatus = $request->input('sync_status', 'all');
+            $dateFrom = $request->input('date_from', now()->startOfMonth()->format('Y-m-d'));
+            $dateTo = $request->input('date_to', now()->format('Y-m-d'));
+            $perPage = $request->input('per_page', 50);
+
+            // Build the query
+            $query = DB::table('transactions as t')
+                ->select(
+                    't.id',
+                    't.invoice_no',
+                    't.transaction_date',
+                    't.final_total',
+                    't.tax_amount',
+                    't.discount_amount',
+                    't.hcm_synced_at',
+                    't.type',
+                    'c.name as customer_name',
+                    'c.mobile as customer_mobile',
+                    't.is_gift_voucher'
+                )
+                ->leftJoin('contacts as c', 't.contact_id', '=', 'c.id')
+                ->where('t.business_id', $business_id)
+                ->where('t.location_id', $location_id)
+                ->whereIn('t.type', ['sell', 'sell_return'])
+                ->whereBetween('t.transaction_date', [$dateFrom . ' 00:00:00', $dateTo . ' 23:59:59'])
+                ->orderBy('t.transaction_date', 'desc');
+
+            // Apply sync status filter
+            if ($syncStatus === 'synced') {
+                $query->whereNotNull('t.hcm_synced_at');
+            } elseif ($syncStatus === 'not_synced') {
+                $query->whereNull('t.hcm_synced_at');
             }
 
-            $output = ['success' => 1,
-                'msg' => 'Tenant configuration updated successfully',
+            // Get stats
+            $totalInvoices = DB::table('transactions')
+                ->where('business_id', $business_id)
+                ->where('location_id', $location_id)
+                ->whereIn('type', ['sell', 'sell_return'])
+                ->whereBetween('transaction_date', [$dateFrom . ' 00:00:00', $dateTo . ' 23:59:59'])
+                ->count();
+
+            $syncedInvoices = DB::table('transactions')
+                ->where('business_id', $business_id)
+                ->where('location_id', $location_id)
+                ->whereIn('type', ['sell', 'sell_return'])
+                ->whereNotNull('hcm_synced_at')
+                ->whereBetween('transaction_date', [$dateFrom . ' 00:00:00', $dateTo . ' 23:59:59'])
+                ->count();
+
+            $stats = [
+                'total_invoices' => $totalInvoices,
+                'synced_invoices' => $syncedInvoices,
+                'not_synced_invoices' => $totalInvoices - $syncedInvoices
             ];
+
+            // If AJAX request, return JSON
+            if ($request->expectsJson() || $request->ajax()) {
+                $invoices = $query->get();
+                return response()->json([
+                    'success' => true,
+                    'invoices' => ['data' => $invoices],
+                    'stats' => $stats
+                ]);
+            }
+
+            // Return view for non-AJAX requests
+            $invoices = $query->paginate($perPage);
+            return view('hcm::hcm.invoice_history', compact('invoices', 'stats', 'location_id'));
+
         } catch (\Exception $e) {
-            \Log::emergency('File:'.$e->getFile().'Line:'.$e->getLine().'Message:'.$e->getMessage());
-
-            $output = ['success' => 0,
-                'msg' => 'Something went wrong',
-            ];
+            if ($request->expectsJson()) {
+                return response()->json([
+                    'success' => false,
+                    'message' => 'Failed to fetch invoice history: ' . $e->getMessage()
+                ], 500);
+            }
+            return redirect()->back()->with('error', 'Failed to fetch invoice history: ' . $e->getMessage());
         }
-
-        return redirect()->back()->with(['status' => $output]);
     }
 
     /**
-     * Test connection with HCM API
-     *
-     * @return Response
+     * Show ping monitor interface
      */
-    public function testConnection()
+    public function showPingMonitor($location_id)
     {
-        $business_id = request()->session()->get('business.id');
-        $location_id = request()->get('location_id');
+        $business_id = request()->session()->get('user.business_id');
 
-        if (! (auth()->user()->can('superadmin') || $this->moduleUtil->hasThePermissionInSubscription($business_id, 'hcm_module'))) {
-            abort(403, 'Unauthorized action.');
+        $location = DB::table('business_locations')
+            ->where('id', $location_id)
+            ->where('business_id', $business_id)
+            ->first();
+
+        if (!$location) {
+            return redirect()->back()->with('error', 'Location not found');
         }
 
+        return view('hcm::hcm.ping_monitor', compact('location', 'location_id'));
+    }
+
+    /**
+     * Test HCM API connection
+     */
+    public function testConnection(Request $request, $location_id)
+    {
         try {
-            $result = $this->hcmUtil->testConnection($business_id, $location_id);
-            return response()->json($result);
+            $business_id = request()->session()->get('user.business_id');
+
+            $config = HcmTenantConfig::where('business_id', $business_id)
+                ->where('business_location_id', $location_id)
+                ->where('is_active', true)
+                ->first();
+
+            if (!$config) {
+                return response()->json([
+                    'success' => false,
+                    'message' => 'No active HCM configuration found'
+                ]);
+            }
+
+            $hcmUtil = new HcmUtil();
+            return response()->json($hcmUtil->testConnection($config));
+
         } catch (\Exception $e) {
             return response()->json([
                 'success' => false,
-                'msg' => $e->getMessage()
+                'message' => 'Connection test failed: ' . $e->getMessage()
             ]);
         }
     }
 
     /**
-     * Synchronizes invoices with HCM
-     *
-     * @return Response
+     * Send ping to HCM API with user info
      */
-    public function syncInvoices()
+    public function sendPing(Request $request, $location_id)
     {
-        $business_id = request()->session()->get('business.id');
-
-        if (! (auth()->user()->can('superadmin') || $this->moduleUtil->hasThePermissionInSubscription($business_id, 'hcm_module'))) {
-            abort(403, 'Unauthorized action.');
-        }
-
         try {
-            DB::beginTransaction();
-            $user_id = request()->session()->get('user.id');
+            $business_id = request()->session()->get('user.business_id');
+            $userId = request()->session()->get('user.id');
+            $username = request()->session()->get('user.username') ?? request()->session()->get('user.first_name') ?? 'Unknown';
+            $ipAddress = $request->ip();
 
-            $result = $this->hcmUtil->syncInvoices($business_id, $user_id);
+            $config = HcmTenantConfig::where('business_id', $business_id)
+                ->where('business_location_id', $location_id)
+                ->where('is_active', true)
+                ->first();
 
-            DB::commit();
+            if (!$config) {
+                return response()->json([
+                    'success' => false,
+                    'message' => 'No active HCM configuration found'
+                ]);
+            }
 
-            $output = ['success' => 1,
-                'msg' => 'Invoices synced successfully',
-                'synced_count' => $result['synced_count'] ?? 0,
-            ];
-        } catch (\Exception $e) {
-            DB::rollBack();
-            \Log::emergency('File:'.$e->getFile().'Line:'.$e->getLine().'Message:'.$e->getMessage());
+            $hcmUtil = new HcmUtil();
+            $result = $hcmUtil->sendPing($config, $userId, $username, $ipAddress);
 
-            $output = ['success' => 0,
-                'msg' => $e->getMessage(),
-            ];
-        }
+            // Log ping to database
+            DB::table('hcm_ping_logs')->insert([
+                'location_id' => $location_id,
+                'user_id' => $userId,
+                'username' => $username,
+                'ip_address' => $ipAddress,
+                'tenant_id' => $config->tenant_id,
+                'pos_id' => $config->pos_id,
+                'success' => $result['success'],
+                'message' => $result['message'],
+                'response_data' => isset($result['response']) ? json_encode($result['response']) : null,
+                'pinged_at' => now(),
+                'created_at' => now(),
+                'updated_at' => now()
+            ]);
 
-        return $output;
-    }
-
-    /**
-     * Display synced invoices
-     *
-     * @return Response
-     */
-    public function syncedInvoices()
-    {
-        $business_id = request()->session()->get('business.id');
-
-        if (! (auth()->user()->can('superadmin') || $this->moduleUtil->hasThePermissionInSubscription($business_id, 'hcm_module'))) {
-            abort(403, 'Unauthorized action.');
-        }
-
-        if (request()->ajax()) {
-            $logs = HcmInvoiceLog::where('hcm_invoice_logs.business_id', $business_id)
-                    ->leftjoin('business_locations as BL', 'BL.id', '=', 'hcm_invoice_logs.location_id')
-                    ->leftjoin('transactions as T', 'T.id', '=', 'hcm_invoice_logs.transaction_id')
-                    ->select([
-                        'hcm_invoice_logs.id',
-                        'hcm_invoice_logs.invoice_no',
-                        'BL.name as location_name',
-                        'hcm_invoice_logs.status',
-                        'hcm_invoice_logs.response_message',
-                        'hcm_invoice_logs.retry_count',
-                        'hcm_invoice_logs.synced_at',
-                        'T.final_total',
-                        'hcm_invoice_logs.id as DT_RowId',
-                    ]);
-
-            return Datatables::of($logs)
-                ->editColumn('status', function ($row) {
-                    $class = '';
-                    switch ($row->status) {
-                        case 'success':
-                            $class = 'label-success';
-                            break;
-                        case 'failed':
-                            $class = 'label-danger';
-                            break;
-                        case 'pending':
-                            $class = 'label-warning';
-                            break;
-                        case 'retrying':
-                            $class = 'label-info';
-                            break;
-                    }
-                    return '<span class="label ' . $class . '">' . ucfirst($row->status) . '</span>';
-                })
-                ->addColumn('action', function ($row) {
-                    $html = '';
-                    if ($row->status == 'failed') {
-                        $html .= '<button type="button" class="btn btn-xs btn-primary retry-invoice" data-href="' . action([\Modules\Hcm\Http\Controllers\HcmController::class, 'retryFailedInvoice'], ['id' => $row->id]) . '">Retry</button>';
-                    }
-                    return $html;
-                })
-                ->rawColumns(['status', 'action'])
-                ->make(true);
-        }
-
-        return view('hcm::hcm.synced_invoices');
-    }
-
-    /**
-     * Generate reports
-     *
-     * @return Response
-     */
-    public function reports()
-    {
-        $business_id = request()->session()->get('business.id');
-
-        if (! (auth()->user()->can('superadmin') || $this->moduleUtil->hasThePermissionInSubscription($business_id, 'hcm_module'))) {
-            abort(403, 'Unauthorized action.');
-        }
-
-        $locations = BusinessLocation::forDropdown($business_id);
-
-        return view('hcm::hcm.reports')
-                ->with(compact('locations'));
-    }
-
-    /**
-     * Generate Excel report
-     *
-     * @return Response
-     */
-    public function generateReport(Request $request)
-    {
-        $business_id = request()->session()->get('business.id');
-
-        if (! (auth()->user()->can('superadmin') || $this->moduleUtil->hasThePermissionInSubscription($business_id, 'hcm_module'))) {
-            abort(403, 'Unauthorized action.');
-        }
-
-        try {
-            $report = $this->hcmUtil->generateExcelReport(
-                $business_id,
-                $request->report_type,
-                $request->location_id,
-                $request->start_date,
-                $request->end_date
-            );
-
-            return $report;
-        } catch (\Exception $e) {
-            return redirect()->back()->with('error', $e->getMessage());
-        }
-    }
-
-    /**
-     * Display ping monitor
-     *
-     * @return Response
-     */
-    public function pingMonitor()
-    {
-        $business_id = request()->session()->get('business.id');
-
-        if (! (auth()->user()->can('superadmin') || $this->moduleUtil->hasThePermissionInSubscription($business_id, 'hcm_module'))) {
-            abort(403, 'Unauthorized action.');
-        }
-
-        $ping_logs = HcmPingLog::where('business_id', $business_id)
-                              ->with('location')
-                              ->orderBy('last_ping_at', 'desc')
-                              ->get();
-
-        return view('hcm::hcm.ping_monitor')
-                ->with(compact('ping_logs'));
-    }
-
-    /**
-     * Retry failed invoice
-     *
-     * @param  int  $id
-     * @return Response
-     */
-    public function retryFailedInvoice($id)
-    {
-        $business_id = request()->session()->get('business.id');
-
-        if (! (auth()->user()->can('superadmin') || $this->moduleUtil->hasThePermissionInSubscription($business_id, 'hcm_module'))) {
-            abort(403, 'Unauthorized action.');
-        }
-
-        try {
-            $result = $this->hcmUtil->retryFailedInvoice($id);
             return response()->json($result);
+
         } catch (\Exception $e) {
             return response()->json([
                 'success' => false,
-                'msg' => $e->getMessage()
+                'message' => 'Ping failed: ' . $e->getMessage()
             ]);
         }
     }
 
     /**
-     * Get sync log
-     *
-     * @return Response
+     * Get ping logs for real-time monitoring
      */
-    public function getSyncLog()
+    public function getPingLogs(Request $request, $location_id)
     {
-        $business_id = request()->session()->get('business.id');
+        try {
+            $limit = $request->input('limit', 50);
+            $since = $request->input('since');
 
-        if (! (auth()->user()->can('superadmin') || $this->moduleUtil->hasThePermissionInSubscription($business_id, 'hcm_module'))) {
-            abort(403, 'Unauthorized action.');
-        }
+            $query = DB::table('hcm_ping_logs')
+                ->where('location_id', $location_id)
+                ->orderBy('created_at', 'desc');
 
-        if (request()->ajax()) {
-            $last_sync = [
-                'invoices' => $this->hcmUtil->getLastSync($business_id, 'invoices'),
-                'ping' => $this->hcmUtil->getLastSync($business_id, 'ping'),
-                'reports' => $this->hcmUtil->getLastSync($business_id, 'reports'),
-            ];
+            if ($since) {
+                $query->where('created_at', '>', $since);
+            }
 
-            return $last_sync;
+            $logs = $query->limit($limit)->get();
+
+            return response()->json([
+                'success' => true,
+                'logs' => $logs
+            ]);
+
+        } catch (\Exception $e) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Failed to fetch ping logs: ' . $e->getMessage()
+            ], 500);
         }
     }
 
     /**
-     * View sync log
-     *
-     * @return Response
+     * Sync sales data to HCM
      */
-    public function viewSyncLog()
+    public function syncSales(Request $request, $location_id)
     {
-        $business_id = request()->session()->get('business.id');
+        try {
+            $business_id = request()->session()->get('user.business_id');
 
-        if (! (auth()->user()->can('superadmin') || $this->moduleUtil->hasThePermissionInSubscription($business_id, 'hcm_module'))) {
-            abort(403, 'Unauthorized action.');
-        }
+            $config = HcmTenantConfig::where('business_id', $business_id)
+                ->where('business_location_id', $location_id)
+                ->where('is_active', true)
+                ->first();
 
-        if (request()->ajax()) {
-            $logs = HcmSyncLog::where('hcm_sync_logs.business_id', $business_id)
-                    ->leftjoin('users as U', 'U.id', '=', 'hcm_sync_logs.created_by')
-                    ->select([
-                        'hcm_sync_logs.created_at',
-                        'sync_type', 'operation_type',
-                        DB::raw("CONCAT(COALESCE(surname, ''), ' ', COALESCE(first_name, ''), ' ', COALESCE(last_name, '')) as full_name"),
-                        'hcm_sync_logs.data',
-                        'hcm_sync_logs.details as log_details',
-                        'hcm_sync_logs.id as DT_RowId',
-                    ]);
+            if (!$config) {
+                return response()->json([
+                    'success' => false,
+                    'message' => 'No active HCM configuration found for this location'
+                ], 404);
+            }
 
-            return Datatables::of($logs)
-                ->editColumn('created_at', function ($row) {
-                    return \Carbon::createFromFormat('Y-m-d H:i:s', $row->created_at)->format('Y-m-d H:i:s');
-                })
-                ->editColumn('sync_type', function ($row) {
-                    return ucfirst($row->sync_type);
-                })
-                ->editColumn('operation_type', function ($row) {
-                    return ucfirst($row->operation_type);
-                })
-                ->rawColumns(['created_at'])
-                ->make(true);
-        }
+            $hcmUtil = new HcmUtil();
+            $result = $hcmUtil->syncInvoices($config);
 
-        return view('hcm::hcm.sync_log');
-    }
+            return response()->json($result);
 
-    /**
-     * Get log details
-     *
-     * @param  int  $id
-     * @return Response
-     */
-    public function getLogDetails($id)
-    {
-        $business_id = request()->session()->get('business.id');
+        } catch (\Exception $e) {
+            Log::error('HCM Sync Error', [
+                'location_id' => $location_id,
+                'error' => $e->getMessage()
+            ]);
 
-        if (! (auth()->user()->can('superadmin') || $this->moduleUtil->hasThePermissionInSubscription($business_id, 'hcm_module'))) {
-            abort(403, 'Unauthorized action.');
-        }
-
-        if (request()->ajax()) {
-            $log = HcmSyncLog::where('business_id', $business_id)->find($id);
-            $log_details = json_decode($log->details);
-
-            return view('hcm::hcm.partials.log_details')
-                    ->with(compact('log_details'));
+            return response()->json([
+                'success' => false,
+                'message' => 'Sync failed: ' . $e->getMessage()
+            ], 500);
         }
     }
 }

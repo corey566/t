@@ -1,8 +1,7 @@
-
 {
     "name": "ColomboCity",
     "alias": "colombocity",
-    "description": "Colombo City Center Integration Module",
+    "description": "Colombo City Center API integration for transaction management",
     "keywords": [],
     "priority": 0,
     "providers": [
