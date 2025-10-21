@@ -38,3 +38,7 @@
         </div><!-- /.container-fluid -->
     </nav>
 </section>
+<li class="header" style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: white; padding: 15px; display: flex; align-items: center; gap: 10px;">
+    <img src="{{ asset('attached_assets/unnamed-removebg-preview_1761014565294.png') }}" alt="One Gallface" style="height: 40px; width: 40px;">
+    <span style="font-weight: 600; font-size: 1.1rem;">One Gallface Integration</span>
+</li>

@@ -250,6 +250,15 @@
 
 <div class="gallface-container">
     @include('gallface::layouts.nav')
+    
+    <!-- One Gallface Header -->
+    <div style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); padding: 20px; border-radius: 12px; margin-bottom: 20px; display: flex; align-items: center; gap: 15px; box-shadow: 0 4px 12px rgba(102, 126, 234, 0.3);">
+        <img src="{{ asset('attached_assets/unnamed-removebg-preview_1761014565294.png') }}" alt="One Gallface" style="height: 60px; width: 60px; background: white; border-radius: 50%; padding: 8px;">
+        <div>
+            <h2 style="color: white; margin: 0; font-size: 1.8rem; font-weight: 700;">One Gallface Mall</h2>
+            <p style="color: rgba(255,255,255,0.9); margin: 5px 0 0 0; font-size: 0.95rem;">MIMS Integration & Sales Sync Management</p>
+        </div>
+    </div>
 
     <!-- Stats Row -->
     <div class="stats-row">
