@@ -10,7 +10,7 @@
                     <span class="icon-bar"></span>
                 </button>
                 <a class="navbar-brand" href="{{action([\Modules\Gallface\Http\Controllers\GallfaceController::class, 'dashboard'])}}" style="display: flex; align-items: center; gap: 10px;">
-                    <img src="{{ asset('attached_assets/unnamed-removebg-preview_1761014565294.png') }}" alt="Mall Integrations" style="height: 30px; width: 30px;">
+                    <img src="{{ asset('modules/gallface/images/one-gallface-logo.png') }}" alt="Mall Integrations" style="height: 30px; width: 30px;">
                     <span>Mall Integrations</span>
                 </a>
             </div>
@@ -20,7 +20,7 @@
                 <ul class="nav navbar-nav ml-auto">
                     <li class="nav-item">
                         <a href="{{ url('gallface/setting') }}" class="nav-link {{ request()->is('gallface/setting') ? 'active' : '' }}" style="display: flex; align-items: center; gap: 8px;">
-                            <img src="{{ asset('attached_assets/unnamed-removebg-preview_1761014565294.png') }}" alt="One Gallface" style="height: 24px; width: 24px;">
+                            <img src="{{ asset('modules/gallface/images/one-gallface-logo.png') }}" alt="One Gallface" style="height: 24px; width: 24px;">
                             <span>One Gallface Mall</span>
                         </a>
                     </li>
