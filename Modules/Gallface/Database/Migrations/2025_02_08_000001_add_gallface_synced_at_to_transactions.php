@@ -1,3 +1,4 @@
+
 <?php
 
 use Illuminate\Support\Facades\Schema;
@@ -13,16 +14,13 @@ class AddGallfaceSyncedAtToTransactions extends Migration
      */
     public function up()
     {
-        if (!Schema::hasTable('transactions')) {
-            return;
+        if (Schema::hasTable('transactions')) {
+            Schema::table('transactions', function (Blueprint $table) {
+                if (!Schema::hasColumn('transactions', 'gallface_synced_at')) {
+                    $table->timestamp('gallface_synced_at')->nullable()->after('updated_at');
+                }
+            });
         }
-
-        Schema::table('transactions', function (Blueprint $table) {
-            if (Schema::hasColumn('transactions', 'gallface_synced_at')) {
-                return;
-            }
-            $table->timestamp('gallface_synced_at')->nullable()->after('updated_at');
-        });
     }
 
     /**

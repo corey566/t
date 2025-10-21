@@ -1,3 +1,4 @@
+
 <?php
 
 use Illuminate\Support\Facades\Schema;
@@ -13,27 +14,22 @@ class AddHcmSyncedAtToTransactions extends Migration
      */
     public function up()
     {
-        if (!Schema::hasTable('transactions')) {
-            return;
+        if (Schema::hasTable('transactions')) {
+            Schema::table('transactions', function (Blueprint $table) {
+                if (!Schema::hasColumn('transactions', 'hcm_synced_at')) {
+                    $table->timestamp('hcm_synced_at')->nullable()->after('updated_at');
+                }
+                if (!Schema::hasColumn('transactions', 'gift_voucher_amount')) {
+                    $table->decimal('gift_voucher_amount', 22, 4)->default(0)->after('final_total');
+                }
+                if (!Schema::hasColumn('transactions', 'hcm_loyalty_amount')) {
+                    $table->decimal('hcm_loyalty_amount', 22, 4)->default(0)->after('gift_voucher_amount');
+                }
+                if (!Schema::hasColumn('transactions', 'is_gift_voucher')) {
+                    $table->boolean('is_gift_voucher')->default(false)->after('type');
+                }
+            });
         }
-
-        Schema::table('transactions', function (Blueprint $table) {
-            if (Schema::hasColumn('transactions', 'hcm_synced_at')) {
-                return;
-            }
-            if (!Schema::hasColumn('transactions', 'hcm_synced_at')) {
-                $table->timestamp('hcm_synced_at')->nullable()->after('updated_at');
-            }
-            if (!Schema::hasColumn('transactions', 'gift_voucher_amount')) {
-                $table->decimal('gift_voucher_amount', 22, 4)->default(0)->after('final_total');
-            }
-            if (!Schema::hasColumn('transactions', 'hcm_loyalty_amount')) {
-                $table->decimal('hcm_loyalty_amount', 22, 4)->default(0)->after('gift_voucher_amount');
-            }
-            if (!Schema::hasColumn('transactions', 'is_gift_voucher')) {
-                $table->boolean('is_gift_voucher')->default(false)->after('type');
-            }
-        });
     }
 
     /**

@@ -145,24 +145,10 @@
 					<strong>{{ $receipt_details->commission_agent_label }}</strong> {{ $receipt_details->commission_agent }}
 				@endif
 				@if(!empty($receipt_details->customer_rp_label))
-				<br/>
-				<strong>{{ $receipt_details->customer_rp_label }}</strong> {{ $receipt_details->customer_total_rp }}
-			@endif
-
-			@if(!empty($receipt_details->hcm_points_earned) || !empty($receipt_details->hcm_points_redeemed))
-				<br/><br/>
-				<strong>HCM Loyalty Points</strong><br/>
-				@if(!empty($receipt_details->hcm_points_earned))
-					Points Earned: {{ number_format($receipt_details->hcm_points_earned, 0) }}<br/>
+					<br/>
+					<strong>{{ $receipt_details->customer_rp_label }}</strong> {{ $receipt_details->customer_total_rp }}
 				@endif
-				@if(!empty($receipt_details->hcm_points_redeemed))
-					Points Redeemed: -{{ number_format($receipt_details->hcm_points_redeemed, 0) }}<br/>
-				@endif
-				@if(!empty($receipt_details->hcm_points_balance))
-					<strong>Points Balance: {{ number_format($receipt_details->hcm_points_balance, 0) }}</strong>
-				@endif
-			@endif
-		</span>
+			</span>
 
 			<span class="pull-right text-left">
 				<b>{{$receipt_details->date_label}}</b> {{$receipt_details->invoice_date}}
@@ -209,7 +195,7 @@
 					@endif
 					{{$receipt_details->repair_status}}<br>
 		        @endif
-
+		        
 		        @if(!empty($receipt_details->repair_warranty_label) || !empty($receipt_details->repair_warranty))
 					@if(!empty($receipt_details->repair_warranty_label))
 						<b>{!! $receipt_details->repair_warranty_label !!}</b>
@@ -217,7 +203,7 @@
 					{{$receipt_details->repair_warranty}}
 					<br>
 		        @endif
-
+		        
 				<!-- Waiter info -->
 				@if(!empty($receipt_details->service_staff_label) || !empty($receipt_details->service_staff))
 		        	<br/>
@@ -243,7 +229,7 @@
 				@endif
 
 				@if(!empty($receipt_details->shipping_custom_field_5_label))
-					<br><strong>{!!$receipt_details->shipping_custom_field_5_label!!}:</strong> {!!$receipt_details->shipping_custom_field_5_value ?? ''!!}
+					<br><strong>{!!$receipt_details->shipping_custom_field_2_label!!}:</strong> {!!$receipt_details->shipping_custom_field_5_value ?? ''!!}
 				@endif
 				{{-- sale order --}}
 				@if(!empty($receipt_details->sale_orders_invoice_no))
@@ -647,7 +633,7 @@
 	    	<p>{!! nl2br($receipt_details->additional_notes) !!}</p>
 	    </div>
     @endif
-
+    
 </div>
 <div class="row" style="color: #000000 !important;">
 	@if(!empty($receipt_details->footer_text))
@@ -661,7 +647,7 @@
 				{{-- Barcode --}}
 				<img class="center-block" src="data:image/png;base64,{{DNS1D::getBarcodePNG($receipt_details->invoice_no, 'C128', 2,30,array(39, 48, 54), true)}}">
 			@endif
-
+			
 			@if($receipt_details->show_qr_code && !empty($receipt_details->qr_code_text))
 				<img class="center-block mt-5" src="data:image/png;base64,{{DNS2D::getBarcodePNG($receipt_details->qr_code_text, 'QRCODE', 3, 3, [39, 48, 54])}}">
 			@endif

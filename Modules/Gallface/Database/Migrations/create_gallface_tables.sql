@@ -96,7 +96,7 @@ PREPARE alterIfNotExists FROM @preparedStatement;
 EXECUTE alterIfNotExists;
 DEALLOCATE PREPARE alterIfNotExists;
 
--- Verify tables exist (informational only, won't cause errors)
+-- Verify tables exist
 SELECT 'location_api_credentials table status:' as message, 
   IF(COUNT(*) > 0, 'EXISTS', 'NOT FOUND') as status 
 FROM INFORMATION_SCHEMA.TABLES 
