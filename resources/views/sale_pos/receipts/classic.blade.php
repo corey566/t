@@ -302,6 +302,9 @@
 					@if(!empty($receipt_details->sales_person_label))
 						<th class="text-right" width="10%">{{$receipt_details->sales_person_label}}</th>
 					@endif
+					@if(!empty($receipt_details->service_staff_label))
+						<th class="text-right" width="10%">Service Staff</th>
+					@endif
 					<th class="text-right" width="15%">{{$receipt_details->table_subtotal_label}}</th>
 				</tr>
 			</thead>
@@ -366,6 +369,11 @@
 								<small>{{$line['service_staff_name'] ?? '-'}}</small>
 							</td>
 						@endif
+						@if(!empty($receipt_details->service_staff_label))
+							<td class="text-right">
+								<small>{{$line['service_staff_name'] ?? '-'}}</small>
+							</td>
+						@endif
 						<td class="text-right">{{$line['line_total']}}</td>
 					</tr>
 					@if(!empty($line['modifiers']))
@@ -387,6 +395,9 @@
 								@if(!empty($receipt_details->sales_person_label))
 									<td></td>
 								@endif
+								@if(!empty($receipt_details->service_staff_label))
+									<td></td>
+								@endif
 								<td class="text-right">{{$modifier['line_total']}}</td>
 							</tr>
 						@endforeach
@@ -401,6 +412,9 @@
     					<td></td>
     					@endif
 						@if(!empty($receipt_details->sales_person_label))
+							<td></td>
+						@endif
+						@if(!empty($receipt_details->service_staff_label))
 							<td></td>
 						@endif
 					</tr>

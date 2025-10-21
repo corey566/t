@@ -371,6 +371,9 @@
 						@if(!empty($receipt_details->sales_person_label))
 							<th class="text-right">Staff</th>
 						@endif
+						@if(!empty($receipt_details->service_staff_label))
+							<th class="text-right">Service Staff</th>
+						@endif
                         @if(empty($receipt_details->hide_price))
                         <th class="unit_price text-right">
                         	{{$receipt_details->table_unit_price_label}}
@@ -444,6 +447,9 @@
                             </small>
                             @endif</td>
 							@if(!empty($receipt_details->sales_person_label))
+								<td class="text-right"><small>{{$line['service_staff_name'] ?? '-'}}</small></td>
+							@endif
+							@if(!empty($receipt_details->service_staff_label))
 								<td class="text-right"><small>{{$line['service_staff_name'] ?? '-'}}</small></td>
 							@endif
 	                        @if(empty($receipt_details->hide_price))

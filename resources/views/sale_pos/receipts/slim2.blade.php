@@ -406,9 +406,9 @@
 				                            </small>
 				                            @endif
 
-				                            @if(!empty($line['service_staff']))
+				                            @if(!empty($line['service_staff_name']))
 				                            	<br>
-				                            	<small><strong>Service Person:</strong> {{$line['service_staff']}}</small>
+				                            	<small><strong>Service Staff:</strong> {{$line['service_staff_name']}}</small>
 				                            @endif
 	                        		</p>
 	                        	</div>
