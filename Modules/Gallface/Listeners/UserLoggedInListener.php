@@ -12,12 +12,22 @@ class UserLoggedInListener
     public function handle($event)
     {
         try {
-            // Get the user from the event
+            // Get the user from the login event
             $user = $event->user ?? auth()->user();
             
             if (!$user || !isset($user->location_id)) {
+                Log::warning('HCM Login Listener - No user or location', [
+                    'has_user' => !empty($user),
+                    'has_location' => isset($user->location_id)
+                ]);
                 return;
             }
+            
+            Log::info('HCM Login Listener Triggered', [
+                'user_id' => $user->id,
+                'location_id' => $user->location_id,
+                'business_id' => $user->business_id
+            ]);
 
             $locationId = $user->location_id;
             $businessId = $user->business_id;
@@ -33,14 +43,14 @@ class UserLoggedInListener
                 ->first();
 
             if ($hcmCredential) {
-                Log::info('User logged in - Starting HCM ping', [
+                Log::info('User logged in - Sending HCM ping', [
                     'location_id' => $locationId,
                     'user_id' => $userId,
                     'username' => $username,
                     'ip_address' => $ipAddress
                 ]);
                 
-                // Send immediate ping
+                // Send immediate ping on login
                 $apiService = new HcmApiService($hcmCredential->getCredentialsForApi());
                 $pingResult = $apiService->sendPing($userId, $username, $ipAddress);
                 

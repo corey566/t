@@ -345,12 +345,26 @@ class HcmApiService
 
         $cashierId = substr((string)($sale->cashier_id ?? $sale->created_by ?? 'CASH-01'), 0, 50);
 
-        // Set customer mobile to blank if not available (don't send random numbers)
+        // Set customer mobile to blank for walk-in customers (don't send random numbers)
         $customerMobile = '';
-        if (!empty($sale->mobile)) {
-            $customerMobile = substr((string)$sale->mobile, 0, 15);
-        } elseif (!empty($sale->customer_mobile)) {
-            $customerMobile = substr((string)$sale->customer_mobile, 0, 15);
+        
+        // Only set customer mobile if it's a valid mobile number (not walk-in)
+        if (!empty($sale->mobile) && !in_array(strtolower(trim($sale->mobile)), ['walk-in', 'walkin', 'walk in', '0', 'null'])) {
+            // Validate it's a number and not just placeholder text
+            $mobile = preg_replace('/\D/', '', $sale->mobile); // Remove non-digits
+            if (strlen($mobile) >= 9) { // Valid mobile should be at least 9 digits
+                $customerMobile = substr($mobile, 0, 15);
+            }
+        } elseif (!empty($sale->customer_mobile) && !in_array(strtolower(trim($sale->customer_mobile)), ['walk-in', 'walkin', 'walk in', '0', 'null'])) {
+            $mobile = preg_replace('/\D/', '', $sale->customer_mobile);
+            if (strlen($mobile) >= 9) {
+                $customerMobile = substr($mobile, 0, 15);
+            }
+        }
+        
+        // Additional check: if contact_id is null or matches default walk-in customer, ensure blank mobile
+        if (empty($sale->contact_id) || $sale->contact_id == 1) {
+            $customerMobile = '';
         }
 
         // Get payment details
@@ -380,12 +394,14 @@ class HcmApiService
                     $cardType = $paymentObj->card_type ?? '';
                 } elseif ($method === 'hcm_loyalty') {
                     $hcmLoyalty += $amount;
+                } elseif ($method === 'havelock_city_voucher' || $method === 'havelock city voucher') {
+                    // Map Havelock City Voucher to hcmLoyalty
+                    $hcmLoyalty += $amount;
+                    $havelockCityVoucher += $amount;
                 } elseif ($method === 'tenant_loyalty' || $method === 'loyalty') {
                     $tenantLoyalty += $amount;
                 } elseif ($method === 'credit_note') {
                     $creditNotes += $amount;
-                } elseif ($method === 'havelock_city_voucher' || $method === 'havelock city voucher') {
-                    $havelockCityVoucher += $amount;
                 } else {
                     $otherPayments += $amount;
                 }

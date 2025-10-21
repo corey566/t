@@ -44,6 +44,7 @@ class GallfaceServiceProvider extends ServiceProvider
             \Modules\Gallface\Console\HcmSyncCommand::class,
             \Modules\Gallface\Console\HcmTestPingCommand::class,
             \Modules\Gallface\Console\HcmActivityPingCommand::class,
+            \Modules\Gallface\Console\HcmValidationTestCommand::class,
         ]);
     }
 
@@ -176,8 +177,11 @@ class GallfaceServiceProvider extends ServiceProvider
                 ->withoutOverlapping()
                 ->runInBackground();
 
-            // Note: HCM ping every 5 seconds is handled by the "Auto Sync Monitor" workflow
-            // which runs the commands continuously with sleep intervals
+            // Run HCM ping check every minute (lightweight, just checks and pings once)
+            $schedule->command('hcm:activity-ping')
+                ->everyMinute()
+                ->withoutOverlapping()
+                ->runInBackground();
         });
     }
 }

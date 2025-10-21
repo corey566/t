@@ -91,11 +91,11 @@ class HcmSyncCommand extends Command
                 continue;
             }
 
-                // Sync sales data
+                // Sync sales and returns data
                 $salesData = DB::table('transactions')
                     ->where('business_id', $credential->business_id)
                     ->where('location_id', $credential->business_location_id)
-                    ->where('type', 'sell')
+                    ->whereIn('type', ['sell', 'sell_return'])
                     ->whereNull('hcm_synced_at')
                     ->limit(100)
                     ->get()
@@ -105,7 +105,7 @@ class HcmSyncCommand extends Command
                     $syncResult = $apiService->syncSales($salesData, $credential->business_location_id);
 
                     if ($syncResult['success']) {
-                        $this->info("✓ Synced {$syncResult['records_synced']} sales records");
+                        $this->info("✓ Synced {$syncResult['records_synced']} sales/return records");
 
                         // Mark as synced
                         $invoiceNos = array_column($salesData, 'invoice_no');
@@ -116,7 +116,7 @@ class HcmSyncCommand extends Command
                         $this->error("✗ Sync failed: {$syncResult['message']}");
                     }
                 } else {
-                    $this->info("No new sales to sync");
+                    $this->info("No new sales or returns to sync");
                 }
 
             // Update last synced timestamp
