@@ -1231,7 +1231,7 @@ class TransactionUtil extends Util
         $output['currency_symbol'] = $business_details->currency_symbol;
 
         $output['hide_price'] = ! empty($il->common_settings['hide_price']) ? true : false;
-        
+
         // Add reward points enabled flag and values
         $output['rp_enabled'] = $business_details->enable_rp == 1 ? true : false;
         if ($output['rp_enabled']) {
@@ -2244,7 +2244,7 @@ class TransactionUtil extends Util
             //         if (!isset($output_taxes['taxes'][$tax_name])) {
             //             $output_taxes['taxes'][$tax_name] = 0;
             //         }
-            //         $output_taxes['taxes'][$tax_name] += ($line->quantity_returned * $line->item_tax);
+            //         $output_taxes['taxes'][$tax_name] += ($line->quantity * $line->item_tax);
             //     }
             // }
 
@@ -3568,7 +3568,7 @@ class TransactionUtil extends Util
 
             //Add mapping for new sell lines and for incremented quantity
             if (! empty($new_sell_lines)) {
-                $this->mapPurchaseSell($business, $new_sell_lines);
+                $this->mapPurchaseSell($business, $new_sell_lines, 'purchase');
             }
         }
     }
@@ -4942,6 +4942,10 @@ class TransactionUtil extends Util
 
         if ($request->has('expense_sub_category_id')) {
             $transaction_data['expense_sub_category_id'] = $request->input('expense_sub_category_id');
+        }
+
+        if ($request->has('expense_category_id')) {
+            $transaction_data['expense_category_id'] = $request->input('expense_category_id');
         }
 
         $transaction_data['total_before_tax'] = $transaction_data['final_total'];
