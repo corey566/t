@@ -388,13 +388,13 @@ class SellPosController extends Controller
                     \Log::error('POS Sale Error: No location_id provided', ['input' => $input]);
                     return ['success' => 0, 'msg' => __('lang_v1.please_select_location')];
                 }
-                
+
                 // Verify location exists and belongs to business
                 $location_exists = \App\BusinessLocation::where('id', $input['location_id'])
                     ->where('business_id', $business_id)
                     ->where('is_active', 1)
                     ->exists();
-                    
+
                 if (!$location_exists) {
                     \Log::error('POS Sale Error: Invalid location_id', [
                         'location_id' => $input['location_id'],
@@ -686,18 +686,36 @@ class SellPosController extends Controller
             }
         } catch (\Exception $e) {
             DB::rollBack();
-            \Log::emergency('File:' . $e->getFile() . 'Line:' . $e->getLine() . 'Message:' . $e->getMessage());
-            $msg = trans('messages.something_went_wrong');
+            \Log::emergency("File:".$e->getFile().'Line:'.$e->getLine().'Message:'.$e->getMessage(), [
+                'trace' => $e->getTraceAsString(),
+                'input' => $input ?? [],
+                'user_id' => $user_id ?? null,
+                'business_id' => $business_id ?? null
+            ]);
+
+            $msg = trans("messages.something_went_wrong");
 
             if (get_class($e) == \App\Exceptions\PurchaseSellMismatch::class) {
                 $msg = $e->getMessage();
             }
+
             if (get_class($e) == \App\Exceptions\AdvanceBalanceNotAvailable::class) {
                 $msg = $e->getMessage();
             }
 
-            $output = ['success' => 0,
-                'msg' => $msg,
+            // Add detailed error message in development
+            if (config('app.debug')) {
+                $msg .= ' - ' . $e->getMessage();
+            }
+
+            if ($is_direct_sale) {
+                return redirect()
+                    ->action([\App\Http\Controllers\SellController::class, 'index'])
+                    ->with('status', ['success' => 0, 'msg' => $msg]);
+            }
+
+            return ['success' => 0,
+                'msg' => $msg
             ];
         }
 

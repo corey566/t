@@ -205,6 +205,7 @@
 <div class="row">
 	<div class="col-sm-12 pos_product_div">
 		<input type="hidden" name="sell_price_tax" id="sell_price_tax" value="{{$business_details->sell_price_tax}}">
+		<input type="hidden" name="location_id" id="location_id" value="{{ $default_location->id ?? '' }}">
 
 		<!-- Keeps count of product rows -->
 		<input type="hidden" id="product_row_count" 
