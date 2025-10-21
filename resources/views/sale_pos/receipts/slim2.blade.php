@@ -690,12 +690,8 @@
 			    !empty($receipt_details->rp_available)
 			)
 			    <div class="border-top textbox-info" style="margin-top: 10px; padding-top: 10px;">
-			        <p style="text-align:center; font-weight:bold; margin-bottom:5px;">Points Status</p>
 			        <p style="text-align:center; font-size:12px; margin:0;">
-			            Before: <strong>{{ $receipt_details->rp_before ?? 0 }}</strong> |
-			            Used: <strong>{{ $receipt_details->rp_used ?? 0 }}</strong> |
-			            Earned: <strong>{{ $receipt_details->rp_earned ?? 0 }}</strong> |
-			            Balance: <strong>{{ $receipt_details->rp_available ?? 0 }}</strong>
+			            <strong>Points Status:</strong> Before: {{ $receipt_details->rp_before ?? 0 }} | Used: {{ $receipt_details->rp_used ?? 0 }} | Earned: {{ $receipt_details->rp_earned ?? 0 }} | Balance: {{ $receipt_details->rp_available ?? 0 }}
 			        </p>
 			    </div>
 			@endif
