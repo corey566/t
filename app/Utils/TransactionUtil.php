@@ -111,7 +111,7 @@ class TransactionUtil extends Util
             'recur_repetitions' => ! empty($input['recur_repetitions']) ? $input['recur_repetitions'] : 0,
             'order_addresses' => ! empty($input['order_addresses']) ? $input['order_addresses'] : null,
             'sub_type' => ! empty($input['sub_type']) ? $input['sub_type'] : null,
-            'rp_earned' => $input['status'] == 'final' ? $this->calculateRewardPoints($input['contact_id'], $final_total) : 0,
+            'rp_earned' => $input['status'] == 'final' ? $this->calculateRewardPoints($business_id, $final_total) : 0,
             'rp_redeemed' => ! empty($input['rp_redeemed']) ? $input['rp_redeemed'] : 0,
             'rp_redeemed_amount' => ! empty($input['rp_redeemed_amount']) ? $input['rp_redeemed_amount'] : 0,
             'is_created_from_api' => ! empty($input['is_created_from_api']) ? 1 : 0,
@@ -230,7 +230,7 @@ class TransactionUtil extends Util
             'subscription_repeat_on' => ! empty($input['subscription_repeat_on']) ? $input['subscription_repeat_on'] : null,
             'recur_repetitions' => ! empty($input['recur_repetitions']) ? $input['recur_repetitions'] : 0,
             'order_addresses' => ! empty($input['order_addresses']) ? $input['order_addresses'] : null,
-            'rp_earned' => $input['status'] == 'final' ? $this->calculateRewardPoints($input['contact_id'], $final_total) : 0,
+            'rp_earned' => $input['status'] == 'final' ? $this->calculateRewardPoints($business_id, $final_total) : 0,
             'rp_redeemed' => ! empty($input['rp_redeemed']) ? $input['rp_redeemed'] : 0,
             'rp_redeemed_amount' => ! empty($input['rp_redeemed_amount']) ? $input['rp_redeemed_amount'] : 0,
             'types_of_service_id' => ! empty($input['types_of_service_id']) ? $input['types_of_service_id'] : null,
@@ -5345,166 +5345,6 @@ class TransactionUtil extends Util
             'location_details' => $location_details,
             'receipt_details' => $receipt_details,
         ];
-    }
-
-    /**
-     * Return mpdf object for
-     * email attachment
-     *
-     * @param  int  $business_id
-     * @param  int  $transaction_id
-     * @param  bool  $is_email_attachment
-     * @return object
-     */
-    public function getEmailAttachmentForGivenTransaction($business_id, $transaction_id, $is_email_attachment)
-    {
-        $receipt_contents = $this->getPdfContentsForGivenTransaction($business_id, $transaction_id);
-
-        $receipt_details = $receipt_contents['receipt_details'];
-        $location_details = $receipt_contents['location_details'];
-
-        $blade_file = 'download_pdf';
-        if (! empty($receipt_details->is_export)) {
-            $blade_file = 'download_export_pdf';
-        }
-
-        //Generate pdf
-        $body = view('sale_pos.receipts.'.$blade_file)
-                    ->with(compact('receipt_details', 'location_details', 'is_email_attachment'))
-                    ->render();
-
-        $mpdf = new \Mpdf\Mpdf(['tempDir' => public_path('uploads/temp'),
-            'mode' => 'utf-8',
-            'autoScriptToLang' => true,
-            'autoLangToFont' => true,
-            'autoVietnamese' => true,
-            'autoArabic' => true,
-            'margin_top' => 8,
-            'margin_bottom' => 8,
-            'format' => 'A4',
-        ]);
-
-        $mpdf->useSubstitutions = true;
-        $mpdf->SetWatermarkText($receipt_details->business_name, 0.1);
-        $mpdf->showWatermarkText = true;
-        $mpdf->SetTitle('INVOICE-'.$receipt_details->invoice_no.'.pdf');
-        $mpdf->WriteHTML($body);
-
-        return $mpdf;
-    }
-
-    public function updateSalesOrderStatus($sales_order_ids = [])
-    {
-        foreach ($sales_order_ids as $sales_order_id) {
-            $sales_order = Transaction::with(['sell_lines'])->find($sales_order_id);
-
-            if (empty($sales_order)) {
-                continue;
-            }
-            $total_ordered = $sales_order->sell_lines->sum('quantity');
-            $total_received = $sales_order->sell_lines->sum('so_quantity_invoiced');
-
-            $status = $total_received == 0 ? 'ordered' : 'partial';
-            if ($total_ordered == $total_received) {
-                $status = 'completed';
-            }
-            $sales_order->status = $status;
-            $sales_order->save();
-        }
-    }
-
-    public function getUserTotalSales($business_id, $user_id, $start_date, $end_date)
-    {
-        $totals = Transaction::where('business_id', $business_id)
-                                ->where('commission_agent', $user_id)
-                                ->where('type', 'sell')
-                                ->where('status', 'final')
-                                ->whereBetween(DB::raw('transaction_date'), [$start_date, $end_date])
-                                ->select(
-                                    DB::raw('SUM(final_total) as total_sales'),
-                                    DB::raw('SUM(total_before_tax - shipping_charges - (SELECT SUM(item_tax*quantity) FROM transaction_sell_lines as tsl WHERE tsl.transaction_id=transactions.id) ) as total_sales_without_tax')
-                                )
-                                ->first();
-
-        return [
-            'total_sales' => $totals->total_sales ?? 0,
-            'total_sales_without_tax' => $totals->total_sales_without_tax ?? 0,
-        ];
-    }
-
-    public function getSources($business_id)
-    {
-        $unique_sources = Transaction::where('business_id', $business_id)
-                                    ->where('type', 'sell')
-                                    ->select('source')
-                                    ->groupBy('source')
-                                    ->get();
-        $sources = [];
-
-        foreach ($unique_sources as $source) {
-            if (! empty($source->source)) {
-                $sources[$source->source] = $source->source;
-            }
-        }
-
-        return $sources;
-    }
-
-    public function getPurchaseOrderPdf($business_id, $transaction_id)
-    {
-        $taxes = TaxRate::where('business_id', $business_id)
-                                ->get();
-
-        $purchase = Transaction::where('business_id', $business_id)
-                    ->where('id', $transaction_id)
-                    ->with(
-                        'contact',
-                        'purchase_lines',
-                        'purchase_lines.product',
-                        'purchase_lines.product.brand',
-                        'purchase_lines.product.category',
-                        'purchase_lines.variations',
-                        'purchase_lines.variations.product_variation',
-                        'location',
-                        'payment_lines'
-                    )
-                    ->first();
-
-        $location_details = BusinessLocation::find($purchase->location_id);
-        $businessUtil = new BusinessUtil();
-        $invoice_layout = $businessUtil->invoiceLayout($business_id, $location_details->invoice_layout_id);
-
-        //Logo
-        $logo = $invoice_layout->show_logo != 0 && ! empty($invoice_layout->logo) && file_exists(public_path('uploads/invoice_logos/'.$invoice_layout->logo)) ? asset('uploads/invoice_logos/'.$invoice_layout->logo) : false;
-
-        $word_format = $invoice_layout->common_settings['num_to_word_format'] ? $invoice_layout->common_settings['num_to_word_format'] : 'international';
-        $total_in_words = $this->numToWord($purchase->final_total, null, $word_format);
-
-        $custom_labels = json_decode(session('business.custom_labels'), true);
-
-        //Generate pdf
-        $body = view('purchase_order.receipts.download_pdf')
-                    ->with(compact('purchase', 'invoice_layout', 'location_details', 'logo', 'total_in_words', 'custom_labels', 'taxes'))
-                    ->render();
-
-        $mpdf = new \Mpdf\Mpdf(['tempDir' => public_path('uploads/temp'),
-            'mode' => 'utf-8',
-            'autoScriptToLang' => true,
-            'autoLangToFont' => true,
-            'autoVietnamese' => true,
-            'autoArabic' => true,
-            'margin_top' => 8,
-            'margin_bottom' => 8,
-            'format' => 'A4',
-        ]);
-
-        $mpdf->useSubstitutions = true;
-        $mpdf->SetWatermarkText($purchase->business->name, 0.1);
-        $mpdf->showWatermarkText = true;
-        $mpdf->SetTitle('PO-'.$purchase->ref_no.'.pdf');
-        $mpdf->WriteHTML($body);
-
-        return $mpdf;
     }
 
     /**
