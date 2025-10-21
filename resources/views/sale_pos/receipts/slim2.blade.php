@@ -432,6 +432,9 @@
                         @if(!empty($line['service_staff']))
                             <div class="item-details">Staff: {{$line['service_staff']}}</div>
                         @endif
+                        @if(!empty($line['service_staff_name']))
+                            <div class="item-details"><strong>Service Staff:</strong> {{$line['service_staff_name']}}</div>
+                        @endif
                     </td>
                     <td class="item-qty">{{$line['quantity']}}</td>
                     <td class="item-price">{{$line['line_total']}}</td>
