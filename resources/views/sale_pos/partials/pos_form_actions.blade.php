@@ -41,11 +41,12 @@
                         @lang('messages.delete')</button>
                 @endif
             </div>
-            <div class="tw-flex tw-items-center tw-gap-4 tw-flex-row tw-overflow-x-auto">
+            <div class="tw-flex tw-items-center tw-gap-4 tw-flex-row tw-overflow-x-auto tw-z-10 tw-relative">
 
                 @if (!Gate::check('disable_draft') || auth()->user()->can('superadmin') || auth()->user()->can('admin'))
                     <button type="button"
-                        class="tw-font-bold tw-text-gray-700 tw-text-xs md:tw-text-sm tw-flex tw-flex-col tw-items-center tw-justify-center tw-gap-1 @if ($pos_settings['disable_draft'] != 0) hide @endif"
+                        class="tw-font-bold tw-text-gray-700 tw-text-xs md:tw-text-sm tw-flex tw-flex-col tw-items-center tw-justify-center tw-gap-1 tw-cursor-pointer @if ($pos_settings['disable_draft'] != 0) hide @endif"
+                        style="pointer-events: auto;"
                         id="pos-draft" @if (!empty($only_payment)) disabled @endif><i
                             class="fas fa-edit tw-text-[#009ce4]"></i> @lang('sale.draft')</button>
                 @endif
@@ -53,6 +54,7 @@
                 @if (!Gate::check('disable_quotation') || auth()->user()->can('superadmin') || auth()->user()->can('admin'))
                     <button type="button"
                         class="tw-font-bold tw-text-gray-700 tw-cursor-pointer tw-text-xs md:tw-text-sm tw-flex tw-flex-col tw-items-center tw-justify-center tw-gap-1 @if ($is_mobile) col-xs-6 @endif"
+                        style="pointer-events: auto;"
                         id="pos-quotation" @if (!empty($only_payment)) disabled @endif><i
                             class="fas fa-edit tw-text-[#E7A500]"></i> @lang('lang_v1.quotation')</button>
                 @endif
@@ -61,6 +63,7 @@
                     @if (empty($pos_settings['disable_suspend']))
                         <button type="button"
                             class="tw-font-bold tw-text-gray-700 tw-cursor-pointer tw-text-xs md:tw-text-sm tw-flex tw-flex-col tw-items-center tw-justify-center tw-gap-1  no-print pos-express-finalize"
+                            style="pointer-events: auto;"
                             data-pay_method="suspend" title="@lang('lang_v1.tooltip_suspend')"
                             @if (!empty($only_payment)) disabled @endif>
                             <i class="fas fa-pause tw-text-[#EF4B51]" aria-hidden="true"></i>
@@ -74,6 +77,7 @@
                         <input type="hidden" name="is_credit_sale" value="0" id="is_credit_sale">
                         <button type="button"
                             class=" tw-font-bold tw-text-gray-700 tw-cursor-pointer tw-text-xs md:tw-text-sm tw-flex tw-flex-col tw-items-center tw-justify-center tw-gap-1 no-print pos-express-finalize @if ($is_mobile) col-xs-6 @endif"
+                            style="pointer-events: auto;"
                             data-pay_method="credit_sale" title="@lang('lang_v1.tooltip_credit_sale')"
                             @if (!empty($only_payment)) disabled @endif>
                             <i class="fas fa-check tw-text-[#5E5CA8]" aria-hidden="true"></i> @lang('lang_v1.credit_sale')
@@ -83,6 +87,7 @@
                 @if (!Gate::check('disable_card') || auth()->user()->can('superadmin') || auth()->user()->can('admin'))
                     <button type="button"
                         class="tw-font-bold tw-text-gray-700 tw-cursor-pointer tw-text-xs md:tw-text-sm tw-flex tw-flex-col tw-items-center tw-justify-center tw-gap-1  no-print @if (!empty($pos_settings['disable_suspend']))  @endif pos-express-finalize @if (!array_key_exists('card', $payment_types)) hide @endif @if ($is_mobile) col-xs-6 @endif"
+                        style="pointer-events: auto;"
                         data-pay_method="card" title="@lang('lang_v1.tooltip_express_checkout_card')">
                         <i class="fas fa-credit-card tw-text-[#D61B60]" aria-hidden="true"></i> @lang('lang_v1.express_checkout_card')
                     </button>
