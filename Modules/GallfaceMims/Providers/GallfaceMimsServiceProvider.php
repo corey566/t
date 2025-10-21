@@ -3,78 +3,61 @@
 namespace Modules\GallfaceMims\Providers;
 
 use Illuminate\Support\ServiceProvider;
-use Illuminate\Database\Eloquent\Factory;
 use Illuminate\Console\Scheduling\Schedule;
 
 class GallfaceMimsServiceProvider extends ServiceProvider
 {
-    /**
-     * @var string $moduleName
-     */
     protected $moduleName = 'GallfaceMims';
-
-    /**
-     * @var string $moduleNameLower
-     */
     protected $moduleNameLower = 'gallfacemims';
 
-    /**
-     * Boot the application events.
-     *
-     * @return void
-     */
     public function boot(): void
     {
         $this->registerTranslations();
         $this->registerConfig();
         $this->registerViews();
-        $this->loadMigrationsFrom(module_path('GallfaceMims', 'Database/Migrations'));
+        $this->loadMigrationsFrom(module_path($this->moduleName, 'Database/Migrations'));
         $this->registerCommands();
+        $this->scheduleAutoSync();
         $this->registerEventListeners();
     }
 
-    /**
-     * Register the service provider.
-     *
-     * @return void
-     */
     public function register(): void
     {
         $this->app->register(RouteServiceProvider::class);
     }
 
-    /**
-     * Register commands.
-     */
-    public function registerCommands()
+    protected function registerCommands()
     {
         // Register commands when they are created
-        // $this->commands([
-        //     \Modules\GallfaceMims\Console\SyncCommand::class,
-        // ]);
     }
 
-    /**
-     * Register event listeners
-     */
+    protected function scheduleAutoSync(): void
+    {
+        $this->app->booted(function () {
+            $schedule = $this->app->make(Schedule::class);
+            // Add scheduled tasks here when needed
+        });
+    }
+
     protected function registerEventListeners(): void
     {
         $events = $this->app->make('events');
 
-        // Listen for sale created event
         $events->listen(
             'eloquent.created: App\Transaction',
             function ($transaction) {
                 // Handle transaction sync if needed
             }
         );
+
+        $events->listen(
+            'Illuminate\Auth\Events\Login',
+            function ($event) {
+                // Handle user login event if needed
+            }
+        );
     }
 
-    /**
-     * Register config.
-     *
-     * @return void
-     */
     protected function registerConfig()
     {
         $this->publishes([
@@ -85,11 +68,6 @@ class GallfaceMimsServiceProvider extends ServiceProvider
         );
     }
 
-    /**
-     * Register views.
-     *
-     * @return void
-     */
     public function registerViews()
     {
         $viewPath = resource_path('views/modules/' . $this->moduleNameLower);
@@ -102,11 +80,6 @@ class GallfaceMimsServiceProvider extends ServiceProvider
         $this->loadViewsFrom(array_merge($this->getPublishableViewPaths(), [$sourcePath]), $this->moduleNameLower);
     }
 
-    /**
-     * Register translations.
-     *
-     * @return void
-     */
     public function registerTranslations()
     {
         $langPath = resource_path('lang/modules/' . $this->moduleNameLower);
@@ -118,16 +91,6 @@ class GallfaceMimsServiceProvider extends ServiceProvider
         }
     }
 
-    /**
-     * Get the services provided by the provider.
-     *
-     * @return array
-     */
-    public function provides()
-    {
-        return [];
-    }
-
     private function getPublishableViewPaths(): array
     {
         $paths = [];
@@ -137,5 +100,10 @@ class GallfaceMimsServiceProvider extends ServiceProvider
             }
         }
         return $paths;
+    }
+
+    public function provides()
+    {
+        return [];
     }
 }
