@@ -18,10 +18,15 @@
             <!-- Collect the nav links, forms, and other content for toggling -->
             <div class="collapse navbar-collapse" id="bs-example-navbar-collapse-1">
                 <ul class="nav navbar-nav ml-auto">
-                    <li class="nav-item">
-                        <a href="{{ url('gallface/setting') }}" class="nav-link {{ request()->is('gallface/setting') ? 'active' : '' }}" style="display: flex; align-items: center; gap: 8px;">
-                            <img src="{{ asset('modules/gallface/images/one-gallface-logo.png') }}" alt="One Gallface" style="height: 24px; width: 24px;">
-                            <span>One Gallface Mall</span>
+                    <li class="@if(request()->segment(3) == 'setting') active @endif">
+                        <a href="{{action([\Modules\Gallface\Http\Controllers\GallfaceController::class, 'setting'])}}">
+                            <i class="fa fa-cog"></i> <span>Settings</span>
+                        </a>
+                    </li>
+
+                    <li class="@if(request()->segment(2) == 'gallface') active @endif">
+                        <a href="{{action([\Modules\Gallface\Http\Controllers\GallfaceController::class, 'dashboard'])}}">
+                            <i class="fa fa-dashboard"></i> <span>@lang('lang_v1.dashboard')</span>
                         </a>
                     </li>
                     <li class="nav-item">
