@@ -659,10 +659,6 @@
 			<hr/>
 			<h4 class="text-center"><strong>@lang('lang_v1.reward_point_details')</strong></h4>
 			<table class="table">
-				<tr>
-					<td><strong>Points status: Before</strong></td>
-					<td class="text-right">{{$receipt_details->rp_before_transaction}}</td>
-				</tr>
 				@if(!empty($receipt_details->rp_earned))
 					<tr>
 						<td><strong>@lang('lang_v1.reward_points_earned'):</strong></td>

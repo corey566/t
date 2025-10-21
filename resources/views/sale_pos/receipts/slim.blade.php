@@ -42,7 +42,7 @@
 						{!! $receipt_details->contact !!}
 					@endif
 					@if(!empty($receipt_details->contact) && !empty($receipt_details->website))
-						,
+						, 
 					@endif
 					@if(!empty($receipt_details->website))
 						{{ $receipt_details->website }}
@@ -62,7 +62,7 @@
 					@endif
 					@if(!empty($receipt_details->sub_heading_line4))
 						{{ $receipt_details->sub_heading_line4 }}<br/>
-					@endif
+					@endif		
 					@if(!empty($receipt_details->sub_heading_line5))
 						{{ $receipt_details->sub_heading_line5 }}<br/>
 					@endif
@@ -291,7 +291,7 @@
 			@if(!empty($receipt_details->shipping_custom_field_1_label))
 				<div class="textbox-info">
 					<p class="f-left"><strong>
-						{!!$receipt_details->shipping_custom_field_1_label!!}
+						{!!$receipt_details->shipping_custom_field_1_label!!} 
 					</strong></p>
 					<p class="f-right">
 						{!!$receipt_details->shipping_custom_field_1_value ?? ''!!}
@@ -301,7 +301,7 @@
 			@if(!empty($receipt_details->shipping_custom_field_2_label))
 				<div class="textbox-info">
 					<p class="f-left"><strong>
-						{!!$receipt_details->shipping_custom_field_2_label!!}
+						{!!$receipt_details->shipping_custom_field_2_label!!} 
 					</strong></p>
 					<p class="f-right">
 						{!!$receipt_details->shipping_custom_field_2_value ?? ''!!}
@@ -311,7 +311,7 @@
 			@if(!empty($receipt_details->shipping_custom_field_3_label))
 				<div class="textbox-info">
 					<p class="f-left"><strong>
-						{!!$receipt_details->shipping_custom_field_3_label!!}
+						{!!$receipt_details->shipping_custom_field_3_label!!} 
 					</strong></p>
 					<p class="f-right">
 						{!!$receipt_details->shipping_custom_field_3_value ?? ''!!}
@@ -321,7 +321,7 @@
 			@if(!empty($receipt_details->shipping_custom_field_4_label))
 				<div class="textbox-info">
 					<p class="f-left"><strong>
-						{!!$receipt_details->shipping_custom_field_4_label!!}
+						{!!$receipt_details->shipping_custom_field_4_label!!} 
 					</strong></p>
 					<p class="f-right">
 						{!!$receipt_details->shipping_custom_field_4_value ?? ''!!}
@@ -331,7 +331,7 @@
 			@if(!empty($receipt_details->shipping_custom_field_5_label))
 				<div class="textbox-info">
 					<p class="f-left"><strong>
-						{!!$receipt_details->shipping_custom_field_5_label!!}
+						{!!$receipt_details->shipping_custom_field_5_label!!} 
 					</strong></p>
 					<p class="f-right">
 						{!!$receipt_details->shipping_custom_field_5_value ?? ''!!}
@@ -359,33 +359,6 @@
 					</p>
 				</div>
 			@endif
-
-			@if(!empty($receipt_details->customer_rp_label) && ($receipt_details->rp_earned > 0 || $receipt_details->rp_redeemed > 0))
-			<div class="text-box">
-				<table class="border-bottom width-100" style="margin-top: 10px;">
-					<thead>
-						<tr>
-							<th colspan="4" class="text-center"><strong>Points status</strong></th>
-						</tr>
-						<tr style="border-top: 1px dashed #000;">
-							<th class="text-center" width="25%">Before</th>
-							<th class="text-center" width="25%">Used</th>
-							<th class="text-center" width="25%">Earned</th>
-							<th class="text-center" width="25%">Balance</th>
-						</tr>
-					</thead>
-					<tbody>
-						<tr>
-							<td class="text-center">{{ $receipt_details->customer_total_rp ?? 0 }}</td>
-							<td class="text-center">{{ $receipt_details->rp_redeemed ?? 0 }}</td>
-							<td class="text-center">{{ $receipt_details->rp_earned ?? 0 }}</td>
-							<td class="text-center">{{ ($receipt_details->customer_total_rp ?? 0) - ($receipt_details->rp_redeemed ?? 0) + ($receipt_details->rp_earned ?? 0) }}</td>
-						</tr>
-					</tbody>
-				</table>
-			</div>
-			@endif
-
             <table style="margin-top: 25px !important" class="border-bottom width-100 table-f-12 mb-10">
                 <thead class="border-bottom-dotted">
                     <tr>
@@ -424,7 +397,7 @@
 	                        	{{$loop->iteration}}
 	                        </td>
 	                        <td class="description">
-	                        	{{$line['name']}} {{$line['product_variation']}} {{$line['variation']}}
+	                        	{{$line['name']}} {{$line['product_variation']}} {{$line['variation']}} 
 	                        	@if(!empty($line['sub_sku'])), {{$line['sub_sku']}} @endif @if(!empty($line['brand'])), {{$line['brand']}} @endif @if(!empty($line['cat_code'])), {{$line['cat_code']}}@endif
 	                        	@if(!empty($line['product_custom_fields'])), {{$line['product_custom_fields']}} @endif
 	                        	@if(!empty($line['product_description']))
@@ -437,8 +410,8 @@
 	                        	<span class="f-8">
 	                        	{!!$line['sell_line_note']!!}
 	                        	</span>
-	                        	@endif
-	                        	@if(!empty($line['lot_number']))<br> {{$line['lot_number_label']}}:  {{$line['lot_number']}} @endif
+	                        	@endif 
+	                        	@if(!empty($line['lot_number']))<br> {{$line['lot_number_label']}}:  {{$line['lot_number']}} @endif 
 	                        	@if(!empty($line['product_expiry'])), {{$line['product_expiry_label']}}:  {{$line['product_expiry']}} @endif
 	                        	@if(!empty($line['warranty_name']))
 	                            	<br>
@@ -458,7 +431,7 @@
 	                            @if($receipt_details->show_base_unit_details && $line['quantity'] && $line['base_unit_multiplier'] !== 1)
 		                            <br><small>
 		                            	1 {{$line['units']}} = {{$line['base_unit_multiplier']}} {{$line['base_unit_name']}} <br>
-	                            			{{$line['base_unit_price']}} x {{$line['orig_quantity']}} = {{$line['line_total']}}
+                            			{{$line['base_unit_price']}} x {{$line['orig_quantity']}} = {{$line['line_total']}}
 		                            </small>
 		                            @endif
 
@@ -484,7 +457,7 @@
 
 	                        @if(!empty($receipt_details->discounted_unit_price_label))
 								<td class="text-right">
-									{{$line['unit_price_inc_tax']}}
+									{{$line['unit_price_inc_tax']}} 
 								</td>
 							@endif
 
@@ -506,9 +479,9 @@
 										&nbsp;
 									</td>
 									<td>
-			                            {{$modifier['name']}} {{$modifier['variation']}}
+			                            {{$modifier['name']}} {{$modifier['variation']}} 
 			                            @if(!empty($modifier['sub_sku'])), {{$modifier['sub_sku']}} @endif @if(!empty($modifier['cat_code'])), {{$modifier['cat_code']}}@endif
-			                            @if(!empty($modifier['sell_line_note']))({!!$modifier['sell_line_note']!!}) @endif
+			                            @if(!empty($modifier['sell_line_note']))({!!$modifier['sell_line_note']!!}) @endif 
 			                        </td>
 									<td class="text-right">{{$modifier['quantity']}} {{$modifier['units']}} </td>
 									@if(!empty($receipt_details->sales_person_label))
@@ -654,7 +627,7 @@
 				@if( $receipt_details->round_off_amount > 0)
 					<div class="flex-box">
 						<p class="width-50 text-right">
-							{!! $receipt_details->round_off_label !!}
+							{!! $receipt_details->round_off_label !!} 
 						</p>
 						<p class="width-50 text-right">
 							{{$receipt_details->round_off}}
