@@ -150,46 +150,6 @@ class TransactionUtil extends Util
     }
 
     /**
-     * Get reward redeem details for a customer
-     *
-     * @param  int  $business_id
-     * @param  int  $contact_id
-     * @return array
-     */
-    public function getRewardRedeemDetails($business_id, $contact_id)
-    {
-        $reward_details = [
-            'points' => 0,
-            'amount' => 0
-        ];
-
-        if (empty($contact_id)) {
-            return $reward_details;
-        }
-
-        $business = Business::find($business_id);
-        
-        if (empty($business) || $business->enable_rp != 1) {
-            return $reward_details;
-        }
-
-        $contact = Contact::find($contact_id);
-        
-        if (empty($contact)) {
-            return $reward_details;
-        }
-
-        $reward_details['points'] = $contact->total_rp ?? 0;
-        
-        // Calculate redemption amount based on business settings
-        if (!empty($business->rp_redeem_point) && $business->rp_redeem_point > 0) {
-            $reward_details['amount'] = ($reward_details['points'] / $business->rp_redeem_point) * $business->rp_redeem_amount;
-        }
-
-        return $reward_details;
-    }
-
-    /**
      * Add Sell transaction
      *
      * @param  int  $business_id
@@ -2627,7 +2587,7 @@ class TransactionUtil extends Util
                     ->select(
                         DB::raw('SUM(final_total) as total_sell'),
                         DB::raw('SUM(final_total - tax_amount) as total_exc_tax'),
-                        DB::raw('SUM(final_total - (SELECT COALESCE(SUM(IF(tp.is_return = 1, -1*tp.amount, tp.amount)), 0) FROM transaction_payments as tp WHERE tp.transaction_id = transactions.id) )  as total_due'),
+                        DB::raw('SUM(final_total - (SELECT SUM(IF(tp.is_return = 1, -1*tp.amount, tp.amount)) FROM transaction_payments as tp WHERE tp.transaction_id = transactions.id) )  as total_due'),
                         DB::raw('SUM(total_before_tax) as total_before_tax'),
                         DB::raw('SUM(shipping_charges) as total_shipping_charges'),
                         DB::raw('SUM(additional_expense_value_1 + additional_expense_value_2 + additional_expense_value_3 + additional_expense_value_4) as total_expense')
@@ -4277,7 +4237,7 @@ class TransactionUtil extends Util
         ];
         //Update reference count
         $ob_ref_count = $this->setAndGetReferenceCount('opening_balance', $business_id);
-        //Generate reference number
+        //Generate referencenumber
         $ob_data['ref_no'] = $this->generateReferenceNumber('opening_balance', $ob_ref_count, $business_id);
         //Create opening balance transaction
         Transaction::create($ob_data);
