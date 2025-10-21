@@ -484,7 +484,7 @@
 					</p>
 				</div>
 			@endif
-			@if(empty($receipt_details->hide_price))
+			@if(empty($receipt_details->hide_price) && !empty($receipt_details->lines))
             <div class="flex-box">
                 <p class="left text-left">
                 	<strong>{!! $receipt_details->subtotal_label !!}</strong>
@@ -682,11 +682,33 @@
 				<img class="center-block mt-5" src="data:image/png;base64,{{DNS2D::getBarcodePNG($receipt_details->qr_code_text, 'QRCODE')}}">
 			@endif
 
-			@if(!empty($receipt_details->footer_text))
-				<p class="centered">
-					{!! $receipt_details->footer_text !!}
-				</p>
+			@if(!empty($receipt_details->rp_earned) || !empty($receipt_details->rp_redeemed) || !empty($receipt_details->rp_balance))
+				<div class="border-top textbox-info" style="margin-top: 10px; padding-top: 10px;">
+					<p class="centered"><strong>@lang('lang_v1.reward_point_details')</strong></p>
+					@if(!empty($receipt_details->rp_earned))
+						<div class="textbox-info">
+							<p class="f-left"><strong>@lang('lang_v1.reward_points_earned'):</strong></p>
+							<p class="f-right">{{$receipt_details->rp_earned}}</p>
+						</div>
+					@endif
+					@if(!empty($receipt_details->rp_redeemed))
+						<div class="textbox-info">
+							<p class="f-left"><strong>@lang('lang_v1.reward_points_redeemed'):</strong></p>
+							<p class="f-right">{{$receipt_details->rp_redeemed}}</p>
+						</div>
+					@endif
+					@if(!empty($receipt_details->rp_balance))
+						<div class="textbox-info">
+							<p class="f-left"><strong>@lang('lang_v1.available_reward_points'):</strong></p>
+							<p class="f-right">{{$receipt_details->rp_balance}}</p>
+						</div>
+					@endif
+				</div>
 			@endif
+
+            @if(!empty($receipt_details->footer_text))
+                <p class="centered">{!! $receipt_details->footer_text !!}</p>
+            @endif
         </div>
         <!-- <button id="btnPrint" class="hidden-print">Print</button>
         <script src="script.js"></script> -->

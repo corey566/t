@@ -195,7 +195,7 @@
 					@endif
 					{{$receipt_details->repair_status}}<br>
 		        @endif
-		        
+
 		        @if(!empty($receipt_details->repair_warranty_label) || !empty($receipt_details->repair_warranty))
 					@if(!empty($receipt_details->repair_warranty_label))
 						<b>{!! $receipt_details->repair_warranty_label !!}</b>
@@ -203,7 +203,7 @@
 					{{$receipt_details->repair_warranty}}
 					<br>
 		        @endif
-		        
+
 				<!-- Waiter info -->
 				@if(!empty($receipt_details->service_staff_label) || !empty($receipt_details->service_staff))
 		        	<br/>
@@ -299,6 +299,9 @@
 					@if(!empty($receipt_details->item_discount_label))
 						<th class="text-right" width="10%">{{$receipt_details->item_discount_label}}</th>
 					@endif
+					@if(!empty($receipt_details->sales_person_label))
+						<th class="text-right" width="10%">{{$receipt_details->sales_person_label}}</th>
+					@endif
 					<th class="text-right" width="15%">{{$receipt_details->table_subtotal_label}}</th>
 				</tr>
 			</thead>
@@ -335,7 +338,7 @@
                             	{{$line['base_unit_price']}} x {{$line['orig_quantity']}} = {{$line['line_total']}}
                             </small>
                             @endif
-                        </td>
+						</td>
 						<td class="text-right">
 							{{$line['quantity']}} {{$line['units']}} 
 
@@ -347,9 +350,7 @@
 						</td>
 						<td class="text-right">{{$line['unit_price_before_discount']}}</td>
 						@if(!empty($receipt_details->discounted_unit_price_label))
-							<td class="text-right">
-								{{$line['unit_price_inc_tax']}} 
-							</td>
+							<td class="text-right">{{$line['unit_price_inc_tax']}}</td>
 						@endif
 						@if(!empty($receipt_details->item_discount_label))
 							<td class="text-right">
@@ -358,6 +359,11 @@
 								@if(!empty($line['line_discount_percent']))
 								 	({{$line['line_discount_percent']}}%)
 								@endif
+							</td>
+						@endif
+						@if(!empty($receipt_details->sales_person_label))
+							<td class="text-right">
+								<small>{{$line['service_staff_name'] ?? '-'}}</small>
 							</td>
 						@endif
 						<td class="text-right">{{$line['line_total']}}</td>
@@ -378,6 +384,9 @@
 								@if(!empty($receipt_details->item_discount_label))
 									<td class="text-right">0.00</td>
 								@endif
+								@if(!empty($receipt_details->sales_person_label))
+									<td></td>
+								@endif
 								<td class="text-right">{{$modifier['line_total']}}</td>
 							</tr>
 						@endforeach
@@ -391,6 +400,9 @@
     					@if(!empty($receipt_details->item_discount_label))
     					<td></td>
     					@endif
+						@if(!empty($receipt_details->sales_person_label))
+							<td></td>
+						@endif
 					</tr>
 				@endforelse
 			</tbody>
@@ -628,12 +640,40 @@
 	    @endif
 	</div>
 
-	@if(!empty($receipt_details->additional_notes))
-	    <div class="col-xs-12">
-	    	<p>{!! nl2br($receipt_details->additional_notes) !!}</p>
-	    </div>
-    @endif
-    
+	@if(!empty($receipt_details->rp_earned) || !empty($receipt_details->rp_redeemed) || !empty($receipt_details->rp_balance))
+		<div class="col-xs-12">
+			<hr/>
+			<h4 class="text-center"><strong>@lang('lang_v1.reward_point_details')</strong></h4>
+			<table class="table">
+				@if(!empty($receipt_details->rp_earned))
+					<tr>
+						<td><strong>@lang('lang_v1.reward_points_earned'):</strong></td>
+						<td class="text-right">{{$receipt_details->rp_earned}}</td>
+					</tr>
+				@endif
+				@if(!empty($receipt_details->rp_redeemed))
+					<tr>
+						<td><strong>@lang('lang_v1.reward_points_redeemed'):</strong></td>
+						<td class="text-right">{{$receipt_details->rp_redeemed}}</td>
+					</tr>
+				@endif
+				@if(!empty($receipt_details->rp_balance))
+					<tr>
+						<td><strong>@lang('lang_v1.available_reward_points'):</strong></td>
+						<td class="text-right">{{$receipt_details->rp_balance}}</td>
+					</tr>
+				@endif
+			</table>
+		</div>
+	@endif
+
+	@if(!empty($receipt_details->footer_text))
+		<br/>
+		<div class="col-xs-12">
+			{!! $receipt_details->footer_text !!}
+		</div>
+	@endif
+
 </div>
 <div class="row" style="color: #000000 !important;">
 	@if(!empty($receipt_details->footer_text))
@@ -647,7 +687,7 @@
 				{{-- Barcode --}}
 				<img class="center-block" src="data:image/png;base64,{{DNS1D::getBarcodePNG($receipt_details->invoice_no, 'C128', 2,30,array(39, 48, 54), true)}}">
 			@endif
-			
+
 			@if($receipt_details->show_qr_code && !empty($receipt_details->qr_code_text))
 				<img class="center-block mt-5" src="data:image/png;base64,{{DNS2D::getBarcodePNG($receipt_details->qr_code_text, 'QRCODE', 3, 3, [39, 48, 54])}}">
 			@endif

@@ -32,7 +32,7 @@
 						</span>
 						<br/>
 					@endif
-					
+
 					@if(!empty($receipt_details->address))
 						{!! $receipt_details->address !!}
 						<br/>
@@ -98,7 +98,7 @@
 					{{$receipt_details->invoice_date}}
 				</p>
 			</div>
-			
+
 			@if(!empty($receipt_details->due_date_label))
 				<div class="textbox-info">
 					<p class="f-left"><strong>{{$receipt_details->due_date_label}}</strong></p>
@@ -109,14 +109,14 @@
 			@if(!empty($receipt_details->sales_person_label))
 				<div class="textbox-info">
 					<p class="f-left"><strong>{{$receipt_details->sales_person_label}}</strong></p>
-				
+
 					<p class="f-right">{{$receipt_details->sales_person}}</p>
 				</div>
 			@endif
 			@if(!empty($receipt_details->commission_agent_label))
 				<div class="textbox-info">
 					<p class="f-left"><strong>{{$receipt_details->commission_agent_label}}</strong></p>
-				
+
 					<p class="f-right">{{$receipt_details->commission_agent}}</p>
 				</div>
 			@endif
@@ -124,7 +124,7 @@
 			@if(!empty($receipt_details->brand_label) || !empty($receipt_details->repair_brand))
 				<div class="textbox-info">
 					<p class="f-left"><strong>{{$receipt_details->brand_label}}</strong></p>
-				
+
 					<p class="f-right">{{$receipt_details->repair_brand}}</p>
 				</div>
 			@endif
@@ -132,23 +132,23 @@
 			@if(!empty($receipt_details->device_label) || !empty($receipt_details->repair_device))
 				<div class="textbox-info">
 					<p class="f-left"><strong>{{$receipt_details->device_label}}</strong></p>
-				
+
 					<p class="f-right">{{$receipt_details->repair_device}}</p>
 				</div>
 			@endif
-			
+
 			@if(!empty($receipt_details->model_no_label) || !empty($receipt_details->repair_model_no))
 				<div class="textbox-info">
 					<p class="f-left"><strong>{{$receipt_details->model_no_label}}</strong></p>
-				
+
 					<p class="f-right">{{$receipt_details->repair_model_no}}</p>
 				</div>
 			@endif
-			
+
 			@if(!empty($receipt_details->serial_no_label) || !empty($receipt_details->repair_serial_no))
 				<div class="textbox-info">
 					<p class="f-left"><strong>{{$receipt_details->serial_no_label}}</strong></p>
-				
+
 					<p class="f-right">{{$receipt_details->repair_serial_no}}</p>
 				</div>
 			@endif
@@ -247,7 +247,7 @@
 					@endif
 	        	</p>
 	        </div>
-			
+
 			@if(!empty($receipt_details->client_id_label))
 				<div class="textbox-info">
 					<p class="f-left"><strong>
@@ -258,7 +258,7 @@
 					</p>
 				</div>
 			@endif
-			
+
 			@if(!empty($receipt_details->customer_tax_label))
 				<div class="textbox-info">
 					<p class="f-left"><strong>
@@ -277,7 +277,7 @@
 					</p>
 				</div>
 			@endif
-			
+
 			@if(!empty($receipt_details->customer_rp_label))
 				<div class="textbox-info">
 					<p class="f-left"><strong>
@@ -367,8 +367,10 @@
                         	{{$receipt_details->table_product_label}}
                         </th>
                         <th class="quantity text-right">
-                        	{{$receipt_details->table_qty_label}}
-                        </th>
+                        	{{$receipt_details->table_qty_label}}</th>
+						@if(!empty($receipt_details->sales_person_label))
+							<th class="text-right">Staff</th>
+						@endif
                         @if(empty($receipt_details->hide_price))
                         <th class="unit_price text-right">
                         	{{$receipt_details->table_unit_price_label}}
@@ -429,17 +431,21 @@
                             			{{$line['base_unit_price']}} x {{$line['orig_quantity']}} = {{$line['line_total']}}
 		                            </small>
 		                            @endif
-		                            
+
 		                            @if(!empty($line['service_staff']))
 		                            	<br>
 		                            	<small><strong>Service Person:</strong> {{$line['service_staff']}}</small>
 		                            @endif
 	                        </td>
-	                        <td class="quantity text-right">{{$line['quantity']}} {{$line['units']}} @if($receipt_details->show_base_unit_details && $line['quantity'] && $line['base_unit_multiplier'] !== 1)
+	                        <td class="quantity text-right">
+                        	{{$line['quantity']}} {{$line['units']}} @if($receipt_details->show_base_unit_details && $line['quantity'] && $line['base_unit_multiplier'] !== 1)
                             <br><small>
                             	{{$line['quantity']}} x {{$line['base_unit_multiplier']}} = {{$line['orig_quantity']}} {{$line['base_unit_name']}}
                             </small>
                             @endif</td>
+							@if(!empty($receipt_details->sales_person_label))
+								<td class="text-right"><small>{{$line['service_staff_name'] ?? '-'}}</small></td>
+							@endif
 	                        @if(empty($receipt_details->hide_price))
 	                        <td class="unit_price text-right">{{$line['unit_price_before_discount']}}</td>
 
@@ -472,6 +478,9 @@
 			                            @if(!empty($modifier['sell_line_note']))({!!$modifier['sell_line_note']!!}) @endif 
 			                        </td>
 									<td class="text-right">{{$modifier['quantity']}} {{$modifier['units']}} </td>
+									@if(!empty($receipt_details->sales_person_label))
+										<td class="text-right"><small>{{$modifier['service_staff_name'] ?? '-'}}</small></td>
+									@endif
 									@if(empty($receipt_details->hide_price))
 									<td class="text-right">{{$modifier['unit_price_inc_tax']}}</td>
 									@if(!empty($receipt_details->discounted_unit_price_label))
@@ -487,7 +496,7 @@
 						@endif
                     @endforeach
                     <tr>
-                    	<td @if(!empty($receipt_details->item_discount_label)) colspan="6" @else colspan="5" @endif>&nbsp;</td>
+                    	<td @if(!empty($receipt_details->item_discount_label)) colspan="7" @elseif(!empty($receipt_details->sales_person_label)) colspan="6" @else colspan="5" @endif>&nbsp;</td>
                     	@if(!empty($receipt_details->discounted_unit_price_label))
     					<td></td>
     					@endif
@@ -679,6 +688,31 @@
 					</div>
 				@endif
 			@endif
+
+			@if(!empty($receipt_details->rp_earned) || !empty($receipt_details->rp_redeemed) || !empty($receipt_details->rp_balance))
+				<div class="border-top textbox-info" style="margin-top: 10px; padding-top: 10px;">
+					<p class="centered"><strong>@lang('lang_v1.reward_point_details')</strong></p>
+					@if(!empty($receipt_details->rp_earned))
+						<div class="textbox-info">
+							<p class="f-left"><strong>@lang('lang_v1.reward_points_earned'):</strong></p>
+							<p class="f-right">{{$receipt_details->rp_earned}}</p>
+						</div>
+					@endif
+					@if(!empty($receipt_details->rp_redeemed))
+						<div class="textbox-info">
+							<p class="f-left"><strong>@lang('lang_v1.reward_points_redeemed'):</strong></p>
+							<p class="f-right">{{$receipt_details->rp_redeemed}}</p>
+						</div>
+					@endif
+					@if(!empty($receipt_details->rp_balance))
+						<div class="textbox-info">
+							<p class="f-left"><strong>@lang('lang_v1.available_reward_points'):</strong></p>
+							<p class="f-right">{{$receipt_details->rp_balance}}</p>
+						</div>
+					@endif
+				</div>
+			@endif
+
             <div class="border-bottom width-100">&nbsp;</div>
             @if(empty($receipt_details->hide_price) && !empty($receipt_details->tax_summary_label) )
 	            <!-- tax -->
@@ -712,13 +746,11 @@
 			@if($receipt_details->show_qr_code && !empty($receipt_details->qr_code_text))
 				<img class="center-block mt-5" src="data:image/png;base64,{{DNS2D::getBarcodePNG($receipt_details->qr_code_text, 'QRCODE')}}">
 			@endif
-			
+
 			@if(!empty($receipt_details->footer_text))
-				<p class="centered">
-					{!! $receipt_details->footer_text !!}
-				</p>
-			@endif
-			
+                <p class="centered">{!! $receipt_details->footer_text !!}</p>
+            @endif
+
         </div>
         <!-- <button id="btnPrint" class="hidden-print">Print</button>
         <script src="script.js"></script> -->
@@ -741,7 +773,7 @@ body {
 	.f-8 {
 		font-size: 8px !important;
 	}
-	
+
 .headings{
 	font-size: 16px;
 	font-weight: 700;
