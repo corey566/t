@@ -278,15 +278,30 @@
 				</div>
 			@endif
 
-			@if(!empty($receipt_details->customer_rp_label))
-				<div class="textbox-info">
+			@if(!empty($receipt_details->reward_point_label))
+				<div class="textbox-info" style="margin-top: 10px;">
 					<p class="f-left"><strong>
-						{{ $receipt_details->customer_rp_label }}
+						{{ $receipt_details->reward_point_label }}
 					</strong></p>
-					<p class="f-right">
-						{{ $receipt_details->customer_total_rp }}
-					</p>
 				</div>
+				<table class="width-100" style="margin-top: 5px; border: 1px solid #000;">
+					<thead>
+						<tr>
+							<th style="border: 1px solid #000; padding: 5px; text-align: center;">Before</th>
+							<th style="border: 1px solid #000; padding: 5px; text-align: center;">Used</th>
+							<th style="border: 1px solid #000; padding: 5px; text-align: center;">Earned</th>
+							<th style="border: 1px solid #000; padding: 5px; text-align: center;">Available</th>
+						</tr>
+					</thead>
+					<tbody>
+						<tr>
+							<td style="border: 1px solid #000; padding: 5px; text-align: center;">{{ $receipt_details->rp_before ?? 0 }}</td>
+							<td style="border: 1px solid #000; padding: 5px; text-align: center;">{{ $receipt_details->rp_used ?? 0 }}</td>
+							<td style="border: 1px solid #000; padding: 5px; text-align: center;">{{ $receipt_details->rp_earned ?? 0 }}</td>
+							<td style="border: 1px solid #000; padding: 5px; text-align: center;">{{ $receipt_details->rp_available ?? 0 }}</td>
+						</tr>
+					</tbody>
+				</table>
 			@endif
 			@if(!empty($receipt_details->shipping_custom_field_1_label))
 				<div class="textbox-info">
