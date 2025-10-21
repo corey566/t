@@ -3782,7 +3782,7 @@ class TransactionUtil extends Util
                             ->decrement('quantity_adjusted', $extra_sold);
                     }
 
-                    TransactionSellLinesPurchaseLines::where('id', $row->tslpl_id)->update(['quantity' => $row->quantity - $extra_sold]);
+                    TransactionSellLinesPurchaseLines::where('id', $row->tslpl->update(['quantity' => $row->quantity - $extra_sold]);
 
                     $extra_sold = 0;
                 }
