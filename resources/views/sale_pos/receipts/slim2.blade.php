@@ -93,25 +93,28 @@
             width: 100%;
             border-collapse: collapse;
             margin: 5px 0;
+            table-layout: fixed;
         }
 
         .items-table th {
             text-align: left;
-            padding: 3px 0;
+            padding: 3px 2px;
             border-bottom: 1px solid #000;
+            font-weight: bold;
         }
 
         .items-table td {
-            padding: 3px 0;
+            padding: 3px 2px;
             vertical-align: top;
         }
 
         .item-name {
-            width: 60%;
+            width: 55%;
+            word-wrap: break-word;
         }
 
         .item-qty {
-            width: 10%;
+            width: 15%;
             text-align: center;
         }
 
@@ -287,6 +290,9 @@
                         @endif
                         @if(!empty($line['product_variation']) || !empty($line['variation']))
                             <div class="item-details">{{$line['product_variation']}} {{$line['variation']}}</div>
+                        @endif
+                        @if(!empty($line['service_staff']))
+                            <div class="item-details">Staff: {{$line['service_staff']}}</div>
                         @endif
                     </td>
                     <td class="item-qty">{{$line['quantity']}}</td>
