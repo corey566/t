@@ -279,28 +279,22 @@
 			@endif
 
 			@if(!empty($receipt_details->reward_point_label))
-				<div class="textbox-info" style="margin-top: 10px;">
-					<p class="f-left"><strong>
-						{{ $receipt_details->reward_point_label }}
-					</strong></p>
+				<div class="border-top textbox-info" style="margin-top: 10px;">
+					<p class="centered"><strong>{{ $receipt_details->reward_point_label }}</strong></p>
 				</div>
-				<table class="width-100" style="margin-top: 5px; border: 1px solid #000;">
-					<thead>
-						<tr>
-							<th style="border: 1px solid #000; padding: 5px; text-align: center;">Before</th>
-							<th style="border: 1px solid #000; padding: 5px; text-align: center;">Used</th>
-							<th style="border: 1px solid #000; padding: 5px; text-align: center;">Earned</th>
-							<th style="border: 1px solid #000; padding: 5px; text-align: center;">Available</th>
-						</tr>
-					</thead>
-					<tbody>
-						<tr>
-							<td style="border: 1px solid #000; padding: 5px; text-align: center;">{{ $receipt_details->rp_before ?? 0 }}</td>
-							<td style="border: 1px solid #000; padding: 5px; text-align: center;">{{ $receipt_details->rp_used ?? 0 }}</td>
-							<td style="border: 1px solid #000; padding: 5px; text-align: center;">{{ $receipt_details->rp_earned ?? 0 }}</td>
-							<td style="border: 1px solid #000; padding: 5px; text-align: center;">{{ $receipt_details->rp_available ?? 0 }}</td>
-						</tr>
-					</tbody>
+				<table class="width-100" style="border-collapse: collapse;">
+					<tr style="border-bottom: 1px dashed #000;">
+						<td style="padding: 3px; text-align: left; width: 25%;"><strong>Before:</strong></td>
+						<td style="padding: 3px; text-align: left; width: 25%;"><strong>Used:</strong></td>
+						<td style="padding: 3px; text-align: left; width: 25%;"><strong>Earned:</strong></td>
+						<td style="padding: 3px; text-align: left; width: 25%;"><strong>Available:</strong></td>
+					</tr>
+					<tr>
+						<td style="padding: 3px; text-align: left;">{{ $receipt_details->rp_before ?? 0 }}</td>
+						<td style="padding: 3px; text-align: left;">{{ $receipt_details->rp_used ?? 0 }}</td>
+						<td style="padding: 3px; text-align: left;">{{ $receipt_details->rp_earned ?? 0 }}</td>
+						<td style="padding: 3px; text-align: left;">{{ $receipt_details->rp_available ?? 0 }}</td>
+					</tr>
 				</table>
 			@endif
 			@if(!empty($receipt_details->shipping_custom_field_1_label))
