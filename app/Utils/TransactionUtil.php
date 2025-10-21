@@ -1227,7 +1227,7 @@ class TransactionUtil extends Util
         }
 
         $output['transaction_date'] = $transaction->transaction_date;
-        $output['date_time_format'] = $business_details->date_format;
+        $output['date_format'] = $business_details->date_format;
         $output['currency_symbol'] = $business_details->currency_symbol;
 
         $output['hide_price'] = ! empty($il->common_settings['hide_price']) ? true : false;
@@ -4727,7 +4727,7 @@ class TransactionUtil extends Util
         );
 
         $data['total_purchase_shipping_charge'] = ! empty($purchase_details['total_shipping_charges']) ? $purchase_details['total_shipping_charges'] : 0;
-        $data['total_sell_shipping_charge'] = ! empty($sell_details['total_shipping_charges']) ? $sell_details['total_shipping_charges'] : 0;
+        $data['total_sell_shipping_charge'] = ! empty($sell_details['total_shipping_charges']) ? $sell_details['total_shipping_charge'] : 0;
 
         $data['total_purchase_additional_expense'] = ! empty($purchase_details['total_additional_expense']) ? $purchase_details['total_additional_expense'] : 0;
         $data['total_sell_additional_expense'] = ! empty($sell_details['total_additional_expense']) ? $sell_details['total_additional_expense'] : 0;
