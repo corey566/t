@@ -683,12 +683,7 @@
 			@endif
 
 			{{-- Reward Points Section --}}
-			@if(
-			    !empty($receipt_details->rp_before) || 
-			    !empty($receipt_details->rp_used) || 
-			    !empty($receipt_details->rp_earned) || 
-			    !empty($receipt_details->rp_available)
-			)
+			@if(!empty($receipt_details->rp_enabled))
 			    <div class="border-top textbox-info" style="margin-top: 10px; padding-top: 10px;">
 			        <p style="text-align:center; font-size:12px; margin:0;">
 			            <strong>Points Status:</strong> Before: {{ $receipt_details->rp_before ?? 0 }} | Used: {{ $receipt_details->rp_used ?? 0 }} | Earned: {{ $receipt_details->rp_earned ?? 0 }} | Balance: {{ $receipt_details->rp_available ?? 0 }}

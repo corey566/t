@@ -1231,6 +1231,15 @@ class TransactionUtil extends Util
         $output['currency_symbol'] = $business_details->currency_symbol;
 
         $output['hide_price'] = ! empty($il->common_settings['hide_price']) ? true : false;
+        
+        // Add reward points enabled flag and values
+        $output['rp_enabled'] = $business_details->enable_rp == 1 ? true : false;
+        if ($output['rp_enabled']) {
+            $output['rp_before'] = 0;
+            $output['rp_used'] = 0;
+            $output['rp_earned'] = 0;
+            $output['rp_available'] = 0;
+        }
 
         if (! empty($il->common_settings['show_due_date']) && $transaction->payment_status != 'paid') {
             $output['due_date_label'] = ! empty($il->common_settings['due_date_label']) ? $il->common_settings['due_date_label'] : '';

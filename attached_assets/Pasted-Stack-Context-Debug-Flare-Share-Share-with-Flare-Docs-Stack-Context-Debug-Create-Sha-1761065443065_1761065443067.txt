@@ -1,0 +1,867 @@
+Stack
+Context
+Debug
+Flare
+Share
+Share with Flare
+Docs
+
+Stack
+
+Context
+
+Debug
+Create Share
+Docs
+
+Ignition Settings
+Docs
+Editor
+
+PhpStorm
+Theme
+auto
+Save settings
+Settings will be saved locally in ~/.ignition.json.
+
+Call to undefined method App\Utils\TransactionUtil::getRewardRedeemDetails()
+Error
+PHP 8.4.13
+9.52.16
+Call to undefined method App\Utils\TransactionUtil::getRewardRedeemDetails()
+
+Expand vendor frames
+App
+ \ 
+Http
+ \ 
+Controllers
+ \ 
+SellPosController
+ 
+: 1077
+edit
+6 vendor frames
+App
+ \ 
+Http
+ \ 
+Middleware
+ \ 
+CheckUserLogin
+ 
+: 22
+handle
+1 vendor frame
+App
+ \ 
+Http
+ \ 
+Middleware
+ \ 
+AdminSidebarMenu
+ 
+: 892
+handle
+1 vendor frame
+App
+ \ 
+Http
+ \ 
+Middleware
+ \ 
+Timezone
+ 
+: 30
+handle
+1 vendor frame
+App
+ \ 
+Http
+ \ 
+Middleware
+ \ 
+Language
+ 
+: 25
+handle
+1 vendor frame
+App
+ \ 
+Http
+ \ 
+Middleware
+ \ 
+SetSessionData
+ 
+: 52
+handle
+1 vendor frame
+App
+ \ 
+Http
+ \ 
+Middleware
+ \ 
+IsInstalled
+ 
+: 50
+handle
+43 vendor frames
+app
+ / 
+Http
+ / 
+Controllers
+ / 
+SellPosController
+.php
+ 
+: 1077
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+        $customer_groups = CustomerGroup::forDropdown($business_id);
+
+
+
+        //Accounts
+
+        $accounts = [];
+
+        if ($this->moduleUtil->isModuleEnabled('account')) {
+
+            $accounts = Account::forDropdown($business_id, true, false, true);
+
+        }
+
+
+
+        $waiters = [];
+
+        if ($this->productUtil->isModuleEnabled('service_staff') && !empty($pos_settings['inline_service_staff'])) {
+
+            $waiters_enabled = true;
+
+            $waiters = $this->productUtil->serviceStaffDropdown($business_id);
+
+        }
+
+        $redeem_details = [];
+
+        if (request()->session()->get('business.enable_rp') == 1) {
+
+            $redeem_details = $this->transactionUtil->getRewardRedeemDetails($business_id, $transaction->contact_id);
+
+
+
+            $redeem_details['points'] += $transaction->rp_redeemed;
+
+            $redeem_details['points'] -= $transaction->rp_earned;
+
+        }
+
+
+
+        $edit_discount = auth()->user()->can('edit_product_discount_from_pos_screen');
+
+        $edit_price = auth()->user()->can('edit_product_price_from_pos_screen');
+
+        $shipping_statuses = $this->transactionUtil->shipping_statuses();
+
+
+
+        $warranties = $this->__getwarranties();
+
+        $sub_type = request()->get('sub_type');
+
+
+
+        //pos screen view from module
+
+        $pos_module_data = $this->moduleUtil->getModuleData('get_pos_screen_view', ['sub_type' => $sub_type]);
+Request
+Browser
+Headers
+Body
+App
+Routing
+Context
+User
+Versions
+Request
+https://zimozo.com/pos/257582/edit
+GET
+curl "https://zimozo.com/pos/257582/edit" \
+   -X GET \
+   -H 'cookie: XSRF-TOKEN=eyJpdiI6ImRtUnFKR0g5ejZqTS9QUjRxK0o2TEE9PSIsInZhbHVlIjoiWWhkanpocWVCVHQ3VEE3MUlpUEFyVVYyYkVRcGJENERQQlhoczRQSkJDRnVzZkppR04zdXRoQVkrWDB4YXZFN3VSaUpXVFpqMUtkdHdHcHFwVUE4ZW5HOFZ6U2szdjFQSkxrZnM5MFhCWjFiOG43RzgySlR5SnVSdm1iWS9QbWsiLCJtYWMiOiI3NGQ3MDA5NWI0NzdkZWQ4MTEzZjVmMWI5MTE1MzVmNGVhOGIzYzI0YThmZjkxOTUyMzViNTgxMjJlYThhOWE3IiwidGFnIjoiIn0%3D; zimozo_pos_session=eyJpdiI6InhLKzIvOWJGcUpqdW1TN1hpZUlxNUE9PSIsInZhbHVlIjoiOTdLODFrRDIyVCtPMXpJeUJZS1BocklqWWdtejd2MEF5ZE95NHFCK2dpRURHL2pXL3VvVXNBQ1VqakExRWx0eGR2YXZEK29WWkxvU1oxYzd1Rkc1ckRZdjFWREw1WFhhUG5pcDBHakswNURhVUp6Nzhia0ZiSXljUVBkbndYV3giLCJtYWMiOiI1ZTU1N2I2MzY4Y2E3ZGRmYWQ5NzIzMTI0ZDE2M2FjZTI1NWUzYTU1YjE5N2JkNjdhZWIxMzZlYWYxYWY2MWI2IiwidGFnIjoiIn0%3D' \
+   -H 'priority: u=0, i' \
+   -H 'accept-language: en-US,en;q=0.9' \
+   -H 'accept-encoding: gzip, deflate, br, zstd' \
+   -H 'referer: https://zimozo.com/pos/create' \
+   -H 'sec-fetch-dest: document' \
+   -H 'sec-fetch-user: ?1' \
+   -H 'sec-fetch-mode: navigate' \
+   -H 'sec-fetch-site: same-origin' \
+   -H 'accept: text/html,application/xhtml+xml,application/xml;q=0.9,image/avif,image/webp,image/apng,*/*;q=0.8,application/signed-exchange;v=b3;q=0.7' \
+   -H 'user-agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/141.0.0.0 Safari/537.36' \
+   -H 'upgrade-insecure-requests: 1' \
+   -H 'sec-ch-ua-platform: "Windows"' \
+   -H 'sec-ch-ua-mobile: ?0' \
+   -H 'sec-ch-ua: "Google Chrome";v="141", "Not?A_Brand";v="8", "Chromium";v="141"' \
+   -H 'connection: close' \
+   -H 'x-accel-internal: /internal-nginx-static-location' \
+   -H 'x-real-ip: 14.1.78.114' \
+   -H 'host: zimozo.com';
+
+
+Browser
+Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/141.0.0.0 Safari/537.36
+
+Headers
+cookie
+XSRF-TOKEN=eyJpdiI6ImRtUnFKR0g5ejZqTS9QUjRxK0o2TEE9PSIsInZhbHVlIjoiWWhkanpocWVCVHQ3VEE3MUlpUEFyVVYyYkVRcGJENERQQlhoczRQSkJDRnVzZkppR04zdXRoQVkrWDB4YXZFN3VSaUpXVFpqMUtkdHdHcHFwVUE4ZW5HOFZ6U2szdjFQSkxrZnM5MFhCWjFiOG43RzgySlR5SnVSdm1iWS9QbWsiLCJtYWMiOiI3NGQ3MDA5NWI0NzdkZWQ4MTEzZjVmMWI5MTE1MzVmNGVhOGIzYzI0YThmZjkxOTUyMzViNTgxMjJlYThhOWE3IiwidGFnIjoiIn0%3D; zimozo_pos_session=eyJpdiI6InhLKzIvOWJGcUpqdW1TN1hpZUlxNUE9PSIsInZhbHVlIjoiOTdLODFrRDIyVCtPMXpJeUJZS1BocklqWWdtejd2MEF5ZE95NHFCK2dpRURHL2pXL3VvVXNBQ1VqakExRWx0eGR2YXZEK29WWkxvU1oxYzd1Rkc1ckRZdjFWREw1WFhhUG5pcDBHakswNURhVUp6Nzhia0ZiSXljUVBkbndYV3giLCJtYWMiOiI1ZTU1N2I2MzY4Y2E3ZGRmYWQ5NzIzMTI0ZDE2M2FjZTI1NWUzYTU1YjE5N2JkNjdhZWIxMzZlYWYxYWY2MWI2IiwidGFnIjoiIn0%3D
+
+priority
+u=0, i
+
+accept-language
+en-US,en;q=0.9
+
+accept-encoding
+gzip, deflate, br, zstd
+
+referer
+https://zimozo.com/pos/create
+
+sec-fetch-dest
+document
+
+sec-fetch-user
+?1
+
+sec-fetch-mode
+navigate
+
+sec-fetch-site
+same-origin
+
+accept
+text/html,application/xhtml+xml,application/xml;q=0.9,image/avif,image/webp,image/apng,*/*;q=0.8,application/signed-exchange;v=b3;q=0.7
+
+user-agent
+Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/141.0.0.0 Safari/537.36
+
+upgrade-insecure-requests
+1
+
+sec-ch-ua-platform
+"Windows"
+
+sec-ch-ua-mobile
+?0
+
+sec-ch-ua
+"Google Chrome";v="141", "Not?A_Brand";v="8", "Chromium";v="141"
+
+connection
+close
+
+x-accel-internal
+/internal-nginx-static-location
+
+x-real-ip
+14.1.78.114
+
+host
+zimozo.com
+
+Body
+[]
+
+App
+Routing
+Controller
+App\Http\Controllers\SellPosController@edit
+
+Route name
+pos.edit
+
+Middleware
+web
+
+setData
+
+auth
+
+SetSessionData
+
+language
+
+timezone
+
+AdminSidebarMenu
+
+CheckUserLogin
+
+Context
+User
+2002yazeedfaumy@gmail.com
+2002yazeedfaumy@gmail.com
+
+{
+    "id": 262,
+    "user_type": "user",
+    "surname": "Mr",
+    "first_name": "Mohamed Yazeed",
+    "last_name": "Faumy",
+    "username": "yazeed",
+    "email": "2002yazeedfaumy@gmail.com",
+    "language": "en",
+    "contact_no": null,
+    "address": null,
+    "business_id": 111,
+    "available_at": null,
+    "paused_at": null,
+    "essentials_department_id": null,
+    "essentials_designation_id": null,
+    "essentials_salary": null,
+    "essentials_pay_period": null,
+    "essentials_pay_cycle": null,
+    "max_sales_discount_percent": null,
+    "allow_login": 1,
+    "status": "active",
+    "is_enable_service_staff_pin": 0,
+    "service_staff_pin": null,
+    "crm_contact_id": null,
+    "is_cmmsn_agnt": 0,
+    "cmmsn_percent": "0.00",
+    "selected_contacts": 0,
+    "dob": null,
+    "gender": null,
+    "marital_status": null,
+    "blood_group": null,
+    "contact_number": null,
+    "alt_number": null,
+    "family_number": null,
+    "fb_link": null,
+    "twitter_link": null,
+    "social_media_1": null,
+    "social_media_2": null,
+    "permanent_address": null,
+    "current_address": null,
+    "guardian_name": null,
+    "custom_field_1": null,
+    "custom_field_2": null,
+    "custom_field_3": null,
+    "custom_field_4": null,
+    "bank_details": null,
+    "id_proof_name": null,
+    "id_proof_number": null,
+    "crm_department": null,
+    "crm_designation": null,
+    "location_id": null,
+    "deleted_at": null,
+    "created_at": "2025-08-19T10:32:56.000000Z",
+    "updated_at": "2025-08-19T10:32:56.000000Z",
+    "roles": [
+        {
+            "id": 268,
+            "name": "Admin#111",
+            "guard_name": "web",
+            "business_id": 111,
+            "is_default": 1,
+            "is_service_staff": 0,
+            "created_at": "2025-08-19T10:32:56.000000Z",
+            "updated_at": "2025-08-19T10:32:56.000000Z",
+            "pivot": {
+                "model_id": 262,
+                "role_id": 268,
+                "model_type": "App\\User"
+            }
+        }
+    ],
+    "permissions": []
+}
+
+
+Versions
+Php Version
+8.4.13
+
+Laravel Version
+9.52.16
+
+Laravel Locale
+en
+
+Laravel Config Cached
+false
+App Debug
+true
+App Env
+live
+
+
+61
+Queries
+
+200
+Logs
+10:20:20 PM
+1.85ms
+mysql
+select * from `system` where `key` = crm_version limit 1
+
+
+1 query parameter
+10:20:20 PM
+0.37ms
+mysql
+select * from `system` where `key` = woocommerce_version limit 1
+
+
+1 query parameter
+10:20:20 PM
+0.45ms
+mysql
+select * from `business` where `woocommerce_api_settings` is not null
+
+
+10:20:20 PM
+0.21ms
+mysql
+select * from `system` where `key` = woocommerce_version limit 1
+
+
+1 query parameter
+10:20:20 PM
+0.32ms
+mysql
+select * from `business` where `woocommerce_api_settings` is not null
+
+
+10:20:21 PM
+0.67ms
+mysql
+select * from `users` where `id` = 262 and `users`.`deleted_at` is null limit 1
+
+
+1 query parameter
+10:20:21 PM
+0.43ms
+mysql
+select `roles`.*, `model_has_roles`.`model_id` as `pivot_model_id`, `model_has_roles`.`role_id` as `pivot_role_id`, `model_has_roles`.`model_type` as `pivot_model_type` from `roles` inner join `model_has_roles` on `roles`.`id` = `model_has_roles`.`role_id` where `model_has_roles`.`model_id` in (262) and `model_has_roles`.`model_type` = App\User
+
+
+1 query parameter
+10:20:21 PM
+0.43ms
+mysql
+select `permissions`.*, `model_has_permissions`.`model_id` as `pivot_model_id`, `model_has_permissions`.`permission_id` as `pivot_permission_id`, `model_has_permissions`.`model_type` as `pivot_model_type` from `permissions` inner join `model_has_permissions` on `permissions`.`id` = `model_has_permissions`.`permission_id` where `model_has_permissions`.`model_id` = 262 and `model_has_permissions`.`model_type` = App\User
+
+
+2 query parameters
+10:20:21 PM
+0.59ms
+mysql
+select * from `system` where `key` = accounting_version limit 1
+
+
+1 query parameter
+10:20:21 PM
+0.36ms
+mysql
+select * from `system` where `key` = aiassistance_version limit 1
+
+
+1 query parameter
+10:20:21 PM
+0.28ms
+mysql
+select * from `system` where `key` = assetmanagement_version limit 1
+
+
+1 query parameter
+10:20:21 PM
+0.29ms
+mysql
+select * from `system` where `key` = cms_version limit 1
+
+
+1 query parameter
+10:20:21 PM
+0.24ms
+mysql
+select * from `system` where `key` = colombocenter_version limit 1
+
+
+1 query parameter
+10:20:21 PM
+0.25ms
+mysql
+select * from `system` where `key` = connector_version limit 1
+
+
+1 query parameter
+10:20:21 PM
+0.26ms
+mysql
+select * from `system` where `key` = crm_version limit 1
+
+
+1 query parameter
+10:20:21 PM
+0.28ms
+mysql
+select * from `system` where `key` = essentials_version limit 1
+
+
+1 query parameter
+10:20:21 PM
+0.37ms
+mysql
+select * from `system` where `key` = gallface_version limit 1
+
+
+1 query parameter
+10:20:21 PM
+0.22ms
+mysql
+select * from `system` where `key` = hcm_version limit 1
+
+
+1 query parameter
+10:20:21 PM
+0.24ms
+mysql
+select * from `system` where `key` = manufacturing_version limit 1
+
+
+1 query parameter
+10:20:21 PM
+0.21ms
+mysql
+select * from `system` where `key` = productcatalogue_version limit 1
+
+
+1 query parameter
+10:20:21 PM
+0.21ms
+mysql
+select * from `system` where `key` = repair_version limit 1
+
+
+1 query parameter
+10:20:21 PM
+0.25ms
+mysql
+select * from `system` where `key` = spreadsheet_version limit 1
+
+
+1 query parameter
+10:20:21 PM
+0.19ms
+mysql
+select * from `system` where `key` = superadmin_version limit 1
+
+
+1 query parameter
+10:20:21 PM
+0.21ms
+mysql
+select * from `system` where `key` = woocommerce_version limit 1
+
+
+1 query parameter
+10:20:21 PM
+0.2ms
+mysql
+select * from `system` where `key` = superadmin_version limit 1
+
+
+1 query parameter
+10:20:21 PM
+0.22ms
+mysql
+select * from `system` where `key` = superadmin_version limit 1
+
+
+1 query parameter
+10:20:21 PM
+0.21ms
+mysql
+select * from `system` where `key` = superadmin_version limit 1
+
+
+1 query parameter
+10:20:21 PM
+0.22ms
+mysql
+select * from `system` where `key` = connector_version limit 1
+
+
+1 query parameter
+10:20:21 PM
+0.22ms
+mysql
+select * from `system` where `key` = superadmin_version limit 1
+
+
+1 query parameter
+10:20:21 PM
+0.41ms
+mysql
+select * from `business` where `business`.`id` = 111 limit 1
+
+
+1 query parameter
+10:20:21 PM
+0.2ms
+mysql
+select * from `system` where `key` = superadmin_version limit 1
+
+
+1 query parameter
+10:20:21 PM
+0.27ms
+mysql
+select * from `system` where `key` = superadmin_version limit 1
+
+
+1 query parameter
+10:20:21 PM
+0.26ms
+mysql
+select * from `system` where `key` = superadmin_version limit 1
+
+
+1 query parameter
+10:20:21 PM
+0.22ms
+mysql
+select * from `system` where `key` = superadmin_version limit 1
+
+
+1 query parameter
+10:20:21 PM
+0.23ms
+mysql
+select * from `system` where `key` = superadmin_version limit 1
+
+
+1 query parameter
+10:20:21 PM
+0.2ms
+mysql
+select * from `system` where `key` = superadmin_version limit 1
+
+
+1 query parameter
+10:20:21 PM
+0.27ms
+mysql
+select * from `system` where `key` = superadmin_version limit 1
+
+
+1 query parameter
+10:20:21 PM
+0.51ms
+mysql
+select * from `transactions` where `transactions`.`id` = 257582 limit 1
+
+
+1 query parameter
+10:20:21 PM
+0.28ms
+mysql
+select count(*) as aggregate from `cash_registers` where `user_id` = 262 and `status` = open
+
+
+2 query parameters
+10:20:21 PM
+0.29ms
+mysql
+select exists(select * from `transactions` where `return_parent_id` = 257582) as `exists`
+
+
+1 query parameter
+10:20:21 PM
+0.42ms
+mysql
+select `contacts`.*, `cg`.`amount` as `discount_percent`, `cg`.`price_calculation_type`, `cg`.`selling_price_group_id` from `contacts` left join `customer_groups` as `cg` on `cg`.`id` = `contacts`.`customer_group_id` where `type` in (customer, both) and `contacts`.`business_id` = 111 and `contacts`.`is_default` = 1 and `contacts`.`deleted_at` is null limit 1
+
+
+4 query parameters
+10:20:21 PM
+0.42ms
+mysql
+select `business`.*, `cur`.`code` as `currency_code`, `cur`.`symbol` as `currency_symbol`, `thousand_separator`, `decimal_separator`, `TR`.`amount` as `tax_calculation_amount`, `business`.`default_sales_discount` from `business` left join `tax_rates` as `TR` on `business`.`default_sales_tax` = `TR`.`id` left join `currencies` as `cur` on `business`.`currency_id` = `cur`.`id` where `business`.`id` = 111 limit 1
+
+
+1 query parameter
+10:20:21 PM
+0.18ms
+mysql
+select * from `tax_rates` where `business_id` = 111 and `for_tax_group` = 0 and `tax_rates`.`deleted_at` is null
+
+
+2 query parameters
+10:20:21 PM
+0.38ms
+mysql
+select * from `transactions` where `business_id` = 111 and `type` = sell and `transactions`.`id` = 257582 limit 1
+
+
+3 query parameters
+10:20:21 PM
+0.23ms
+mysql
+select * from `selling_price_groups` where `selling_price_groups`.`id` in (0) and `selling_price_groups`.`deleted_at` is null
+
+
+10:20:21 PM
+0.16ms
+mysql
+select * from `types_of_services` where 0 = 1
+
+
+10:20:21 PM
+0.34ms
+mysql
+select * from `business_locations` where `business_locations`.`id` = 123 limit 1
+
+
+1 query parameter
+10:20:21 PM
+0.27ms
+mysql
+select * from `business` where `business`.`id` = 111 limit 1
+
+
+1 query parameter
+10:20:21 PM
+0.59ms
+mysql
+select IF(pv.is_dummy = 0, CONCAT(p.name, ' (', pv.name, ':',variations.name, ')'), p.name) AS product_name, `p`.`id` as `product_id`, `p`.`enable_stock`, `p`.`image` as `product_image`, `p`.`name` as `product_actual_name`, `p`.`type` as `product_type`, `pv`.`name` as `product_variation_name`, `pv`.`is_dummy` as `is_dummy`, `variations`.`name` as `variation_name`, `variations`.`sub_sku`, `p`.`barcode_type`, `p`.`enable_sr_no`, `variations`.`id` as `variation_id`, `units`.`short_name` as `unit`, `units`.`allow_decimal` as `unit_allow_decimal`, `u`.`short_name` as `second_unit`, `transaction_sell_lines`.`secondary_unit_quantity`, `transaction_sell_lines`.`tax_id` as `tax_id`, `transaction_sell_lines`.`item_tax` as `item_tax`, `transaction_sell_lines`.`unit_price` as `default_sell_price`, `transaction_sell_lines`.`unit_price_before_discount` as `unit_price_before_discount`, `transaction_sell_lines`.`unit_price_inc_tax` as `sell_price_inc_tax`, `transaction_sell_lines`.`id` as `transaction_sell_lines_id`, `transaction_sell_lines`.`id`, `transaction_sell_lines`.`quantity` as `quantity_ordered`, `transaction_sell_lines`.`sell_line_note` as `sell_line_note`, `transaction_sell_lines`.`parent_sell_line_id`, `transaction_sell_lines`.`lot_no_line_id`, `transaction_sell_lines`.`line_discount_type`, `transaction_sell_lines`.`line_discount_amount`, `transaction_sell_lines`.`res_service_staff_id`, `units`.`id` as `unit_id`, `transaction_sell_lines`.`sub_unit_id`, IF(vld.qty_available > 0, vld.qty_available + transaction_sell_lines.quantity, transaction_sell_lines.quantity) AS qty_available from `transaction_sell_lines` inner join `products` as `p` on `transaction_sell_lines`.`product_id` = `p`.`id` inner join `variations` as `variations` on `transaction_sell_lines`.`variation_id` = `variations`.`id` inner join `product_variations` as `pv` on `variations`.`product_variation_id` = `pv`.`id` left join `variation_location_details` as `vld` on `variations`.`id` = `vld`.`variation_id` and `vld`.`location_id` = 123 left join `units` on `units`.`id` = `p`.`unit_id` left join `units` as `u` on `p`.`secondary_unit_id` = `u`.`id` where `transaction_sell_lines`.`transaction_id` = 257582
+
+
+2 query parameters
+10:20:21 PM
+0.21ms
+mysql
+select `warranties`.*, `sell_line_warranties`.`sell_line_id` as `pivot_sell_line_id`, `sell_line_warranties`.`warranty_id` as `pivot_warranty_id` from `warranties` inner join `sell_line_warranties` on `warranties`.`id` = `sell_line_warranties`.`warranty_id` where `sell_line_warranties`.`sell_line_id` in (538333)
+
+
+10:20:21 PM
+0.21ms
+mysql
+select * from `variations` where `variations`.`id` = 31664 and `variations`.`deleted_at` is null limit 1
+
+
+1 query parameter
+10:20:21 PM
+0.22ms
+mysql
+select * from `media` where `media`.`model_id` in (31664) and `media`.`model_type` = App\Variation
+
+
+1 query parameter
+10:20:21 PM
+0.88ms
+mysql
+select `purchase_lines`.`id` as `purchase_line_id`, `lot_number`, `purchase_lines`.`exp_date` as `exp_date`, (purchase_lines.quantity - (purchase_lines.quantity_sold + purchase_lines.quantity_adjusted + purchase_lines.quantity_returned)) AS qty_available from `purchase_lines` inner join `transactions` as `T` on `purchase_lines`.`transaction_id` = `T`.`id` where `T`.`business_id` = 111 and `T`.`location_id` = 123 and `purchase_lines`.`variation_id` = 31664 and `purchase_lines`.`lot_number` is not null and (purchase_lines.quantity_sold + purchase_lines.quantity_adjusted + purchase_lines.quantity_returned) <= purchase_lines.quantity
+
+
+3 query parameters
+10:20:21 PM
+0.23ms
+mysql
+select * from `transaction_payments` where `transaction_id` = 257582
+
+
+1 query parameter
+10:20:21 PM
+0.6ms
+mysql
+select * from `cash_denominations` where `cash_denominations`.`model_id` in (232891) and `cash_denominations`.`model_type` = App\TransactionPayment
+
+
+1 query parameter
+10:20:21 PM
+0.23ms
+mysql
+select * from `categories` where `business_id` = 111 and `category_type` = product and `categories`.`deleted_at` is null order by `name` asc
+
+
+2 query parameters
+10:20:21 PM
+0.21ms
+mysql
+select `name`, `id` from `brands` where `business_id` = 111 and `brands`.`deleted_at` is null order by `name` asc
+
+
+1 query parameter
+10:20:21 PM
+0.2ms
+mysql
+select `name`, `id` from `customer_groups` where `business_id` = 111
+
+
+1 query parameter
+10:20:21 PM
+0.18ms
+mysql
+select `name` from `roles` where `business_id` = 111 and `is_service_staff` = 1
+
+
+2 query parameters
+10:20:21 PM
+0.2ms
+mysql
+select * from `roles` where `name` = Cashier#111 and `guard_name` = web limit 1
+
+
+2 query parameters
+10:20:21 PM
+0.31ms
+mysql
+select `id`, CONCAT(COALESCE(first_name, ""), " ", COALESCE(last_name, "")) as full_name from `users` where `business_id` = 111 and exists (select * from `roles` inner join `model_has_roles` on `roles`.`id` = `model_has_roles`.`role_id` where `users`.`id` = `model_has_roles`.`model_id` and `model_has_roles`.`model_type` = App\User and `roles`.`id` in (269)) and `users`.`deleted_at` is null
+
+
+3 query parameters
+·
+Source
+·
+Docs
+·
+Laravel
+Ignition is built byFlare, the Laravel error reporting service.
