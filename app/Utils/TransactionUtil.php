@@ -494,6 +494,7 @@ class TransactionUtil extends Util
      * Edit transaction sell line
      *
      * @param  array  $product
+     * @param  int  $location_id
      * @return bool
      */
     public function editSellLine($product, $location_id, $status_before, $multiplier = 1, $uf_data = true)
@@ -1132,34 +1133,8 @@ class TransactionUtil extends Util
         }
 
         if ($il->show_reward_point == 1) {
-            $output['reward_point_label'] = $business_details->rp_name;
-            $contact = $transaction->contact;
-
-            if ($contact) {
-                // Get current total points from contact
-                $current_total_rp = $contact->total_rp ?? 0;
-
-                // Get points used in this transaction
-                $rp_used = $transaction->rp_redeemed ?? 0;
-
-                // Get points earned in this transaction
-                $rp_earned = $transaction->rp_earned ?? 0;
-
-                // Calculate points before this transaction
-                // Current = Before - Used + Earned
-                // So: Before = Current + Used - Earned
-                $rp_before = $current_total_rp + $rp_used - $rp_earned;
-
-                // Available is the current total
-                $rp_available = $current_total_rp;
-
-                $output['rp_before'] = $rp_before;
-                $output['rp_used'] = $rp_used;
-                $output['rp_earned'] = $rp_earned;
-                $output['rp_available'] = $rp_available;
-                $output['customer_rp_label'] = $business_details->rp_name;
-                $output['customer_total_rp'] = $current_total_rp;
-            }
+            $output['customer_rp_label'] = $business_details->rp_name;
+            $output['customer_total_rp'] = $customer->total_rp;
         }
 
         $output['client_id'] = '';
