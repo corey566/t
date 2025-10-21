@@ -4237,7 +4237,7 @@ class TransactionUtil extends Util
         ];
         //Update reference count
         $ob_ref_count = $this->setAndGetReferenceCount('opening_balance', $business_id);
-        //Generate referencenumber
+        //Generate reference number
         $ob_data['ref_no'] = $this->generateReferenceNumber('opening_balance', $ob_ref_count, $business_id);
         //Create opening balance transaction
         Transaction::create($ob_data);
