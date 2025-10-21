@@ -1,0 +1,12 @@
+
+{
+    "name": "ColomboCenter",
+    "alias": "colombocenter",
+    "description": "Colombo City Center (Integra POS) Integration",
+    "keywords": ["colombo", "integra", "mall", "integration"],
+    "priority": 0,
+    "providers": [
+        "Modules\\ColomboCenter\\Providers\\ColomboCenterServiceProvider"
+    ],
+    "files": []
+}

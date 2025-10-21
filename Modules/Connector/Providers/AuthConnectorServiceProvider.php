@@ -3,7 +3,7 @@
 namespace Modules\Connector\Providers;
 
 use Illuminate\Foundation\Support\Providers\AuthServiceProvider as ServiceProvider;
-use Laravel\Passport\Passport;
+// use Laravel\Passport\Passport;
 
 class AuthConnectorServiceProvider extends ServiceProvider
 {
@@ -40,8 +40,8 @@ class AuthConnectorServiceProvider extends ServiceProvider
      * @param  \Illuminate\Contracts\Auth\Access\Gate  $gate
      * @return void
      */
-    public function boot(GateContract $gate)
+    public function boot()
     {
-        Passport::routes();
+        // Passport::routes();
     }
 }

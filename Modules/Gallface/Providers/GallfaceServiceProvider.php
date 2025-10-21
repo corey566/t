@@ -1,4 +1,3 @@
-
 <?php
 
 namespace Modules\Gallface\Providers;
@@ -42,6 +41,10 @@ class GallfaceServiceProvider extends ServiceProvider
     {
         $this->commands([
             \Modules\Gallface\Console\GallfaceSyncCommand::class,
+            \Modules\Gallface\Console\HcmSyncCommand::class,
+            \Modules\Gallface\Console\HcmTestPingCommand::class,
+            \Modules\Gallface\Console\HcmActivityPingCommand::class,
+            \Modules\Gallface\Console\HcmValidationTestCommand::class,
         ]);
     }
 
@@ -164,6 +167,18 @@ class GallfaceServiceProvider extends ServiceProvider
 
             // Run Gallface auto-sync every minute for locations with auto_sync_enabled
             $schedule->command('gallface:sync --auto')
+                ->everyMinute()
+                ->withoutOverlapping()
+                ->runInBackground();
+
+            // Run HCM auto-sync every minute for locations with auto_sync_enabled
+            $schedule->command('hcm:sync --auto')
+                ->everyMinute()
+                ->withoutOverlapping()
+                ->runInBackground();
+
+            // Run HCM ping check every minute (lightweight, just checks and pings once)
+            $schedule->command('hcm:activity-ping')
                 ->everyMinute()
                 ->withoutOverlapping()
                 ->runInBackground();

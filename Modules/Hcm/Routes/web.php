@@ -1,18 +1,18 @@
+
 <?php
 
-Route::middleware('web', 'SetSessionData', 'auth', 'language', 'timezone', 'AdminSidebarMenu')->prefix('hcm')->name('hcm.')->group(function () {
-    // Dashboard and credentials
-    Route::get('credentials', [\Modules\Hcm\Http\Controllers\HcmController::class, 'credentials'])->name('credentials');
-    Route::post('save-credentials/{location_id}', [\Modules\Hcm\Http\Controllers\HcmController::class, 'saveCredentials'])->name('save.credentials');
-    Route::delete('delete-credentials/{location_id}', [\Modules\Hcm\Http\Controllers\HcmController::class, 'deleteCredentials'])->name('delete.credentials');
+use Modules\Hcm\Http\Controllers\HcmController;
 
-    // Location-specific routes
-    Route::prefix('location/{location_id}')->group(function () {
-        Route::get('invoice-history', [\Modules\Hcm\Http\Controllers\HcmController::class, 'viewInvoiceHistory'])->name('invoice.history');
-        Route::get('ping-monitor', [\Modules\Hcm\Http\Controllers\HcmController::class, 'showPingMonitor'])->name('ping.monitor');
-        Route::post('ping', [\Modules\Hcm\Http\Controllers\HcmController::class, 'sendPing'])->name('ping');
-        Route::get('ping-logs', [\Modules\Hcm\Http\Controllers\HcmController::class, 'getPingLogs'])->name('ping.logs');
-        Route::post('test-connection', [\Modules\Hcm\Http\Controllers\HcmController::class, 'testConnection'])->name('test.connection');
-        Route::post('sync-sales', [\Modules\Hcm\Http\Controllers\HcmController::class, 'syncSales'])->name('sync.sales');
-    });
-});
+Route::get('dashboard', [HcmController::class, 'dashboard'])->name('hcm.dashboard');
+Route::get('credentials', [HcmController::class, 'credentials'])->name('hcm.credentials');
+Route::post('save-credentials/{location_id}', [HcmController::class, 'saveCredentials'])->name('hcm.save.credentials');
+Route::delete('delete-credentials/{location_id}', [HcmController::class, 'deleteCredentials'])->name('hcm.delete.credentials');
+Route::get('location/{location_id}/invoice-history', [HcmController::class, 'viewInvoiceHistory'])->name('hcm.invoice.history');
+Route::get('location/{location_id}/ping-monitor', [HcmController::class, 'showPingMonitor'])->name('hcm.ping.monitor');
+Route::post('location/{location_id}/ping', [HcmController::class, 'sendPing'])->name('hcm.ping');
+Route::get('location/{location_id}/ping-logs', [HcmController::class, 'getPingLogs'])->name('hcm.ping.logs');
+Route::post('location/{location_id}/test-connection', [HcmController::class, 'testConnection'])->name('hcm.test.connection');
+Route::post('location/{location_id}/sync-sales', [HcmController::class, 'syncSales'])->name('hcm.sync.sales');
+Route::get('location/{location_id}/download-excel', [HcmController::class, 'downloadExcel'])->name('hcm.download.excel');
+Route::post('location/{location_id}/upload-excel', [HcmController::class, 'uploadExcel'])->name('hcm.upload.excel');
+Route::get('manual-sync/{location_id}', [HcmController::class, 'manualSyncTest'])->name('hcm.manual.sync.test');

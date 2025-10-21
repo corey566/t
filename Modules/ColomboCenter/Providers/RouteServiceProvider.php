@@ -1,14 +1,14 @@
 
 <?php
 
-namespace Modules\Hcm\Providers;
+namespace Modules\ColomboCenter\Providers;
 
 use Illuminate\Support\Facades\Route;
 use Illuminate\Foundation\Support\Providers\RouteServiceProvider as ServiceProvider;
 
 class RouteServiceProvider extends ServiceProvider
 {
-    protected string $name = 'Hcm';
+    protected string $name = 'ColomboCenter';
 
     public function boot(): void
     {
@@ -24,14 +24,14 @@ class RouteServiceProvider extends ServiceProvider
     protected function mapWebRoutes(): void
     {
         Route::middleware(['web', 'SetSessionData', 'auth', 'language', 'timezone', 'AdminSidebarMenu'])
-            ->prefix('hcm')
-            ->group(module_path('Hcm', '/Routes/web.php'));
+            ->prefix('colombocenter')
+            ->group(module_path('ColomboCenter', '/Routes/web.php'));
     }
 
     protected function mapApiRoutes(): void
     {
         Route::middleware('api')
-            ->prefix('api/hcm')
-            ->group(module_path('Hcm', '/Routes/api.php'));
+            ->prefix('api')
+            ->group(module_path('ColomboCenter', '/Routes/api.php'));
     }
 }

@@ -1,25 +1,24 @@
 
 <?php
 
-namespace Modules\Hcm\Providers;
+namespace Modules\GallfaceMims\Providers;
 
 use Illuminate\Support\ServiceProvider;
 use Illuminate\Console\Scheduling\Schedule;
 
-class HcmServiceProvider extends ServiceProvider
+class GallfaceMimsServiceProvider extends ServiceProvider
 {
-    protected $moduleName = 'Hcm';
-    protected $moduleNameLower = 'hcm';
+    protected $moduleName = 'GallfaceMims';
+    protected $moduleNameLower = 'gallfacemims';
 
     public function boot(): void
     {
         $this->registerTranslations();
         $this->registerConfig();
         $this->registerViews();
-        $this->loadMigrationsFrom(module_path('Hcm', 'Database/Migrations'));
+        $this->loadMigrationsFrom(module_path('GallfaceMims', 'Database/Migrations'));
         $this->registerCommands();
         $this->scheduleAutoSync();
-        $this->registerEventListeners();
     }
 
     public function register(): void
@@ -63,8 +62,7 @@ class HcmServiceProvider extends ServiceProvider
     protected function registerCommands()
     {
         $this->commands([
-            \Modules\Hcm\Console\HcmSyncCommand::class,
-            \Modules\Hcm\Console\HcmActivityPingCommand::class,
+            \Modules\GallfaceMims\Console\GallfaceSyncCommand::class,
         ]);
     }
 
@@ -72,26 +70,11 @@ class HcmServiceProvider extends ServiceProvider
     {
         $this->app->booted(function () {
             $schedule = $this->app->make(Schedule::class);
-            $schedule->command('hcm:sync --auto')
-                ->everyMinute()
-                ->withoutOverlapping()
-                ->runInBackground();
-            
-            $schedule->command('hcm:activity-ping')
+            $schedule->command('gallfacemims:sync --auto')
                 ->everyMinute()
                 ->withoutOverlapping()
                 ->runInBackground();
         });
-    }
-
-    protected function registerEventListeners(): void
-    {
-        $events = $this->app->make('events');
-        
-        $events->listen(
-            'Illuminate\Auth\Events\Login',
-            'Modules\Hcm\Listeners\UserLoggedInListener@handle'
-        );
     }
 
     private function getPublishableViewPaths(): array

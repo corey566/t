@@ -1,0 +1,12 @@
+
+{
+    "name": "GallfaceMims",
+    "alias": "gallfacemims",
+    "description": "One Gallface Mall (MIMS) Integration",
+    "keywords": ["gallface", "mims", "mall", "integration"],
+    "priority": 0,
+    "providers": [
+        "Modules\\GallfaceMims\\Providers\\GallfaceMimsServiceProvider"
+    ],
+    "files": []
+}

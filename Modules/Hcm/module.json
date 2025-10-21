@@ -2,8 +2,8 @@
 {
     "name": "Hcm",
     "alias": "hcm",
-    "description": "Havlock City Mall Integration Module",
-    "keywords": [],
+    "description": "Havelock City Mall (HCM) Integration",
+    "keywords": ["hcm", "havelock", "mall", "integration"],
     "priority": 0,
     "providers": [
         "Modules\\Hcm\\Providers\\HcmServiceProvider"
