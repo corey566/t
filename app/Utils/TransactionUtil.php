@@ -1134,7 +1134,29 @@ class TransactionUtil extends Util
 
         if ($il->show_reward_point == 1) {
             $output['customer_rp_label'] = $business_details->rp_name;
-            $output['customer_total_rp'] = $customer->total_rp;
+            //reward points
+            if ($il->show_reward_point == 1) {
+                $output['reward_point_label'] = $business_details->rp_name;
+                $contact = $transaction->contact;
+
+                // Get points before this transaction
+                $rp_before = $contact->total_rp ?? 0;
+
+                // Get points used in this transaction
+                $rp_used = $transaction->rp_redeemed ?? 0;
+
+                // Get points earned in this transaction
+                $rp_earned = $transaction->rp_earned ?? 0;
+
+                // Calculate available points (Before - Used + Earned)
+                $rp_available = $rp_before - $rp_used + $rp_earned;
+
+                $output['rp_before'] = $rp_before;
+                $output['rp_used'] = $rp_used;
+                $output['rp_earned'] = $rp_earned;
+                $output['rp_available'] = $rp_available;
+                $output['total_rp'] = $contact->total_rp ?? 0;
+            }
         }
 
         $output['client_id'] = '';
@@ -2246,15 +2268,8 @@ class TransactionUtil extends Util
                 'line_total' => $this->num_f($line->unit_price_inc_tax * $line->quantity_returned, false, $business_details),
 
                 // field for zatca pdf
-                'unit_price_before_discount_uf' => $line->unit_price_before_discount,
-                'line_total_uf' => $line->unit_price_inc_tax * $line->quantity_returned,
-
-                'tax_name' => ! empty($tax_details) ? $tax_details->name : null,
-                'tax_percent' => ! empty($tax_details) ? $tax_details->amount : null,
-                'quantity_uf' => $line->quantity_returned,
-                'unit_price_uf' => $line->unit_price,
-                 'line_discount_amount_uf' => $line->line_discount_amount,
-                 'line_discount_type_uf' => $line->line_discount_type,
+                'line_discount_amount_uf' => $line->line_discount_amount,
+                'line_discount_type_uf' => $line->line_discount_type,
             ];
             $line_array['line_discount'] = 0;
 
