@@ -30,10 +30,15 @@ class GallfaceServiceProvider extends ServiceProvider
         $this->registerViews();
         $this->loadMigrationsFrom(module_path('Gallface', 'Database/Migrations'));
 
-        // Register event listener for auto-sync
+        // Register event listeners for auto-sync
         $this->app['events']->listen(
             \App\Events\SellCreatedOrModified::class,
             \Modules\Gallface\Listeners\GallfaceSaleCreatedListener::class
+        );
+        
+        $this->app['events']->listen(
+            \App\Events\SellCreatedOrModified::class,
+            \Modules\Gallface\Listeners\HcmSaleCreatedListener::class
         );
     }
 
