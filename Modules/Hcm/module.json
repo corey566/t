@@ -13,3 +13,14 @@
     "files": [],
     "requires": []
 }
+{
+    "name": "Hcm",
+    "alias": "hcm",
+    "description": "Havelock City Mall Integration Module",
+    "keywords": [],
+    "priority": 0,
+    "providers": [
+        "Modules\\Hcm\\Providers\\HcmServiceProvider"
+    ],
+    "files": []
+}

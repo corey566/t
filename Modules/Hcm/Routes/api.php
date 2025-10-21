@@ -22,3 +22,10 @@ Route::prefix('hcm')->group(function () {
     Route::post('/webhook/ping-status', [Modules\Hcm\Http\Controllers\HcmWebhookController::class, 'pingStatus']);
     Route::post('/manual-sync/{invoice_id}', [Modules\Hcm\Http\Controllers\HcmController::class, 'manualSyncInvoice']);
 });
+<?php
+
+use Illuminate\Http\Request;
+
+Route::middleware('auth:api')->get('/hcm', function (Request $request) {
+    return $request->user();
+});
