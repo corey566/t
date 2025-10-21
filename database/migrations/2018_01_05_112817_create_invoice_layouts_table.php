@@ -39,8 +39,6 @@ return new class extends Migration
             $table->boolean('show_tax_1')->default(1);
             $table->boolean('show_tax_2')->default(0);
             $table->boolean('show_barcode')->default(0);
-            
-            $table->enum('design', ['classic', 'slim', 'slim2', 'electronifly'])->default('classic');
 
             $table->string('highlight_color', 10)->nullable();
             $table->text('footer_text')->nullable();
