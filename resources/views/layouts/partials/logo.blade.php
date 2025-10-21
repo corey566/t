@@ -4,6 +4,8 @@
 			<img src="/uploads/logo.png" class="img-rounded" alt="Logo" width="150" style="margin-bottom: 30px;">
 		</div>
 	@else
-    	<h1 class="text-center page-header">{{ config('app.name', 'ultimatePOS') }}</h1>
+    	<div class="col-xs-12" style="margin-bottom: 30px;">
+    		<img src="{{ asset('modules/gallface/images/one-gallface-logo.png') }}" alt="Logo" style="height: 60px;">
+    	</div>
     @endif
 </div>
