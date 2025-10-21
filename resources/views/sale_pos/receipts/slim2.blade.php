@@ -1,5 +1,6 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -80,6 +81,23 @@
             padding: 5px 0;
             border-top: 1px solid #ddd;
             border-bottom: 1px solid #ddd;
+        }
+
+        .points-section {
+            margin: 8px 0;
+        }
+
+        .points-table {
+            width: 100%;
+            border-collapse: collapse;
+            margin: 5px 0;
+        }
+
+        .points-table th,
+        .points-table td {
+            text-align: center;
+            padding: 2px;
+            border: 1px solid #000;
         }
 
         /* Invoice Details */
@@ -268,91 +286,93 @@
             body {
                 padding: 0;
             }
+
             .receipt {
                 max-width: none;
             }
         }
     </style>
 </head>
+
 <body>
     <div class="receipt">
         <!-- Header Section -->
         <div class="header">
             @if(!empty($receipt_details->logo))
-                <div class="logo-section">
-                    <img src="{{$receipt_details->logo}}" alt="Logo">
-                </div>
+            <div class="logo-section">
+                <img src="{{$receipt_details->logo}}" alt="Logo">
+            </div>
             @endif
 
             @if(!empty($receipt_details->display_name))
-                <div class="business-name">{{$receipt_details->display_name}}</div>
+            <div class="business-name">{{$receipt_details->display_name}}</div>
             @endif
 
             @if(!empty($receipt_details->contact))
-                <div class="contact-info">Phone: {!! strip_tags($receipt_details->contact) !!}</div>
+            <div class="contact-info">Phone: {!! strip_tags($receipt_details->contact) !!}</div>
             @endif
 
             @if(!empty($receipt_details->email))
-                <div class="contact-info">Email: {{$receipt_details->email}}</div>
+            <div class="contact-info">Email: {{$receipt_details->email}}</div>
             @endif
 
             @if(!empty($receipt_details->address))
-                <div class="contact-info">{!! $receipt_details->address !!}</div>
+            <div class="contact-info">{!! $receipt_details->address !!}</div>
             @endif
 
             @if(!empty($receipt_details->website))
-                <div class="contact-info">{{$receipt_details->website}}</div>
+            <div class="contact-info">{{$receipt_details->website}}</div>
             @endif
 
             @if(!empty($receipt_details->tax_info1))
-                <div class="contact-info">{{ $receipt_details->tax_label1 }}: {{ $receipt_details->tax_info1 }}</div>
+            <div class="contact-info">{{ $receipt_details->tax_label1 }}: {{ $receipt_details->tax_info1 }}</div>
             @endif
         </div>
 
         <!-- Invoice Title -->
-        <div class="invoice-title">TAX INVOICE</div>
+        <div class="invoice-title">INVOICE</div>
 
         <!-- Invoice Details -->
         <div class="invoice-details">
             @if(!empty($receipt_details->invoice_no))
-                <div class="detail-row">
-                    <span class="detail-label">Invoice :</span>
-                    <span>{{$receipt_details->invoice_no}}</span>
-                </div>
+            <div class="detail-row">
+                <span class="detail-label">Invoice :</span>
+                <span>{{$receipt_details->invoice_no}}</span>
+            </div>
             @endif
 
             @if(!empty($receipt_details->invoice_date))
-                <div class="detail-row">
-                    <span class="detail-label">Date :</span>
-                    <span>{{$receipt_details->invoice_date}}</span>
-                </div>
+            <div class="detail-row">
+                <span class="detail-label">Date :</span>
+                <span>{{$receipt_details->invoice_date}}</span>
+            </div>
             @endif
 
             @if(!empty($receipt_details->customer_info))
-                <div class="detail-row">
-                    <span class="detail-label">Customer :</span>
-                    <span>{!! strip_tags($receipt_details->customer_info) !!}</span>
-                </div>
+            <div class="detail-row">
+                <span class="detail-label">Customer :</span>
+                <span>{!! strip_tags($receipt_details->customer_info) !!}</span>
+            </div>
             @endif
 
             @if(!empty($receipt_details->customer_label))
-                <div class="detail-row">
-                    <span>{{$receipt_details->customer_label}}</span>
-                </div>
+            <div class="detail-row">
+                <span>{{$receipt_details->customer_label}}</span>
+            </div>
             @endif
 
             @if(!empty($receipt_details->service_staff))
-                <div class="detail-row">
-                    <span class="detail-label">Sold By :</span>
-                    <span>{{$receipt_details->service_staff}}</span>
-                </div>
+            <div class="detail-row">
+                <span class="detail-label">Sold By :</span>
+                <span>{{$receipt_details->service_staff}}</span>
+            </div>
             @endif
 
             @if(!empty($receipt_details->table))
-                <div class="detail-row">
-                    <span class="detail-label">{!! $receipt_details->table_label !!} :</span>
-                    <span>{{$receipt_details->table}}</span>
-                </div>
+            <div class="detail-row">
+                <span class="detail-label">{!! $receipt_details->table_label !!} :</span>
+                <span>{{$receipt_details->table}}</span>
+            </div>
             @endif
         </div>
 
@@ -375,16 +395,16 @@
                     <td class="col-item">
                         <div class="item-name">{{$line['name']}}</div>
                         @if(!empty($line['sub_sku']))
-                            <div class="item-details">SKU: {{$line['sub_sku']}}</div>
+                        <div class="item-details">SKU: {{$line['sub_sku']}}</div>
                         @endif
                         @if(!empty($line['product_variation']) || !empty($line['variation']))
-                            <div class="item-details">{{$line['product_variation']}} {{$line['variation']}}</div>
+                        <div class="item-details">{{$line['product_variation']}} {{$line['variation']}}</div>
                         @endif
                         @if(!empty($line['service_staff']))
-                            <div class="item-details">Staff: {{$line['service_staff']}}</div>
+                        <div class="item-details">Staff: {{$line['service_staff']}}</div>
                         @endif
                         @if(!empty($line['service_staff_name']))
-                            <div class="item-details">Service Staff: {{$line['service_staff_name']}}</div>
+                        <div class="item-details">Svr: {{$line['service_staff_name']}}</div>
                         @endif
                     </td>
                     <td class="col-qty">{{$line['quantity']}}</td>
@@ -392,17 +412,17 @@
                     <td class="col-total">{{$line['line_total']}}</td>
                 </tr>
                 @if(!empty($line['modifiers']))
-                    @foreach($line['modifiers'] as $modifier)
-                    <tr>
-                        <td class="col-num"></td>
-                        <td class="col-item">
-                            <div class="item-details">+ {{$modifier['name']}}</div>
-                        </td>
-                        <td class="col-qty">{{$modifier['quantity']}}</td>
-                        <td class="col-rate">{{$modifier['unit_price']}}</td>
-                        <td class="col-total">{{$modifier['line_total']}}</td>
-                    </tr>
-                    @endforeach
+                @foreach($line['modifiers'] as $modifier)
+                <tr>
+                    <td class="col-num"></td>
+                    <td class="col-item">
+                        <div class="item-details">+ {{$modifier['name']}}</div>
+                    </td>
+                    <td class="col-qty">{{$modifier['quantity']}}</td>
+                    <td class="col-rate">{{$modifier['unit_price']}}</td>
+                    <td class="col-total">{{$modifier['line_total']}}</td>
+                </tr>
+                @endforeach
                 @endif
                 @endforeach
             </tbody>
@@ -436,20 +456,20 @@
         <!-- Totals Section -->
         <div class="totals-section">
             @php
-                $total_items = 0;
-                $total_quantity = 0;
-                if(!empty($receipt_details->lines)) {
-                    $total_items = count($receipt_details->lines);
-                    foreach($receipt_details->lines as $line) {
-                        $total_quantity += $line['quantity'];
-                    }
-                }
+            $total_items = 0;
+            $total_quantity = 0;
+            if(!empty($receipt_details->lines)) {
+            $total_items = count($receipt_details->lines);
+            foreach($receipt_details->lines as $line) {
+            $total_quantity += $line['quantity'];
+            }
+            }
             @endphp
             <div class="summary-row">
                 <span>Items: {{$total_items}}</span>
                 <span>Qty: {{$total_quantity}}</span>
                 @if(!empty($receipt_details->total))
-                    <span>Total: {{$receipt_details->total}}</span>
+                <span>Total: {{$receipt_details->total}}</span>
                 @endif
             </div>
         </div>
@@ -466,11 +486,11 @@
             </div>
 
             @if(!empty($receipt_details->payments))
-                @foreach($receipt_details->payments as $payment)
-                <div class="payment-mode">
-                    Payment Mode: {{$payment['amount']}} ({{$payment['method']}})
-                </div>
-                @endforeach
+            @foreach($receipt_details->payments as $payment)
+            <div class="payment-mode">
+                Payment Mode: {{$payment['amount']}} ({{$payment['method']}})
+            </div>
+            @endforeach
             @endif
         </div>
 
@@ -492,23 +512,43 @@
             Total Tax : {{$receipt_details->tax}}
         </div>
         @endif
-
+        @if(!empty($receipt_details->rp_enabled))
+        <div class="points-section">
+            <div class="text-center bold">Points status:</div>
+            <table class="points-table">
+                <tr>
+                    <th>Before</th>
+                    <th>Used</th>
+                    <th>Earned</th>
+                    <th>Balance</th>
+                </tr>
+                <tr>
+                    <td>{{ $receipt_details->rp_before ?? 0 }}</td>
+                    <td>{{ $receipt_details->rp_used ?? 0 }}</td>
+                    <td>{{ $receipt_details->rp_earned ?? 0 }}</td>
+                    <td>{{ $receipt_details->rp_available ?? 0 }}</td>
+                </tr>
+            </table>
+        </div>
+        @endif
         <!-- Barcode Section -->
         @if($receipt_details->show_barcode)
-            <div class="barcode-section">
-                <img src="data:image/png;base64,{{DNS1D::getBarcodePNG($receipt_details->invoice_no, 'C128', 1, 40, array(0, 0, 0), true)}}" alt="Barcode">
-                <div class="barcode-number">{{$receipt_details->invoice_no}}</div>
-            </div>
+        <div class="barcode-section">
+            <img src="data:image/png;base64,{{DNS1D::getBarcodePNG($receipt_details->invoice_no, 'C128', 1, 40, array(0, 0, 0), true)}}"
+                alt="Barcode">
+            <div class="barcode-number">{{$receipt_details->invoice_no}}</div>
+        </div>
         @endif
 
         <!-- Footer -->
         <div class="footer">
             @if(!empty($receipt_details->footer_text))
-                {!! $receipt_details->footer_text !!}
+            {!! $receipt_details->footer_text !!}
             @else
-                Thank You For Shopping With Us. Please Come Again
+            Thank You For Shopping With Us. Please Come Again
             @endif
         </div>
     </div>
 </body>
+
 </html>

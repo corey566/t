@@ -152,6 +152,7 @@ class TransactionUtil extends Util
     /**
      * Add Sell transaction
      *
+     * @param  mixed  $transaction_id
      * @param  int  $business_id
      * @param  array  $input
      * @param  float  $invoice_total
@@ -490,10 +491,66 @@ class TransactionUtil extends Util
         return true;
     }
 
+    private function updateSalesOrderLine($so_line_id, $new_qty, $old_qty = 0)
+    {
+        $diff = $new_qty - $old_qty;
+        if (! empty($so_line_id) && ! empty($diff)) {
+            $so_line = TransactionSellLine::find($so_line_id);
+            $so_line->so_quantity_invoiced += ($diff);
+            $so_line->save();
+        }
+    }
+
+    /**
+     * Returns the line for combo product
+     *
+     * @param  array  $combo_items
+     * @param  object  $parent_sell_line
+     * @return array
+     */
+    private function __makeLinesForComboProduct($combo_items, $parent_sell_line)
+    {
+        $combo_lines = [];
+
+        //Calculate the percentage change in price.
+        $combo_total_price = 0;
+        foreach ($combo_items as $key => $value) {
+            $sell_price_inc_tax = Variation::findOrFail($value['variation_id'])->sell_price_inc_tax;
+
+            $combo_items[$key]['unit_price_inc_tax'] = $sell_price_inc_tax;
+            $combo_total_price += $value['quantity'] * $sell_price_inc_tax;
+        }
+        $change_percent = $this->get_percent($combo_total_price, $parent_sell_line->unit_price_inc_tax * $parent_sell_line->quantity);
+
+        foreach ($combo_items as $value) {
+            $price = $this->calc_percentage($value['unit_price_inc_tax'], $change_percent, $value['unit_price_inc_tax']);
+
+            $combo_lines[] = new TransactionSellLine([
+                'product_id' => $value['product_id'],
+                'variation_id' => $value['variation_id'],
+                'quantity' => $value['quantity'],
+                'unit_price_before_discount' => $price,
+                'unit_price' => $price,
+                'line_discount_type' => null,
+                'line_discount_amount' => 0,
+                'item_tax' => 0,
+                'tax_id' => null,
+                'unit_price_inc_tax' => $price,
+                'sub_unit_id' => null,
+                'discount_id' => null,
+                'parent_sell_line_id' => $parent_sell_line->id,
+                'children_type' => 'combo',
+            ]);
+        }
+
+        return $combo_lines;
+    }
+
     /**
      * Edit transaction sell line
      *
      * @param  array  $product
+     * @param  int  $location_id
      * @return bool
      */
     public function editSellLine($product, $location_id, $status_before, $multiplier = 1, $uf_data = true)
@@ -1044,8 +1101,8 @@ class TransactionUtil extends Util
             $output['customer_mobile'] = $customer->mobile;
 
             if ($receipt_printer_type != 'printer') {
-                $output['customer_info'] .= $customer->address_line_1;
-                if (! empty($customer->address_line_1)) {
+                $output['customer_info'] .= $customer->contact_address;
+                if (! empty($customer->contact_address)) {
                     $output['customer_info'] .= '<br>';
                 }
                 $output['customer_info'] .= '<b>'.__('contact.mobile').'</b>: '.$customer->mobile;
@@ -1132,34 +1189,8 @@ class TransactionUtil extends Util
         }
 
         if ($il->show_reward_point == 1) {
-            $output['reward_point_label'] = $business_details->rp_name;
-            $contact = $transaction->contact;
-
-            if ($contact) {
-                // Get current total points from contact
-                $current_total_rp = $contact->total_rp ?? 0;
-
-                // Get points used in this transaction
-                $rp_used = $transaction->rp_redeemed ?? 0;
-
-                // Get points earned in this transaction
-                $rp_earned = $transaction->rp_earned ?? 0;
-
-                // Calculate points before this transaction
-                // Current = Before - Used + Earned
-                // So: Before = Current + Used - Earned
-                $rp_before = $current_total_rp + $rp_used - $rp_earned;
-
-                // Available is the current total
-                $rp_available = $current_total_rp;
-
-                $output['rp_before'] = $rp_before;
-                $output['rp_used'] = $rp_used;
-                $output['rp_earned'] = $rp_earned;
-                $output['rp_available'] = $rp_available;
-                $output['customer_rp_label'] = $business_details->rp_name;
-                $output['customer_total_rp'] = $current_total_rp;
-            }
+            $output['customer_rp_label'] = $business_details->rp_name;
+            $output['customer_total_rp'] = $customer->total_rp;
         }
 
         $output['client_id'] = '';
@@ -1169,7 +1200,7 @@ class TransactionUtil extends Util
             $output['client_id'] = ! empty($customer->contact_id) ? $customer->contact_id : '';
         }
 
-        // added by
+        // added by 
         $user = \App\User::find($transaction->created_by);
         $output['added_by'] = $user ? trim("{$user->surname} {$user->first_name} {$user->last_name}") : '';
 
@@ -1227,19 +1258,10 @@ class TransactionUtil extends Util
         }
 
         $output['transaction_date'] = $transaction->transaction_date;
-        $output['date_format'] = $business_details->date_format;
+        $output['date_time_format'] = $business_details->date_format;
         $output['currency_symbol'] = $business_details->currency_symbol;
 
         $output['hide_price'] = ! empty($il->common_settings['hide_price']) ? true : false;
-
-        // Add reward points enabled flag and values
-        $output['rp_enabled'] = $business_details->enable_rp == 1 ? true : false;
-        if ($output['rp_enabled']) {
-            $output['rp_before'] = 0;
-            $output['rp_used'] = 0;
-            $output['rp_earned'] = 0;
-            $output['rp_available'] = 0;
-        }
 
         if (! empty($il->common_settings['show_due_date']) && $transaction->payment_status != 'paid') {
             $output['due_date_label'] = ! empty($il->common_settings['due_date_label']) ? $il->common_settings['due_date_label'] : '';
@@ -1271,11 +1293,7 @@ class TransactionUtil extends Util
                 $sell_line_relations[] = 'lot_details';
             }
 
-            $lines = $transaction->sell_lines()
-                        ->whereNull('parent_sell_line_id')
-                        ->with($sell_line_relations)
-                        ->with('service_staff') // Add eager loading for service_staff
-                        ->get();
+            $lines = $transaction->sell_lines()->whereNull('parent_sell_line_id')->with($sell_line_relations)->get();
 
             foreach ($lines as $key => $value) {
                 if (! empty($value->sub_unit_id)) {
@@ -1643,7 +1661,7 @@ class TransactionUtil extends Util
                 $total_order_tax = $transaction->tax_amount + $total_line_taxes;
                 $zatca_phase = ! empty($il->common_settings['zatca_phase']) ? $il->common_settings['zatca_phase'] : '';
                 $qr_code_text = $this->_zatca_qr_text($business_details->name, $business_details->tax_number_1, $transaction, $total_order_tax, $zatca_phase);
-            }
+            } 
 
             if ($transaction->status == 'final') {
                 $output['qr_code_text'] = $qr_code_text;
@@ -1858,6 +1876,7 @@ class TransactionUtil extends Util
         }
 
 
+
         // location custom fields
         if (in_array('custom_field1', $location_custom_field_settings) && ! empty($location_details->custom_field1) && ! empty($custom_labels->location->custom_field_1)) {
             $output['location_custom_field_1_label'] = $custom_labels->location->custom_field_1;
@@ -1919,23 +1938,6 @@ class TransactionUtil extends Util
 
         $output['design'] = $il->design;
         $output['table_tax_headings'] = ! empty($il->table_tax_headings) ? array_filter(json_decode($il->table_tax_headings), 'strlen') : null;
-        $output['rp_earned'] = $transaction->rp_earned ?? 0;
-        $output['rp_redeemed'] = $transaction->rp_redeemed ?? 0;
-
-        //Calculate current reward points balance
-        $rp_balance = 0;
-        if (!empty($transaction->contact)) {
-            $total_earned = \App\Transaction::where('contact_id', $transaction->contact_id)
-                ->where('business_id', $transaction->business_id)
-                ->where('status', 'final')
-                ->sum('rp_earned');
-            $total_redeemed = \App\Transaction::where('contact_id', $transaction->contact_id)
-                ->where('business_id', $transaction->business_id)
-                ->where('status', 'final')
-                ->sum('rp_redeemed');
-            $rp_balance = $total_earned - $total_redeemed;
-        }
-        $output['rp_balance'] = $rp_balance;
 
         return (object) $output;
     }
@@ -2024,7 +2026,7 @@ class TransactionUtil extends Util
             $base_unit_price = $line->unit_price_inc_tax / $base_unit_multiplier;
 
             $show_product_description = $il->common_settings['show_product_description'] ?? null;
-            $output_line = [
+            $line_array = [
                 //Field for 1st column
                 'name' => $product->name,
                 'product_description' => ! empty($show_product_description) ? $product->product_description : null,
@@ -2081,7 +2083,7 @@ class TransactionUtil extends Util
                 $temp[] = $product->product_custom_field4;
             }
             if (! empty($temp)) {
-                $output_line['product_custom_fields'] = implode(',', $temp);
+                $line_array['product_custom_fields'] = implode(',', $temp);
             }
 
             //Group product taxes by name.
@@ -2089,7 +2091,7 @@ class TransactionUtil extends Util
                 if ($tax_details->is_tax_group) {
                     $group_tax_details = $this->groupTaxDetails($tax_details, $line->quantity * $line->item_tax);
 
-                    $output_line['group_tax_details'] = $group_tax_details;
+                    $line_array['group_tax_details'] = $group_tax_details;
 
                     foreach ($group_tax_details as $value) {
                         if (! isset($output_taxes['taxes'][$value['name']])) {
@@ -2106,59 +2108,59 @@ class TransactionUtil extends Util
                 }
             }
 
-            $output_line['line_discount'] = method_exists($line, 'get_discount_amount') ? $this->num_f($line->get_discount_amount(), false, $business_details) : 0;
-            $output_line['line_discount_uf'] = method_exists($line, 'get_discount_amount') ? $line->get_discount_amount() : 0;
+            $line_array['line_discount'] = method_exists($line, 'get_discount_amount') ? $this->num_f($line->get_discount_amount(), false, $business_details) : 0;
+            $line_array['line_discount_uf'] = method_exists($line, 'get_discount_amount') ? $line->get_discount_amount() : 0;
 
             if ($line->line_discount_type == 'percentage') {
-                $output_line['line_discount'] .= ' ('.$this->num_f($line->line_discount_amount, false, $business_details).'%)';
+                $line_array['line_discount'] .= ' ('.$this->num_f($line->line_discount_amount, false, $business_details).'%)';
 
-                $output_line['line_discount_percent'] = $this->num_f($line->line_discount_amount, false, $business_details);
+                $line_array['line_discount_percent'] = $this->num_f($line->line_discount_amount, false, $business_details);
             }
 
-            $output_line['total_line_discount'] = $this->num_f($output_line['line_discount_uf'] * $output_line['quantity_uf'], false, $business_details);
+            $line_array['total_line_discount'] = $this->num_f($line_array['line_discount_uf'] * $line_array['quantity_uf'], false, $business_details);
 
             if ($il->show_brand == 1) {
-                $output_line['brand'] = ! empty($brand->name) ? $brand->name : '';
+                $line_array['brand'] = ! empty($brand->name) ? $brand->name : '';
             }
             if ($il->show_sku == 1) {
-                $output_line['sub_sku'] = ! empty($variation->sub_sku) ? $variation->sub_sku : '';
+                $line_array['sub_sku'] = ! empty($variation->sub_sku) ? $variation->sub_sku : '';
             }
             if ($il->show_image == 1) {
                 $media = $variation->media;
                 if (count($media)) {
                     $first_img = $media->first();
-                    $output_line['image'] = ! empty($first_img->display_url) ? $first_img->display_url : asset('/img/default.png');
+                    $line_array['image'] = ! empty($first_img->display_url) ? $first_img->display_url : asset('/img/default.png');
                 } else {
-                    $output_line['image'] = $product->image_url;
+                    $line_array['image'] = $product->image_url;
                 }
             }
             if ($il->show_cat_code == 1) {
-                $output_line['cat_code'] = ! empty($cat->short_code) ? $cat->short_code : '';
+                $line_array['cat_code'] = ! empty($cat->short_code) ? $cat->short_code : '';
             }
             if ($il->show_sale_description == 1) {
-                $output_line['sell_line_note'] = ! empty($line->sell_line_note) ? nl2br($line->sell_line_note) : '';
+                $line_array['sell_line_note'] = ! empty($line->sell_line_note) ? nl2br($line->sell_line_note) : '';
             }
             if ($is_lot_number_enabled == 1 && $il->show_lot == 1) {
-                $output_line['lot_number'] = ! empty($line->lot_details->lot_number) ? $line->lot_details->lot_number : null;
-                $output_line['lot_number_label'] = __('lang_v1.lot');
+                $line_array['lot_number'] = ! empty($line->lot_details->lot_number) ? $line->lot_details->lot_number : null;
+                $line_array['lot_number_label'] = __('lang_v1.lot');
             }
 
             if ($is_product_expiry_enabled == 1 && $il->show_expiry == 1) {
-                $output_line['product_expiry'] = ! empty($line->lot_details->exp_date) ? $this->format_date($line->lot_details->exp_date, false, $business_details) : null;
-                $output_line['product_expiry_label'] = __('lang_v1.expiry');
+                $line_array['product_expiry'] = ! empty($line->lot_details->exp_date) ? $this->format_date($line->lot_details->exp_date, false, $business_details) : null;
+                $line_array['product_expiry_label'] = __('lang_v1.expiry');
             }
 
             //Set warranty data if enabled
             if ($is_warranty_enabled && ! empty($line->warranties->first())) {
                 $warranty = $line->warranties->first();
                 if (! empty($il->common_settings['show_warranty_name'])) {
-                    $output_line['warranty_name'] = $warranty->name;
+                    $line_array['warranty_name'] = $warranty->name;
                 }
                 if (! empty($il->common_settings['show_warranty_description'])) {
-                    $output_line['warranty_description'] = $warranty->description;
+                    $line_array['warranty_description'] = $warranty->description;
                 }
                 if (! empty($il->common_settings['show_warranty_exp_date'])) {
-                    $output_line['warranty_exp_date'] = $warranty->getEndDate($line->transaction->transaction_date);
+                    $line_array['warranty_exp_date'] = $warranty->getEndDate($line->transaction->transaction_date);
                 }
             }
 
@@ -2198,18 +2200,11 @@ class TransactionUtil extends Util
                         $modifier_line_array['sell_line_note'] = ! empty($line->sell_line_note) ? nl2br($line->sell_line_note) : '';
                     }
 
-                    $output_line['modifiers'][] = $modifier_line_array;
+                    $line_array['modifiers'][] = $modifier_line_array;
                 }
             }
 
-            // Add service staff information for the line
-            if (!empty($line->res_service_staff_id) && !empty($line->service_staff)) {
-                $output_line['service_staff_name'] = $line->service_staff->first_name . ' ' . $line->service_staff->last_name;
-            } else {
-                $output_line['service_staff_name'] = '';
-            }
-
-            $output_lines[] = $output_line;
+            $output_lines[] = $line_array;
         }
 
         return ['lines' => $output_lines];
@@ -2244,7 +2239,7 @@ class TransactionUtil extends Util
             //         if (!isset($output_taxes['taxes'][$tax_name])) {
             //             $output_taxes['taxes'][$tax_name] = 0;
             //         }
-            //         $output_taxes['taxes'][$tax_name] += ($line->quantity * $line->item_tax);
+            //         $output_taxes['taxes'][$tax_name] += ($line->quantity_returned * $line->item_tax);
             //     }
             // }
 
@@ -2270,7 +2265,6 @@ class TransactionUtil extends Util
                 'unit_price' => $this->num_f($line->unit_price, false, $business_details),
                 'tax' => $this->num_f($line->item_tax, false, $business_details),
                 'tax_name' => ! empty($tax_details) ? $tax_details->name : null,
-                'tax_percent' => ! empty($tax_details) ? $tax_details->amount : null,
 
                 //Field for 3rd column
                 'unit_price_inc_tax' => $this->num_f($line->unit_price_inc_tax, false, $business_details),
@@ -2587,7 +2581,7 @@ class TransactionUtil extends Util
                     ->select(
                         DB::raw('SUM(final_total) as total_sell'),
                         DB::raw('SUM(final_total - tax_amount) as total_exc_tax'),
-                        DB::raw('SUM(final_total - (SELECT SUM(IF(tp.is_return = 1, -1*tp.amount, tp.amount)) FROM transaction_payments as tp WHERE tp.transaction_id = transactions.id) )  as total_due'),
+                        DB::raw('SUM(final_total - (SELECT COALESCE(SUM(IF(tp.is_return = 1, -1*tp.amount, tp.amount)), 0) FROM transaction_payments as tp WHERE tp.transaction_id = transactions.id) )  as total_due'),
                         DB::raw('SUM(total_before_tax) as total_before_tax'),
                         DB::raw('SUM(shipping_charges) as total_shipping_charges'),
                         DB::raw('SUM(additional_expense_value_1 + additional_expense_value_2 + additional_expense_value_3 + additional_expense_value_4) as total_expense')
@@ -2982,8 +2976,7 @@ class TransactionUtil extends Util
                             ->whereIn('type', ['expense', 'expense_refund']);
         // ->where('payment_status', 'paid');
 
-        //Check for permitted locations of a user
-        $permitted_locations = auth()->user()->permitted_locations();
+
         if(!empty($permitted_locations)){
             if ($permitted_locations != 'all') {
                 $query->whereIn('transactions.location_id', $permitted_locations);
@@ -3179,6 +3172,7 @@ class TransactionUtil extends Util
                         'card_type' => $parent_payment->card_type,
                         'card_holder_name' => $parent_payment->card_holder_name,
                         'card_month' => $parent_payment->card_month,
+                        'card_year' => $parent_payment->card_year,
                         'card_security' => $parent_payment->card_security,
                         'cheque_number' => $parent_payment->cheque_number,
                         'bank_account_number' => $parent_payment->bank_account_number,
@@ -3373,7 +3367,7 @@ class TransactionUtil extends Util
                             'updated_at' => \Carbon::now(),
                         ];
                         //Update purchase line
-                        PurchaseLine::where('id', $row->purchase_line_id)
+                        PurchaseLine::where('id', $row->purchase_lines_id)
                             ->update(['quantity_sold' => $row->quantity_sold + $qty_allocated]);
                     }
                 } elseif ($mapping_type == 'production_purchase') {
@@ -3387,7 +3381,7 @@ class TransactionUtil extends Util
                         ];
 
                         //Update purchase line
-                        PurchaseLine::where('id', $row->purchase_line_id)
+                        PurchaseLine::where('id', $row->purchase_lines_id)
                             ->update(['mfg_quantity_used' => $row->mfg_quantity_used + $qty_allocated]);
                     }
                 }
@@ -3569,7 +3563,7 @@ class TransactionUtil extends Util
 
             //Add mapping for new sell lines and for incremented quantity
             if (! empty($new_sell_lines)) {
-                $this->mapPurchaseSell($business, $new_sell_lines, 'purchase');
+                $this->mapPurchaseSell($business, $new_sell_lines);
             }
         }
     }
@@ -3794,8 +3788,7 @@ class TransactionUtil extends Util
             }
         }
 
-        $business = Business::find($transaction->business_id);
-        $business = $business->toArray();
+        $business = Business::find($transaction->business_id)->toArray();
         $business['location_id'] = $transaction->location_id;
 
         //Allocate the sold lines to purchases.
@@ -3939,64 +3932,42 @@ class TransactionUtil extends Util
     public function getTotalSellCommission($business_id, $start_date = null, $end_date = null, $location_id = null, $commission_agent = null)
     {
         //Query to sum total sell without line tax and order tax
-        $query = TransactionSellLine::join('transactions as sale', 'transaction_sell_lines.transaction_id', '=', 'sale.id')
-                            ->leftjoin('transaction_sell_lines_purchase_lines as TSPL', 'transaction_sell_lines.id', '=', 'TSPL.sell_line_id')
-                            ->leftjoin(
-                                'purchase_lines as PL',
-                                'TSPL.purchase_line_id',
-                                '=',
-                                'PL.id'
-                            )
-                            ->where('sale.type', 'sell')
-                            ->where('sale.status', 'final')
-                            ->join('products as P', 'transaction_sell_lines.product_id', '=', 'P.id')
-                            ->where('sale.business_id', $business_id)
-                            ->where('transaction_sell_lines.children_type', '!=', 'combo');
-        //If type combo: find childrens, sale price parent - get PP of childrens
-        $query->select(DB::raw('SUM(IF (TSPL.id IS NULL AND P.type="combo", ( 
-            SELECT Sum((tspl2.quantity - tspl2.qty_returned) * (tsl.unit_price_inc_tax - pl2.purchase_price_inc_tax)) AS total
-                FROM transaction_sell_lines AS tsl
-                    JOIN transaction_sell_lines_purchase_lines AS tspl2
-                ON tsl.id=tspl2.sell_line_id 
-                JOIN purchase_lines AS pl2 
-                ON tspl2.purchase_line_id = pl2.id 
-                WHERE tsl.parent_sell_line_id = transaction_sell_lines.id), IF(P.enable_stock=0,(transaction_sell_lines.quantity - transaction_sell_lines.quantity_returned) * transaction_sell_lines.unit_price_inc_tax,   
-                (TSPL.quantity - TSPL.qty_returned) * (transaction_sell_lines.unit_price_inc_tax - PL.purchase_price_inc_tax)) )) AS gross_profit')
-            );
+        $query = TransactionSellLine::leftjoin('transactions as t', 'transaction_sell_lines.transaction_id', '=', 't.id')
+                            ->where('t.business_id', $business_id)
+                            ->where('t.type', 'sell')
+                            ->where('t.status', 'final')
+                            ->select(DB::raw('SUM( (transaction_sell_lines.quantity - transaction_sell_lines.quantity_returned) * transaction_sell_lines.unit_price ) as final_total'));
 
-        if (! empty($start_date) && ! empty($end_date) && $start_date != $end_date) {
-            $query->whereDate('sale.transaction_date', '>=', $start_date)
-                ->whereDate('sale.transaction_date', '<=', $end_date);
-        }
-        if (! empty($start_date) && ! empty($end_date) && $start_date == $end_date) {
-            $query->whereDate('sale.transaction_date', $end_date);
+        //Check for permitted locations of a user
+        $permitted_locations = auth()->user()->permitted_locations();
+        if ($permitted_locations != 'all') {
+            $query->whereIn('t.location_id', $permitted_locations);
         }
 
-        if(!empty($permitted_locations)) {
-            if ($permitted_locations != 'all') {
-                $query->whereIn('sale.location_id', $permitted_locations);
-            }
+        if (! empty($start_date) && ! empty($end_date)) {
+            $query->whereBetween(DB::raw('date(t.transaction_date)'), [$start_date, $end_date]);
         }
 
         //Filter by the location
         if (! empty($location_id)) {
-            $query->where('sale.location_id', $location_id);
+            $query->where('t.location_id', $location_id);
         }
 
         if (! empty($commission_agent)) {
-           $query->where('sale.commission_agent', $commission_agent);
+            $query->where('t.commission_agent', $commission_agent);
         }
 
         $sell_details = $query->get();
 
-        $output['total_sales_with_commission'] = $sell_details->sum('gross_profit');
+        $output['total_sales_with_commission'] = $sell_details->sum('final_total');
 
         return $output;
     }
 
     public function getTotalPaymentWithCommission($business_id, $start_date = null, $end_date = null, $location_id = null, $commission_agent = null)
     {
-        $query = TransactionPayment::join('transactions as t', 'transaction_payments.transaction_id', '=', 't.id')
+        $query = TransactionPayment::join('transactions as t',
+            'transaction_payments.transaction_id', '=', 't.id')
                             ->where('t.business_id', $business_id)
                             ->where('t.type', 'sell')
                             ->where('t.status', 'final')
@@ -4009,7 +3980,7 @@ class TransactionUtil extends Util
         }
 
         if (! empty($start_date) && ! empty($end_date)) {
-            $query->whereDate('paid_on', [$start_date, $end_date]);
+            $query->whereBetween(DB::raw('date(paid_on)'), [$start_date, $end_date]);
         }
 
         //Filter by the location
@@ -4147,7 +4118,7 @@ class TransactionUtil extends Util
     }
 
     /**
-     * Checks whether a customer's credit limit is exceeded
+     * Checks if credit limit of a customer is exceeded
      *
      * @param  array  $input
      * @param  int  $exclude_transaction_id (For update sell)
@@ -4423,6 +4394,10 @@ class TransactionUtil extends Util
             unset($data['recurring_invoices']);
         }
 
+        if (isset($data['sell_lines'])) {
+            unset($data['sell_lines']);
+        }
+
         if (isset($data['business'])) {
             unset($data['business']);
         }
@@ -4675,6 +4650,959 @@ class TransactionUtil extends Util
 
     public function getGrossProfit($business_id, $start_date = null, $end_date = null, $location_id = null, $user_id = null, $permitted_locations)
     {
+        $query = TransactionSellLine::join('transactions as sale', 'transaction_sell_lines.transaction_id', '=', 'sale.id')
+            ->leftjoin('transaction_sell_lines_purchase_lines as TSPL', 'transaction_sell_lines.id', '=', 'TSPL.sell_line_id')
+            ->leftjoin(
+                'purchase_lines as PL',
+                'TSPL.purchase_line_id',
+                '=',
+                'PL.id'
+            )
+            ->where('sale.type', 'sell')
+            ->where('sale.status', 'final')
+            ->join('products as P', 'transaction_sell_lines.product_id', '=', 'P.id')
+            ->where('sale.business_id', $business_id)
+            ->where('transaction_sell_lines.children_type', '!=', 'combo');
+        //If type combo: find childrens, sale price parent - get PP of childrens
+        $query->select(DB::raw('SUM(IF (TSPL.id IS NULL AND P.type="combo", ( 
+            SELECT Sum((tspl2.quantity - tspl2.qty_returned) * (tsl.unit_price_inc_tax - pl2.purchase_price_inc_tax)) AS total
+                FROM transaction_sell_lines AS tsl
+                    JOIN transaction_sell_lines_purchase_lines AS tspl2
+                ON tsl.id=tspl2.sell_line_id 
+                JOIN purchase_lines AS pl2 
+                ON tspl2.purchase_line_id = pl2.id 
+                WHERE tsl.parent_sell_line_id = transaction_sell_lines.id), IF(P.enable_stock=0,(transaction_sell_lines.quantity - transaction_sell_lines.quantity_returned) * transaction_sell_lines.unit_price_inc_tax,   
+                (TSPL.quantity - TSPL.qty_returned) * (transaction_sell_lines.unit_price_inc_tax - PL.purchase_price_inc_tax)) )) AS gross_profit')
+            );
+
+        if (! empty($start_date) && ! empty($end_date) && $start_date != $end_date) {
+            $query->whereDate('sale.transaction_date', '>=', $start_date)
+                ->whereDate('sale.transaction_date', '<=', $end_date);
+        }
+        if (! empty($start_date) && ! empty($end_date) && $start_date == $end_date) {
+            $query->whereDate('sale.transaction_date', $end_date);
+        }
+
+        if(!empty($permitted_locations)) {
+            if ($permitted_locations != 'all') {
+                $query->whereIn('sale.location_id', $permitted_locations);
+            }
+        }
+
+        //Filter by the location
+        if (! empty($location_id)) {
+            $query->where('sale.location_id', $location_id);
+        }
+
+        if (! empty($user_id)) {
+            $query->where('sale.created_by', $user_id);
+        }
+
+        $gross_profit_obj = $query->first();
+
+        $gross_profit = ! empty($gross_profit_obj->gross_profit) ? $gross_profit_obj->gross_profit : 0;
+
+        //KNOWS ISSUE: If products are returned then also the discount gets applied for it.
+
+        return $gross_profit;
+    }
+
+    /**
+     * Calculates reward points to be earned from an order
+     *
+     * @return int
+     */
+    public function calculateRewardPoints($business_id, $total)
+    {
+        if (session()->has('business')) {
+            $business = session()->get('business');
+        } else {
+            $business = Business::find($business_id);
+        }
+        $total_points = 0;
+
+        if ($business->enable_rp == 1) {
+            //check if order total elegible for reward
+            if ($business->min_order_total_for_rp > $total) {
+                return $total_points;
+            }
+            $amount_per_unit_point = $business->amount_for_unit_rp;
+
+            $total_points = floor($total / $amount_per_unit_point);
+
+            if (! empty($business->max_rp_per_order) && $business->max_rp_per_order < $total_points) {
+                $total_points = $business->max_rp_per_order;
+            }
+        }
+
+        return $total_points;
+    }
+
+    /**
+     * Updates reward point of a customer
+     *
+     * @return void
+     */
+    public function updateCustomerRewardPoints(
+        $customer_id,
+        $earned,
+        $earned_before = 0,
+        $redeemed = 0,
+        $redeemed_before = 0
+    ) {
+        $customer = Contact::find($customer_id);
+
+        //Return if walk in customer
+        if ($customer->is_default == 1) {
+            return false;
+        }
+
+        $total_earned = $earned - $earned_before;
+        $total_redeemed = $redeemed - $redeemed_before;
+
+        $diff = $total_earned - $total_redeemed;
+
+        $customer_points = empty($customer->total_rp) ? 0 : $customer->total_rp;
+        $total_points = $customer_points + $diff;
+
+        $customer->total_rp = $total_points;
+        $customer->total_rp_used += $total_redeemed;
+        $customer->save();
+    }
+
+    /**
+     * Calculates reward points to be redeemed from an order
+     *
+     * @return array
+     */
+    public function getRewardRedeemDetails($business_id, $customer_id)
+    {
+        if (session()->has('business')) {
+            $business = session()->get('business');
+        } else {
+            $business = Business::find($business_id);
+        }
+        $details = ['points' => 0, 'amount' => 0];
+
+        $customer = Contact::where('business_id', $business_id)
+                                        ->find($customer_id);
+        $customer_reward_points = $customer->total_rp;
+
+        //If zero reward point or walk in customer return blank values
+        if (empty($customer_reward_points) || $customer->is_default == 1) {
+            return $details;
+        }
+
+        $min_reward_point_required = $business->min_redeem_point;
+
+        if (! empty($min_reward_point_required) && $customer_reward_points < $min_reward_point_required) {
+            return $details;
+        }
+
+        $max_redeem_point = $business->max_redeem_point;
+
+        if (! empty($max_redeem_point) && $max_redeem_point <= $customer_reward_points) {
+            $customer_reward_points = $max_redeem_point;
+        }
+
+        $amount_per_unit_point = $business->redeem_amount_per_unit_rp;
+
+        $equivalent_amount = $customer_reward_points * $amount_per_unit_point;
+
+        $details = ['points' => $customer_reward_points, 'amount' => $equivalent_amount];
+
+        return $details;
+    }
+
+    /**
+     * Checks whether a reward point date is expired
+     *
+     * @return bool
+     */
+    public function isRewardExpired($date, $business_id)
+    {
+        if (session()->has('business')) {
+            $business = session()->get('business');
+        } else {
+            $business = Business::find($business_id);
+        }
+
+        $is_expired = false;
+
+        if (! empty($business->rp_expiry_period)) {
+            $expiry_date = \Carbon::parse($date);
+            if ($business->rp_expiry_type == 'month') {
+                $expiry_date = $expiry_date->addMonths($business->rp_expiry_period);
+            } elseif ($business->rp_expiry_type == 'year') {
+                $expiry_date = $expiry_date->addYears($business->rp_expiry_period);
+            }
+
+            if ($expiry_date->format('Y-m-d') >= \Carbon::now()->format('Y-m-d')) {
+                $is_expired = true;
+            }
+        }
+
+        return $is_expired;
+    }
+
+    /**
+     * Function to delete sale
+     *
+     * @param  int  $business_id
+     * @param  int  $transaction_id
+     * @return array
+     */
+    public function deleteSale($business_id, $transaction_id)
+    {
+        //Check if return exist then not allowed
+        if ($this->isReturnExist($transaction_id)) {
+            $output = [
+                'success' => false,
+                'msg' => __('lang_v1.return_exist'),
+            ];
+
+            return $output;
+        }
+
+        $transaction = Transaction::where('id', $transaction_id)
+                    ->where('business_id', $business_id)
+                    ->whereIn('type', ['sell', 'sales_order'])
+                    ->with(['sell_lines', 'payment_lines'])
+                    ->first();
+
+         // If ZATCA module is installed and this transaction is successfully synced, prevent deletion
+        $moduleUtil = new ModuleUtil();
+        if ($moduleUtil->isModuleInstalled('ZatcaIntegrationKsa')) {
+             if (!empty($transaction) && $transaction->zatca_status === 'success') {
+                 $output = [
+                     'success' => false,
+                     'msg' => __('lang_v1.invoice_synced_to_zatca_cannot_be_deleted'),
+                 ];
+                 return $output;
+             }
+         }
+
+
+        if (! empty($transaction)) {
+            $log_properities = [
+                'id' => $transaction->id,
+                'invoice_no' => $transaction->invoice_no,
+            ];
+            $log_type = $transaction->type == 'sales_order' ? 'so_deleted' : 'sell_deleted';
+            $this->activityLog($transaction, $log_type, null, $log_properities);
+
+            //If status is draft direct delete transaction
+            if ($transaction->status == 'draft') {
+                foreach ($transaction->sell_lines as $sell_line) {
+                    $this->updateSalesOrderLine($sell_line->so_line_id, 0, $sell_line->quantity);
+                }
+                $sales_order_ids = $transaction->sales_order_ids ?? [];
+                if (! empty($sales_order_ids)) {
+                    $this->updateSalesOrderStatus($sales_order_ids);
+                }
+
+                $transaction->delete();
+            } else {
+                $business = Business::findOrFail($business_id);
+                $transaction_payments = $transaction->payment_lines;
+                $deleted_sell_lines = $transaction->sell_lines;
+                $deleted_sell_lines_ids = $deleted_sell_lines->pluck('id')->toArray();
+                $this->deleteSellLines(
+                    $deleted_sell_lines_ids,
+                    $transaction->location_id
+                );
+
+                $this->updateCustomerRewardPoints($transaction->contact_id, 0, $transaction->rp_earned, 0, $transaction->rp_redeemed);
+
+                $transaction->status = 'draft';
+                $business_data = ['id' => $business_id,
+                    'accounting_method' => $business->accounting_method,
+                    'location_id' => $transaction->location_id,
+                ];
+
+                $this->adjustMappingPurchaseSell('final', $transaction, $business_data, $deleted_sell_lines_ids);
+
+                $sales_order_ids = $transaction->sales_order_ids ?? [];
+
+                if (! empty($sales_order_ids)) {
+                    $this->updateSalesOrderStatus($sales_order_ids);
+                }
+
+                //Delete Cash register transactions
+                $transaction->cash_register_payments()->delete();
+
+                $transaction->delete();
+
+                foreach ($transaction_payments as $payment) {
+                    event(new TransactionPaymentDeleted($payment));
+                }
+            }
+        }
+
+        $output = [
+            'success' => true,
+            'msg' => __('lang_v1.sale_delete_success'),
+        ];
+
+        return $output;
+    }
+
+    /**
+     * common function to get
+     * list purchase
+     *
+     * @param  int  $business_id
+     * @return object
+     */
+    public function getListPurchases($business_id)
+    {
+        $purchases = Transaction::leftJoin('contacts', 'transactions.contact_id', '=', 'contacts.id')
+                    ->join(
+                        'business_locations AS BS',
+                        'transactions.location_id',
+                        '=',
+                        'BS.id'
+                    )
+                    ->leftJoin(
+                        'transaction_payments AS TP',
+                        'transactions.id',
+                        '=',
+                        'TP.transaction_id'
+                    )
+                    ->leftJoin(
+                        'transactions AS PR',
+                        'transactions.id',
+                        '=',
+                        'PR.return_parent_id'
+                    )
+                    ->leftJoin('users as u', 'transactions.created_by', '=', 'u.id')
+                    ->where('transactions.business_id', $business_id)
+                    ->where('transactions.type', 'purchase')
+                    ->select(
+                        'transactions.id',
+                        'transactions.document',
+                        'transactions.transaction_date',
+                        'transactions.ref_no',
+                        'contacts.name',
+                        'contacts.supplier_business_name',
+                        'transactions.status',
+                        'transactions.payment_status',
+                        'transactions.final_total',
+                        'BS.name as location_name',
+                        'transactions.pay_term_number',
+                        'transactions.pay_term_type',
+                        'PR.id as return_transaction_id',
+                        'transactions.custom_field_1',
+                        'transactions.custom_field_2',
+                        'transactions.custom_field_3',
+                        'transactions.custom_field_4',
+                        DB::raw('SUM(TP.amount) as amount_paid'),
+                        DB::raw('(SELECT SUM(TP2.amount) FROM transaction_payments AS TP2 WHERE
+                        TP2.transaction_id=PR.id ) as return_paid'),
+                        DB::raw('COUNT(PR.id) as return_exists'),
+                        DB::raw('COALESCE(PR.final_total, 0) as amount_return'),
+                        DB::raw("CONCAT(COALESCE(u.surname, ''),' ',COALESCE(u.first_name, ''),' ',COALESCE(u.last_name,'')) as added_by")
+                    )
+                    ->groupBy('transactions.id');
+
+        return $purchases;
+    }
+
+        /**
+     * common function to get
+     * list expenses
+     *
+     * @param  int  $business_id
+     * @return object
+     */
+    public function getListExpenses($business_id)
+    {
+        $expenses = Transaction::leftJoin('expense_categories AS ec', 'transactions.expense_category_id', '=', 'ec.id')
+            ->leftJoin('expense_categories AS esc', 'transactions.expense_sub_category_id', '=', 'esc.id')
+            ->join(
+                'business_locations AS bl',
+                'transactions.location_id',
+                '=',
+                'bl.id'
+            )
+            ->leftJoin('tax_rates as tr', 'transactions.tax_id', '=', 'tr.id')
+            ->leftJoin('users AS U', 'transactions.expense_for', '=', 'U.id')
+            ->leftJoin('users AS usr', 'transactions.created_by', '=', 'usr.id')
+            ->leftJoin('contacts AS c', 'transactions.contact_id', '=', 'c.id')
+            ->leftJoin(
+                'transaction_payments AS TP',
+                'transactions.id',
+                '=',
+                'TP.transaction_id'
+            )
+            ->where('transactions.business_id', $business_id)
+            ->whereIn('transactions.type', ['expense', 'expense_refund'])
+            ->select(
+                'transactions.id',
+                'transactions.document',
+                'transaction_date',
+                'ref_no',
+                'ec.name as category',
+                'esc.name as sub_category',
+                'payment_status',
+                'additional_notes',
+                'final_total',
+                'transactions.is_recurring',
+                'transactions.recur_interval',
+                'transactions.recur_interval_type',
+                'transactions.recur_repetitions',
+                'transactions.subscription_repeat_on',
+                'bl.name as location_name',
+                DB::raw("CONCAT(COALESCE(U.surname, ''),' ',COALESCE(U.first_name, ''),' ',COALESCE(U.last_name,'')) as expense_for"),
+                DB::raw("CONCAT(tr.name ,' (', tr.amount ,' )') as tax"),
+                DB::raw('SUM(TP.amount) as amount_paid'),
+                DB::raw("CONCAT(COALESCE(usr.surname, ''),' ',COALESCE(usr.first_name, ''),' ',COALESCE(usr.last_name,'')) as added_by"),
+                'transactions.recur_parent_id',
+                'c.name as contact_name',
+                'transactions.type'
+            )
+            ->with(['recurring_parent'])
+            ->groupBy('transactions.id');
+        return $expenses;
+    }
+    /**
+     * common function to get
+     * list sell
+     *
+     * @param  int  $business_id
+     * @return object
+     */
+    public function getListSells($business_id, $sale_type = 'sell')
+    {
+        $sells = Transaction::leftJoin('contacts', 'transactions.contact_id', '=', 'contacts.id')
+                // ->leftJoin('transaction_payments as tp', 'transactions.id', '=', 'tp.transaction_id')
+                ->leftJoin('transaction_sell_lines as tsl', function ($join) {
+                    $join->on('transactions.id', '=', 'tsl.transaction_id')
+                        ->whereNull('tsl.parent_sell_line_id');
+                })
+                ->leftJoin('users as u', 'transactions.created_by', '=', 'u.id')
+                ->leftJoin('users as ss', 'transactions.res_waiter_id', '=', 'ss.id')
+                ->leftJoin('users as dp', 'transactions.delivery_person', '=', 'dp.id')
+                ->leftJoin('res_tables as tables', 'transactions.res_table_id', '=', 'tables.id')
+                ->join(
+                    'business_locations AS bl',
+                    'transactions.location_id',
+                    '=',
+                    'bl.id'
+                )
+                ->leftJoin(
+                    'transactions AS SR',
+                    'transactions.id',
+                    '=',
+                    'SR.return_parent_id'
+                )
+                ->leftJoin(
+                    'types_of_services AS tos',
+                    'transactions.types_of_service_id',
+                    '=',
+                    'tos.id'
+                )
+                ->where('transactions.business_id', $business_id)
+                ->where('transactions.type', $sale_type)
+                ->select(
+                    'transactions.id',
+                    'transactions.transaction_date',
+                    'transactions.type',
+                    'transactions.is_direct_sale',
+                    'transactions.invoice_no',
+                    'transactions.invoice_no as invoice_no_text',
+                    'contacts.name',
+                    'contacts.mobile',
+                    'contacts.contact_id',
+                    'contacts.supplier_business_name',
+                    'transactions.status',
+                    'transactions.payment_status',
+                    'transactions.final_total',
+                    'transactions.tax_amount',
+                    'transactions.discount_amount',
+                    'transactions.discount_type',
+                    'transactions.total_before_tax',
+                    'transactions.rp_redeemed',
+                    'transactions.rp_redeemed_amount',
+                    'transactions.rp_earned',
+                    'transactions.types_of_service_id',
+                    'transactions.shipping_status',
+                    'transactions.pay_term_number',
+                    'transactions.pay_term_type',
+                    'transactions.additional_notes',
+                    'transactions.staff_note',
+                    'transactions.shipping_details',
+                    'transactions.document',
+                    'transactions.shipping_custom_field_1',
+                    'transactions.shipping_custom_field_2',
+                    'transactions.shipping_custom_field_3',
+                    'transactions.shipping_custom_field_4',
+                    'transactions.shipping_custom_field_5',
+                    'transactions.custom_field_1',
+                    'transactions.custom_field_2',
+                    'transactions.custom_field_3',
+                    'transactions.custom_field_4',
+                    DB::raw('DATE_FORMAT(transactions.transaction_date, "%Y/%m/%d") as sale_date'),
+                    DB::raw("CONCAT(COALESCE(u.surname, ''),' ',COALESCE(u.first_name, ''),' ',COALESCE(u.last_name,'')) as added_by"),
+                    DB::raw('(SELECT SUM(IF(TP.is_return = 1,-1*TP.amount,TP.amount)) FROM transaction_payments AS TP WHERE
+                        TP.transaction_id=transactions.id) as total_paid'),
+                    'bl.name as business_location',
+                    DB::raw('COUNT(SR.id) as return_exists'),
+                    DB::raw('(SELECT SUM(TP2.amount) FROM transaction_payments AS TP2 WHERE
+                        TP2.transaction_id=SR.id ) as return_paid'),
+                    DB::raw('COALESCE(SR.final_total, 0) as amount_return'),
+                    'SR.id as return_transaction_id',
+                    'tos.name as types_of_service_name',
+                    'transactions.service_custom_field_1',
+                    DB::raw('COUNT( DISTINCT tsl.id) as total_items'),
+                    DB::raw("CONCAT(COALESCE(ss.surname, ''),' ',COALESCE(ss.first_name, ''),' ',COALESCE(ss.last_name,'')) as waiter"),
+                    'tables.name as table_name',
+                    DB::raw('SUM(tsl.quantity - tsl.so_quantity_invoiced) as so_qty_remaining'),
+                    'transactions.is_export',
+                    DB::raw("CONCAT(COALESCE(dp.surname, ''),' ',COALESCE(dp.first_name, ''),' ',COALESCE(dp.last_name,'')) as delivery_person")
+                );
+
+        if ($sale_type == 'sell') {
+            $sells->where('transactions.status', 'final');
+        }
+
+        return $sells;
+    }
+
+    /**
+     * Function to get ledger details
+     */
+    public function getLedgerDetails($contact_id, $start, $end, $format = 'format_1', $location_id = null, $line_details = false)
+    {
+        $business_id = request()->session()->get('user.business_id');
+        //Get sum of totals before start date
+        $previous_transaction_sums = $this->__transactionQuery($contact_id, $start, null, $location_id)
+                ->select(
+                    DB::raw("SUM(IF(type = 'purchase', final_total, 0)) as total_purchase"),
+                    DB::raw("SUM(IF(type = 'sell' AND status = 'final', final_total, 0)) as total_invoice"),
+                    DB::raw("SUM(IF(type = 'sell_return', final_total, 0)) as total_sell_return"),
+                    DB::raw("SUM(IF(type = 'purchase_return', final_total, 0)) as total_purchase_return"),
+                    DB::raw("SUM(IF(type = 'opening_balance', final_total, 0)) as total_opening_balance"),
+                    DB::raw("SUM(IF(type = 'ledger_discount', final_total, 0)) as total_ledger_discount")
+                )->first();
+
+        //Get payment totals before start date
+        $prev_payments = $this->__paymentQuery($contact_id, $start, null, $location_id)
+                            ->select('transaction_payments.*', 'bl.name as location_name', 't.type as transaction_type', 'is_advance')
+                                    ->get();
+
+        $prev_total_invoice_paid = $prev_payments->where('transaction_type', 'sell')->where('is_return', 0)->sum('amount');
+        $prev_total_ob_paid = $prev_payments->where('transaction_type', 'opening_balance')->where('is_return', 0)->sum('amount');
+        $prev_total_sell_change_return = $prev_payments->where('transaction_type', 'sell')->where('is_return', 1)->sum('amount');
+        $prev_total_sell_change_return = ! empty($prev_total_sell_change_return) ? $prev_total_sell_change_return : 0;
+        $prev_total_invoice_paid -= $prev_total_sell_change_return;
+        $prev_total_purchase_paid = $prev_payments->where('transaction_type', 'purchase')->where('is_return', 0)->sum('amount');
+        $prev_total_sell_return_paid = $prev_payments->where('transaction_type', 'sell_return')->sum('amount');
+        $prev_total_purchase_return_paid = $prev_payments->where('transaction_type', 'purchase_return')->sum('amount');
+        //$prev_total_advance_payment = $prev_payments->where('is_advance', 1)->sum('amount');
+        $prev_total_advance_payment = $this->__paymentQuery($contact_id, $start, null, $location_id)
+                                        ->select('bl.name as location_name',
+                                                't.type as transaction_type',
+                                                'is_advance',
+                                                'transaction_payments.id',
+                                                DB::raw('(transaction_payments.amount - COALESCE((SELECT SUM(amount) from transaction_payments as TP where TP.parent_id = transaction_payments.id), 0)) as amount')
+                                        )
+                                        ->where('is_advance', 1)
+                                        ->get()
+                                        ->sum('amount');
+
+        $total_prev_paid = $prev_total_invoice_paid + $prev_total_purchase_paid - $prev_total_sell_return_paid - $prev_total_purchase_return_paid + $prev_total_ob_paid + $prev_total_advance_payment;
+
+        $total_prev_invoice = $previous_transaction_sums->total_purchase + $previous_transaction_sums->total_invoice - $previous_transaction_sums->total_sell_return - $previous_transaction_sums->total_purchase_return + $previous_transaction_sums->total_opening_balance - $previous_transaction_sums->total_ledger_discount;
+        //$total_prev_paid = $prev_payments_sum->total_paid;
+        $beginning_balance = $total_prev_invoice - $total_prev_paid;
+
+        $contact = Contact::find($contact_id);
+
+        $with = ['location'];
+        if ($line_details) {
+            $with = ['location', 'sell_lines', 'sell_lines.sub_unit', 'sell_lines.product',
+                'sell_lines.variations', 'sell_lines.product.unit', 'sell_lines.variations.product_variation',
+                'sell_lines.line_tax', 'purchase_lines', 'purchase_lines.product', 'purchase_lines.variations',
+                'purchase_lines.variations.product_variation', 'purchase_lines.line_tax',
+                'purchase_lines.product.unit', 'purchase_lines.product.unit.sub_units', ];
+        }
+        //Get transaction totals between dates
+        $transaction_query = $this->__transactionQuery($contact_id, $start, $end, $location_id)
+                            ->with(['location'])
+                            ->select('transactions.*');
+
+        if ($format == 'format_2' || $format == 'format_4') {
+            $transaction_query->leftjoin('transaction_payments as tp', 'tp.transaction_id', '=', 'transactions.id')
+                            ->addSelect(DB::raw('COALESCE(SUM(tp.amount), 0) as total_paid'))
+                            ->groupBy('transactions.id');
+        }
+
+        $transactions = $transaction_query->get();
+        $transaction_types = Transaction::transactionTypes();
+        $ledger = [];
+
+        $opening_balance = 0;
+        $opening_balance_paid = 0;
+        $ledger_discount = 0;
+
+        foreach ($transactions as $transaction) {
+            if ($transaction->type == 'opening_balance') {
+                //Skip opening balance, it will be added in the end
+                $opening_balance += $transaction->final_total;
+
+                continue;
+            }
+
+            if ($transaction->type == 'ledger_discount') {
+                $ledger_discount += $transaction->final_total;
+            }
+
+            $temp_array = [
+                'date' => $transaction->transaction_date,
+                'ref_no' => in_array($transaction->type, ['sell', 'sell_return']) ? $transaction->invoice_no : $transaction->ref_no,
+                'type' => $transaction_types[$transaction->type],
+                'location' => $transaction->location->name ?? '',
+                'payment_status' => ! in_array($transaction->type, ['ledger_discount']) ? __('lang_v1.'.$transaction->payment_status) : '',
+                'total' => '',
+                'payment_method' => '',
+                'debit' => in_array($transaction->type, ['sell', 'purchase_return']) || ($transaction->sub_type == 'purchase_discount') ? $transaction->final_total : '',
+                'credit' => in_array($transaction->type, ['purchase', 'sell_return']) || ($transaction->sub_type == 'sell_discount') ? $transaction->final_total : '',
+                'others' => $transaction->additional_notes,
+                'transaction_id' => $transaction->id,
+                'transaction_type' => $transaction->type,
+            ];
+
+            if ($format == 'format_2' || $format == 'format_4') {
+                $temp_array['final_total'] = $transaction->final_total;
+                $temp_array['total_due'] = $transaction->final_total - $transaction->total_paid;
+                $temp_array['due_date'] = $transaction->due_date;
+                $temp_array['payment_status'] = $transaction->payment_status;
+                $temp_array['total_paid'] = $transaction->total_paid;
+            }
+
+            if ($format == 'format_3' || $format == 'format_4') {
+                foreach ($transaction->sell_lines as $key => $value) {
+                    if (! empty($value->sub_unit_id)) {
+                        $formated_sell_line = $this->recalculateSellLineTotals($business_id, $value);
+                        $transaction->sell_lines[$key] = $formated_sell_line;
+                    }
+                }
+                $productUtil = new \App\Utils\ProductUtil();
+                foreach ($transaction->purchase_lines as $key => $value) {
+                    if (! empty($value->sub_unit_id)) {
+                        $formated_purchase_line = $productUtil->changePurchaseLineUnit($value, $business_id);
+                        $transaction->purchase_lines[$key] = $formated_purchase_line;
+                    }
+                }
+
+                $temp_array['sell_lines'] = $transaction->sell_lines;
+                $temp_array['purchase_lines'] = $transaction->purchase_lines;
+            }
+
+            $ledger[] = $temp_array;
+        }
+
+        $invoice_sum = $transactions->where('type', 'sell')->sum('final_total');
+        $purchase_sum = $transactions->where('type', 'purchase')->sum('final_total');
+        $sell_return_sum = $transactions->where('type', 'sell_return')->sum('final_total');
+        $purchase_return_sum = $transactions->where('type', 'purchase_return')->sum('final_total');
+
+        //Get payment totals between dates
+        if ($format == 'format_1' || $format == 'format_3' || $format == 'format_4') {
+            $payments = $this->__paymentQuery($contact_id, $start, $end, $location_id)
+                            ->select('transaction_payments.*', 'bl.name as location_name', 't.type as transaction_type', 't.ref_no', 't.invoice_no')
+                            ->get();
+        } else {
+            $payments = [];
+        }
+
+        $paymentTypes = $this->payment_types(null, true, $business_id);
+
+        $total_reverse_payment = 0;
+
+        foreach ($payments as $payment) {
+            if ($payment->transaction_type == 'opening_balance') {
+                $opening_balance_paid += $payment->amount;
+            }
+
+            if ($contact->type == 'customer' && $payment->is_advance == 0 && empty($payment->transaction_id) && $payment->payment_type == 'debit') {
+                $total_reverse_payment += $payment->amount;
+            }
+            if ($contact->type == 'supplier' && $payment->is_advance == 0 && empty($payment->transaction_id) && $payment->payment_type == 'credit') {
+                $total_reverse_payment += $payment->amount;
+            }
+
+            //Hide all the adjusted payments because it has already been summed as advance payment
+            if (! empty($payment->parent_id)) {
+                continue;
+            }
+
+            $ref_no = in_array($payment->transaction_type, ['sell', 'sell_return']) ? $payment->invoice_no : $payment->ref_no;
+            $note = $payment->note;
+            if (! empty($ref_no)) {
+                $note .= '<small>'.__('account.payment_for').': '.$ref_no.'</small>';
+            }
+
+            if ($payment->is_advance == 1) {
+                $note .= '<small>'.__('lang_v1.advance_payment').'</small>';
+            }
+
+            if ($payment->is_return == 1) {
+                $note .= '<small>('.__('lang_v1.change_return').')</small>';
+            }
+
+            $ledger[] = [
+                'date' => $payment->paid_on,
+                'ref_no' => $payment->payment_ref_no,
+                'type' => $transaction_types['payment'],
+                'location' => $payment->location_name,
+                'payment_status' => '',
+                'total' => '',
+                'payment_method' => ! empty($paymentTypes[$payment->method]) ? $paymentTypes[$payment->method] : '',
+                'payment_method_key' => $payment->method,
+                'debit' => in_array($payment->transaction_type, ['purchase', 'sell_return']) || ($payment->is_advance == 1 && $contact->type == 'supplier') || (in_array($payment->transaction_type, ['sell', 'purchase_return', 'opening_balance']) && $payment->is_return == 1) || $payment->payment_type == 'debit' ? $payment->amount : '',
+                'credit' => (in_array($payment->transaction_type, ['sell', 'purchase_return', 'opening_balance']) || ($payment->is_advance == 1 && in_array($contact->type, ['customer', 'both']))) && $payment->is_return == 0 || $payment->payment_type == 'credit' ? $payment->amount : '',
+                'others' => $note,
+            ];
+        }
+
+        $total_excess_advance_payment = $this->__paymentQuery($contact_id, $start, $end, $location_id)
+                                    ->select(
+                                            DB::raw('(transaction_payments.amount - COALESCE((SELECT SUM(amount) from transaction_payments as TP where TP.parent_id = transaction_payments.id), 0)) as amount')
+                                    )
+                                    ->where('is_advance', 1)
+                                    ->get()
+                                    ->sum('amount');
+        $total_advance_payment = $this->__paymentQuery($contact_id, $start, $end, $location_id)
+                                ->select(
+                                        DB::raw('SUM(transaction_payments.amount) as amount')
+                                )
+                                ->where('method', 'advance')
+                                ->get()
+                                ->sum('amount');
+
+        $total_invoice_paid = ! empty($payments) ? $payments->where('transaction_type', 'sell')->where('is_return', 0)->sum('amount') : 0;
+        $total_sell_change_return = ! empty($payments) ? $payments->where('transaction_type', 'sell')->where('is_return', 1)->sum('amount') : 0;
+        $total_sell_change_return = ! empty($total_sell_change_return) ? $total_sell_change_return : 0;
+        $total_invoice_paid -= $total_sell_change_return;
+        $total_purchase_paid = ! empty($payments) ? $payments->where('transaction_type', 'purchase')->where('is_return', 0)->sum('amount') : 0;
+        $total_sell_return_paid = ! empty($payments) ? $payments->where('transaction_type', 'sell_return')->sum('amount') : 0;
+        $total_purchase_return_paid = ! empty($payments) ? $payments->where('transaction_type', 'purchase_return')->sum('amount') : 0;
+
+        $total_invoice_paid += $opening_balance_paid;
+
+        $start_date = $this->format_date($start);
+        $end_date = $this->format_date($end);
+
+        $total_invoice = $invoice_sum - $sell_return_sum;
+        $total_purchase = $purchase_sum - $purchase_return_sum;
+
+        $opening_balance_due = $opening_balance;
+        $total_paid = $total_invoice_paid + $total_purchase_paid - $total_sell_return_paid - $total_purchase_return_paid + $total_excess_advance_payment - $total_advance_payment;
+
+        $total_transactions_paid = $total_invoice_paid + $total_purchase_paid - $total_sell_return_paid - $total_purchase_return_paid;
+
+        $curr_due = $total_invoice + $total_purchase - $total_transactions_paid + $beginning_balance + $opening_balance_due;
+
+        //Sort by date
+        if (! empty($ledger)) {
+            usort($ledger, function ($a, $b) {
+                $t1 = strtotime($a['date']);
+                $t2 = strtotime($b['date']);
+
+                return $t1 - $t2;
+            });
+        }
+
+        $total_opening_bal = $beginning_balance + $opening_balance_due;
+        if ($format != 'format_2') {
+            //Add Beginning balance & openining balance to ledger
+            $ledger = array_merge([[
+                'date' => $start,
+                'ref_no' => '',
+                'type' => __('lang_v1.opening_balance'),
+                'location' => '',
+                'payment_status' => '',
+                'total' => '',
+                'payment_method' => '',
+                'debit' => $contact->type == 'customer' ? abs($total_opening_bal) : '',
+                'credit' => $contact->type == 'supplier' ? abs($total_opening_bal) : '',
+                'others' => '',
+                'final_total' => abs($total_opening_bal),
+                'total_due' => 0,
+                'due_date' => null,
+            ]], $ledger);
+        }
+
+        $bal = 0;
+        foreach ($ledger as $key => $val) {
+            $credit = ! empty($val['credit']) ? $val['credit'] : 0;
+            $debit = ! empty($val['debit']) ? $val['debit'] : 0;
+
+            //Skip advance method payment because it is already added in customer advance payment
+            if (! empty($val['payment_method_key']) && $val['payment_method_key'] == 'advance') {
+                $credit = 0;
+                $debit = 0;
+            }
+
+            $bal += ($credit - $debit);
+            $balance = $this->num_f(abs($bal));
+
+            if ($bal < 0) {
+                $balance .= ' '.__('lang_v1.dr');
+            } elseif ($bal > 0) {
+                $balance .= ' '.__('lang_v1.cr');
+            }
+
+            $ledger[$key]['balance'] = $balance;
+        }
+
+        //Get Overall transaction
+        $overall_transaction_sums = $this->__transactionQuery($contact_id, null, null, $location_id)
+                ->select(
+                    DB::raw("SUM(IF(type = 'purchase', final_total, 0)) as total_purchase"),
+                    DB::raw("SUM(IF(type = 'sell' AND status = 'final', final_total, 0)) as total_invoice"),
+                    DB::raw("SUM(IF(type = 'sell_return', final_total, 0)) as total_sell_return"),
+                    DB::raw("SUM(IF(type = 'purchase_return', final_total, 0)) as total_purchase_return"),
+                    DB::raw("SUM(IF(type = 'opening_balance', final_total, 0)) as total_opening_balance"),
+                    DB::raw("SUM(IF(type = 'ledger_discount', final_total, 0)) as total_ledger_discount")
+                )->first();
+        $total_overall_invoice = $overall_transaction_sums->total_invoice - $overall_transaction_sums->total_sell_return + $overall_transaction_sums->total_opening_balance - $overall_transaction_sums->total_ledger_discount;
+        $total_overall_purchase = $overall_transaction_sums->total_purchase - $overall_transaction_sums->total_purchase_return;
+        $overall_ledger_discount = $overall_transaction_sums->total_ledger_discount;
+
+        //Get Overall transaction payment
+        $overall_payments = $this->__paymentQuery($contact_id, null, null, $location_id)
+                            ->select('transaction_payments.*', 'bl.name as location_name', 't.type as transaction_type', 'is_advance')
+                                    ->get();
+        $overall_total_invoice_paid = $overall_payments->where('transaction_type', 'sell')->where('is_return', 0)->sum('amount');
+        $overall_total_ob_paid = $overall_payments->where('transaction_type', 'opening_balance')->where('is_return', 0)->sum('amount');
+        $overall_total_sell_change_return = $overall_payments->where('transaction_type', 'sell')->where('is_return', 1)->sum('amount');
+        $overall_total_sell_change_return = ! empty($overall_total_sell_change_return) ? $overall_total_sell_change_return : 0;
+        $overall_total_invoice_paid -= $overall_total_sell_change_return;
+        $overall_total_purchase_paid = $overall_payments->where('transaction_type', 'purchase')->where('is_return', 0)->sum('amount');
+        $overall_total_sell_return_paid = $overall_payments->where('transaction_type', 'sell_return')->sum('amount');
+        $overall_total_purchase_return_paid = $overall_payments->where('transaction_type', 'purchase_return')->sum('amount');
+
+        $overall_total_advance_payment = $this->__paymentQuery($contact_id, null, null, $location_id)
+                                        ->select('bl.name as location_name',
+                                                't.type as transaction_type',
+                                                'is_advance',
+                                                'transaction_payments.id',
+                                                DB::raw('(transaction_payments.amount - COALESCE((SELECT SUM(amount) from transaction_payments as TP where TP.parent_id = transaction_payments.id), 0)) as amount')
+                                        )
+                                        ->where('is_advance', 1)
+                                        ->get()
+                                        ->sum('amount');
+
+        $total_overall_paid_customer = $overall_total_invoice_paid - $overall_total_sell_return_paid + $overall_total_ob_paid; //Add '+ $overall_total_advance_payment'
+
+        $total_overall_paid_supplier = $overall_total_purchase_paid - $overall_total_purchase_return_paid;
+        $overall_due = $total_overall_invoice + $total_overall_purchase - $total_overall_paid_customer - $total_overall_paid_supplier;
+
+        $output = [
+            'ledger' => $ledger,
+            'start_date' => $start_date,
+            'end_date' => $end_date,
+            'total_invoice' => $total_invoice,
+            'total_purchase' => $total_purchase,
+            'beginning_balance' => $beginning_balance + $opening_balance_due,
+            'balance_due' => $curr_due,
+            'total_paid' => $total_paid,
+            'total_reverse_payment' => $total_reverse_payment,
+            'ledger_discount' => $ledger_discount,
+
+            'all_total_invoice' => $total_overall_invoice,
+            'all_invoice_paid' => $total_overall_paid_customer,
+            // 'all_total_paid' => $all_total_paid,
+            'all_total_purchase' => $total_overall_purchase,
+            'all_purchase_paid' => $total_overall_paid_supplier,
+            'all_balance_due' => $overall_due,
+            'all_ledger_discount' => $overall_ledger_discount,
+        ];
+
+        return $output;
+    }
+
+    /**
+     * Query to get transaction totals for a customer
+     */
+    private function __transactionQuery($contact_id, $start, $end = null, $location_id = null)
+    {
+        $business_id = request()->session()->get('user.business_id');
+        $transaction_type_keys = array_keys(Transaction::transactionTypes());
+
+        $query = Transaction::where('transactions.contact_id', $contact_id)
+                        ->where('transactions.business_id', $business_id)
+                        ->where('transactions.status', '!=', 'draft')
+                        ->whereIn('transactions.type', $transaction_type_keys);
+
+        if (! empty($start) && ! empty($end)) {
+            $query->whereDate(
+                'transactions.transaction_date',
+                '>=',
+                $start
+            )
+                ->whereDate('transactions.transaction_date', '<=', $end)->get();
+        }
+
+        if (! empty($location_id)) {
+            $query->where('transactions.location_id', $location_id);
+        }
+
+        if (! empty($start) && empty($end)) {
+            $query->whereDate('transactions.transaction_date', '<', $start);
+        }
+
+        return $query;
+    }
+
+    /**
+     * Query to get payment details for a customer
+     */
+    private function __paymentQuery($contact_id, $start, $end = null, $location_id = null)
+    {
+        $business_id = request()->session()->get('user.business_id');
+
+        $query = TransactionPayment::leftJoin(
+            'transactions as t',
+            'transaction_payments.transaction_id',
+            '=',
+            't.id'
+        )
+            ->leftJoin('business_locations as bl', 't.location_id', '=', 'bl.id')
+            ->where('transaction_payments.payment_for', $contact_id)
+            // use to not diaplay expense in payment list in ledger
+            ->where(function ($query) {
+                $query->where('t.type', '!=', 'expense')
+                      ->orWhereNull('t.type');
+            }); 
+        //->whereNull('transaction_payments.parent_id');
+
+        if (! empty($start) && ! empty($end)) {
+            $query->whereDate('paid_on', '>=', $start)
+                        ->whereDate('paid_on', '<=', $end);
+        }
+
+        if (! empty($start) && empty($end)) {
+            $query->whereDate('paid_on', '<', $start);
+        }
+
+        if (! empty($location_id)) {
+            //if location id present get all transaction with the location id and opening balance
+            $query->where(function ($q) use ($location_id) {
+                $q->where('transaction_payments.is_advance', 1)
+                     ->orWhere('t.location_id', $location_id);
+            });
+        }
+
+        return $query;
+    }
+
+    //
+    public function getProfitLossDetails($business_id, $location_id, $start_date, $end_date, $user_id = null, $permitted_locations = null)
+    {
         //For Opening stock date should be 1 day before
         $day_before_start_date = \Carbon::createFromFormat('Y-m-d', $start_date)->subDay()->format('Y-m-d');
 
@@ -4737,7 +5665,7 @@ class TransactionUtil extends Util
         );
 
         $data['total_purchase_shipping_charge'] = ! empty($purchase_details['total_shipping_charges']) ? $purchase_details['total_shipping_charges'] : 0;
-        $data['total_sell_shipping_charge'] = ! empty($sell_details['total_shipping_charges']) ? $sell_details['total_shipping_charge'] : 0;
+        $data['total_sell_shipping_charge'] = ! empty($sell_details['total_shipping_charges']) ? $sell_details['total_shipping_charges'] : 0;
 
         $data['total_purchase_additional_expense'] = ! empty($purchase_details['total_additional_expense']) ? $purchase_details['total_additional_expense'] : 0;
         $data['total_sell_additional_expense'] = ! empty($sell_details['total_additional_expense']) ? $sell_details['total_additional_expense'] : 0;
@@ -4833,7 +5761,7 @@ class TransactionUtil extends Util
         //                         - $data['total_sell_return'];
         $data['net_profit'] = $module_total + $gross_profit
                                 + ($data['total_sell_round_off'] + $data['total_recovered'] + $data['total_sell_shipping_charge'] + $data['total_purchase_discount'] + $data['total_sell_additional_expense'] + $data['total_sell_return_discount']
-                                ) - ($data['total_reward_amount'] + $data['total_expense'] + $data['total_adjustment'] + $data['total_transfer_shipping_charges'] + $data['total_purchase_shipping_charge'] + $data['total_sell_additional_expense'] + $data['total_sell_discount']
+                                ) - ($data['total_reward_amount'] + $data['total_expense'] + $data['total_adjustment'] + $data['total_transfer_shipping_charges'] + $data['total_purchase_shipping_charge'] + $data['total_purchase_additional_expense'] + $data['total_sell_discount']
                                 );
 
         //get gross profit from Project Module
@@ -4843,7 +5771,7 @@ class TransactionUtil extends Util
             'end_date' => $end_date,
             'location_id' => $location_id,
         ];
-        $grossProfitData = $moduleUtil->getModuleData('profitLossReportData', $module_parameters);
+        $grossProfitData = $moduleUtil->getModuleData('grossProfit', $module_parameters);
 
         // if (! empty($project_module_data['Project']['gross_profit'])) {
         //     $gross_profit = $gross_profit + $project_module_data['Project']['gross_profit'];
@@ -4880,6 +5808,12 @@ class TransactionUtil extends Util
         return $data;
     }
 
+    /**
+     * Creates recurring expense from existing expense
+     *
+     * @param  obj  $transaction
+     * @return obj $recurring_invoice
+     */
     public function createRecurringExpense($transaction)
     {
         $data = $transaction->toArray();
@@ -4937,10 +5871,6 @@ class TransactionUtil extends Util
 
         if ($request->has('expense_sub_category_id')) {
             $transaction_data['expense_sub_category_id'] = $request->input('expense_sub_category_id');
-        }
-
-        if ($request->has('expense_category_id')) {
-            $transaction_data['expense_category_id'] = $request->input('expense_category_id');
         }
 
         $transaction_data['total_before_tax'] = $transaction_data['final_total'];
@@ -5042,7 +5972,7 @@ class TransactionUtil extends Util
         }
 
         $transaction_data['is_recurring'] = $request->has('is_recurring') ? 1 : 0;
-        $transaction_data['recur_interval'] = ! empty($request->input('recur_interval')) ? $request->input('recur_interval') : $transaction->recur_interval;
+        $transaction_data['recur_interval'] = ! empty($request->input('recur_interval')) ? $request->input('recur_interval') : 0;
         $transaction_data['recur_interval_type'] = ! empty($request->input('recur_interval_type')) ? $request->input('recur_interval_type') : $transaction->recur_interval_type;
         $transaction_data['recur_repetitions'] = ! empty($request->input('recur_repetitions')) ? $request->input('recur_repetitions') : $transaction->recur_repetitions;
         $transaction_data['subscription_repeat_on'] = ! empty($request->input('subscription_repeat_on')) ? $request->input('subscription_repeat_on') : $transaction->subscription_repeat_on;
@@ -5115,7 +6045,9 @@ class TransactionUtil extends Util
         }
 
         $contact = Contact::where('business_id', $business_id)
-                        ->findOrFail($contact_id);        $due_payment_type = $request->input('due_payment_type');
+                        ->findOrFail($contact_id);
+
+        $due_payment_type = $request->input('due_payment_type');
         if (empty($due_payment_type)) {
             $due_payment_type = $contact->type == 'supplier' ? 'purchase' : 'sell';
         }
@@ -5243,7 +6175,7 @@ class TransactionUtil extends Util
             $is_reward_expired = $this->isRewardExpired($sell->transaction_date, $business_id);
             if (! $is_reward_expired) {
                 $diff = $sell->final_total - $sell_return->final_total;
-                $new_reward_point = $this->calculateRewardPoints($sell->contact_id, $diff);
+                $new_reward_point = $this->calculateRewardPoints($business_id, $diff);
                 $this->updateCustomerRewardPoints($sell->contact_id, $new_reward_point, $sell->rp_earned);
 
                 $sell->rp_earned = $new_reward_point;
@@ -5346,6 +6278,166 @@ class TransactionUtil extends Util
             'location_details' => $location_details,
             'receipt_details' => $receipt_details,
         ];
+    }
+
+    /**
+     * Return mpdf object for
+     * email attachment
+     *
+     * @param  int  $business_id
+     * @param  int  $transaction_id
+     * @param  bool  $is_email_attachment
+     * @return object
+     */
+    public function getEmailAttachmentForGivenTransaction($business_id, $transaction_id, $is_email_attachment)
+    {
+        $receipt_contents = $this->getPdfContentsForGivenTransaction($business_id, $transaction_id);
+
+        $receipt_details = $receipt_contents['receipt_details'];
+        $location_details = $receipt_contents['location_details'];
+
+        $blade_file = 'download_pdf';
+        if (! empty($receipt_details->is_export)) {
+            $blade_file = 'download_export_pdf';
+        }
+
+        //Generate pdf
+        $body = view('sale_pos.receipts.'.$blade_file)
+                    ->with(compact('receipt_details', 'location_details', 'is_email_attachment'))
+                    ->render();
+
+        $mpdf = new \Mpdf\Mpdf(['tempDir' => public_path('uploads/temp'),
+            'mode' => 'utf-8',
+            'autoScriptToLang' => true,
+            'autoLangToFont' => true,
+            'autoVietnamese' => true,
+            'autoArabic' => true,
+            'margin_top' => 8,
+            'margin_bottom' => 8,
+            'format' => 'A4',
+        ]);
+
+        $mpdf->useSubstitutions = true;
+        $mpdf->SetWatermarkText($receipt_details->business_name, 0.1);
+        $mpdf->showWatermarkText = true;
+        $mpdf->SetTitle('INVOICE-'.$receipt_details->invoice_no.'.pdf');
+        $mpdf->WriteHTML($body);
+
+        return $mpdf;
+    }
+
+    public function updateSalesOrderStatus($sales_order_ids = [])
+    {
+        foreach ($sales_order_ids as $sales_order_id) {
+            $sales_order = Transaction::with(['sell_lines'])->find($sales_order_id);
+
+            if (empty($sales_order)) {
+                continue;
+            }
+            $total_ordered = $sales_order->sell_lines->sum('quantity');
+            $total_received = $sales_order->sell_lines->sum('so_quantity_invoiced');
+
+            $status = $total_received == 0 ? 'ordered' : 'partial';
+            if ($total_ordered == $total_received) {
+                $status = 'completed';
+            }
+            $sales_order->status = $status;
+            $sales_order->save();
+        }
+    }
+
+    public function getUserTotalSales($business_id, $user_id, $start_date, $end_date)
+    {
+        $totals = Transaction::where('business_id', $business_id)
+                                ->where('commission_agent', $user_id)
+                                ->where('type', 'sell')
+                                ->where('status', 'final')
+                                ->whereBetween(DB::raw('transaction_date'), [$start_date, $end_date])
+                                ->select(
+                                    DB::raw('SUM(final_total) as total_sales'),
+                                    DB::raw('SUM(total_before_tax - shipping_charges - (SELECT SUM(item_tax*quantity) FROM transaction_sell_lines as tsl WHERE tsl.transaction_id=transactions.id) ) as total_sales_without_tax')
+                                )
+                                ->first();
+
+        return [
+            'total_sales' => $totals->total_sales ?? 0,
+            'total_sales_without_tax' => $totals->total_sales_without_tax ?? 0,
+        ];
+    }
+
+    public function getSources($business_id)
+    {
+        $unique_sources = Transaction::where('business_id', $business_id)
+                                    ->where('type', 'sell')
+                                    ->select('source')
+                                    ->groupBy('source')
+                                    ->get();
+        $sources = [];
+
+        foreach ($unique_sources as $source) {
+            if (! empty($source->source)) {
+                $sources[$source->source] = $source->source;
+            }
+        }
+
+        return $sources;
+    }
+
+    public function getPurchaseOrderPdf($business_id, $transaction_id)
+    {
+        $taxes = TaxRate::where('business_id', $business_id)
+                                ->get();
+
+        $purchase = Transaction::where('business_id', $business_id)
+                    ->where('id', $transaction_id)
+                    ->with(
+                        'contact',
+                        'purchase_lines',
+                        'purchase_lines.product',
+                        'purchase_lines.product.brand',
+                        'purchase_lines.product.category',
+                        'purchase_lines.variations',
+                        'purchase_lines.variations.product_variation',
+                        'location',
+                        'payment_lines'
+                    )
+                    ->first();
+
+        $location_details = BusinessLocation::find($purchase->location_id);
+        $businessUtil = new BusinessUtil();
+        $invoice_layout = $businessUtil->invoiceLayout($business_id, $location_details->invoice_layout_id);
+
+        //Logo
+        $logo = $invoice_layout->show_logo != 0 && ! empty($invoice_layout->logo) && file_exists(public_path('uploads/invoice_logos/'.$invoice_layout->logo)) ? asset('uploads/invoice_logos/'.$invoice_layout->logo) : false;
+
+        $word_format = $invoice_layout->common_settings['num_to_word_format'] ? $invoice_layout->common_settings['num_to_word_format'] : 'international';
+        $total_in_words = $this->numToWord($purchase->final_total, null, $word_format);
+
+        $custom_labels = json_decode(session('business.custom_labels'), true);
+
+        //Generate pdf
+        $body = view('purchase_order.receipts.download_pdf')
+                    ->with(compact('purchase', 'invoice_layout', 'location_details', 'logo', 'total_in_words', 'custom_labels', 'taxes'))
+                    ->render();
+
+        $mpdf = new \Mpdf\Mpdf(['tempDir' => public_path('uploads/temp'),
+            'mode' => 'utf-8',
+            'autoScriptToLang' => true,
+            'autoLangToFont' => true,
+            'autoVietnamese' => true,
+            'autoArabic' => true,
+            'margin_top' => 8,
+            'margin_bottom' => 8,
+            'format' => 'A4',
+        ]);
+
+        $mpdf->useSubstitutions = true;
+        $mpdf->SetWatermarkText($purchase->business->name, 0.1);
+        $mpdf->showWatermarkText = true;
+        $mpdf->SetTitle('PO-'.$purchase->ref_no.'.pdf');
+        $mpdf->WriteHTML($body);
+
+        return $mpdf;
     }
 
     /**
