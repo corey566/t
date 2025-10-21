@@ -304,12 +304,13 @@ $(document).ready(function() {
 
     //Update line total and check for quantity not greater than max quantity
     $('table#pos_table tbody').on('change', 'input.pos_quantity', function() {
-        // comment line becouse it validate form at increment and decrement item
-        // if (sell_form_validator) {
-        //     sell_form.valid();
-        // }
+        // Validate the quantity field
         if (pos_form_validator) {
-            pos_form_validator.element($(this));
+            try {
+                pos_form_validator.element($(this));
+            } catch(e) {
+                console.log('Validation error:', e);
+            }
         }
         // var max_qty = parseFloat($(this).data('rule-max'));
         var entered_qty = __read_number($(this));

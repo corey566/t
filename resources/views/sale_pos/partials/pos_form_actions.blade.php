@@ -21,13 +21,13 @@
             <div class="!tw-w-full md:!tw-w-none !tw-flex md:!tw-hidden !tw-flex-row !tw-items-center !tw-gap-3">
                 <button type="button"
                     class="tw-flex tw-flex-row tw-items-center tw-justify-center tw-gap-1 tw-font-bold tw-text-white tw-cursor-pointer tw-text-xs md:tw-text-sm tw-bg-[#001F3E] tw-rounded-md tw-p-2 tw-w-[8.5rem] no-print"
-                    id="pos-finalize" title="@lang('lang_v1.tooltip_checkout_multi_pay')">
+                    id="pos-finalize" title="@lang('lang_v1.tooltip_checkout_multi_pay')" style="pointer-events: auto !important; opacity: 1 !important;">
                     <i class="fas fa-money-check-alt" aria-hidden="true"></i> @lang('lang_v1.checkout_multi_pay')
                 </button>
 
                 <button type="button"
                     class="tw-font-bold tw-text-white tw-cursor-pointer tw-text-xs md:tw-text-sm tw-bg-[rgb(40,183,123)] tw-p-2 tw-rounded-md tw-w-[5.5rem] tw-flex tw-flex-row tw-items-center tw-justify-center tw-gap-1 no-print pos-express-finalize"
-                    data-pay_method="cash" title="@lang('tooltip.express_checkout')">
+                    data-pay_method="cash" title="@lang('tooltip.express_checkout')" style="pointer-events: auto !important; opacity: 1 !important;">
                     <i class="fas fa-money-bill-alt" aria-hidden="true"></i> @lang('lang_v1.express_checkout_cash')
                 </button>
                 @if (empty($edit))
