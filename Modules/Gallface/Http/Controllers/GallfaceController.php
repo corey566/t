@@ -63,19 +63,13 @@ class GallfaceController extends Controller
             // Get locations and stats for the view
             $locations = \App\BusinessLocation::where('business_id', $business_id)
                 ->where('is_active', true)
-                ->with(['credentials' => function($query) {
-                    $query->where('mall_code', 'gallface');
-                }])
                 ->get();
 
-            // Debug log to verify credentials are loaded
+            // Load credentials for each location
             foreach ($locations as $location) {
-                \Log::info('Location credentials check', [
-                    'location_id' => $location->id,
-                    'location_name' => $location->name,
-                    'credentials_count' => $location->credentials->count(),
-                    'credentials' => $location->credentials->toArray()
-                ]);
+                $location->load(['credentials' => function($query) {
+                    $query->where('mall_code', 'gallface');
+                }]);
             }
 
             // Get statistics
@@ -352,11 +346,11 @@ class GallfaceController extends Controller
                     ->where('mall_code', 'gallface')
                     ->firstOrFail();
 
-                // Get unsynced sales and returns for THIS SPECIFIC LOCATION ONLY
+                // Get unsynced sales for THIS SPECIFIC LOCATION ONLY
                 $salesData = \DB::table('transactions')
                     ->where('business_id', $business_id)
                     ->where('location_id', $location_id) // Strict location filter
-                    ->whereIn('type', ['sell', 'sell_return'])
+                    ->where('type', 'sell')
                     ->whereNull('gallface_synced_at')
                     ->limit(100)
                     ->get();
@@ -694,7 +688,7 @@ class GallfaceController extends Controller
                     ->leftJoin('contacts as c', 't.contact_id', '=', 'c.id')
                     ->leftJoin('business_locations as bl', 't.location_id', '=', 'bl.id')
                     ->where('t.business_id', $business_id)
-                    ->whereIn('t.type', ['sell', 'sell_return'])
+                    ->where('t.type', 'sell')
                     ->whereBetween('t.transaction_date', [$dateFrom . ' 00:00:00', $dateTo . ' 23:59:59'])
                     ->orderBy('t.transaction_date', 'desc');
 

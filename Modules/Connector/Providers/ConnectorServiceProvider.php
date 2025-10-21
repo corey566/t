@@ -5,9 +5,9 @@ namespace Modules\Connector\Providers;
 use Illuminate\Database\Eloquent\Factory;
 use Illuminate\Routing\Router;
 use Illuminate\Support\ServiceProvider;
-// use Laravel\Passport\Console\ClientCommand;
-// use Laravel\Passport\Console\InstallCommand;
-// use Laravel\Passport\Console\KeysCommand;
+use Laravel\Passport\Console\ClientCommand;
+use Laravel\Passport\Console\InstallCommand;
+use Laravel\Passport\Console\KeysCommand;
 
 class ConnectorServiceProvider extends ServiceProvider
 {
@@ -38,12 +38,11 @@ class ConnectorServiceProvider extends ServiceProvider
         $this->registerMiddleware($this->app['router']);
 
         /*ADD THIS LINES*/
-        // Commented out Passport commands temporarily
-        // $this->commands([
-        //     InstallCommand::class,
-        //     ClientCommand::class,
-        //     KeysCommand::class,
-        // ]);
+        $this->commands([
+            InstallCommand::class,
+            ClientCommand::class,
+            KeysCommand::class,
+        ]);
     }
 
     /**

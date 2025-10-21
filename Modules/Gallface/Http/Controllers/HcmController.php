@@ -46,7 +46,7 @@ class HcmController extends Controller
                 ->leftJoin('contacts as c', 't.contact_id', '=', 'c.id')
                 ->where('t.business_id', $business_id)
                 ->where('t.location_id', $location_id)
-                ->whereIn('t.type', ['sell', 'sell_return'])
+                ->where('t.type', 'sell')
                 ->whereBetween('t.transaction_date', [$dateFrom . ' 00:00:00', $dateTo . ' 23:59:59'])
                 ->orderBy('t.transaction_date', 'desc');
             
@@ -61,14 +61,14 @@ class HcmController extends Controller
             $totalInvoices = DB::table('transactions')
                 ->where('business_id', $business_id)
                 ->where('location_id', $location_id)
-                ->whereIn('type', ['sell', 'sell_return'])
+                ->where('type', 'sell')
                 ->whereBetween('transaction_date', [$dateFrom . ' 00:00:00', $dateTo . ' 23:59:59'])
                 ->count();
             
             $syncedInvoices = DB::table('transactions')
                 ->where('business_id', $business_id)
                 ->where('location_id', $location_id)
-                ->whereIn('type', ['sell', 'sell_return'])
+                ->where('type', 'sell')
                 ->whereNotNull('hcm_synced_at')
                 ->whereBetween('transaction_date', [$dateFrom . ' 00:00:00', $dateTo . ' 23:59:59'])
                 ->count();
@@ -263,14 +263,14 @@ class HcmController extends Controller
 
             $apiService = new HcmApiService($credentials->getCredentialsForApi());
 
-            // Get unsynced sales and returns data with payment lines
+            // Get unsynced sales data with payment lines
             $salesData = DB::table('transactions as t')
                 ->select('t.*', 'c.mobile', 'u.username as cashier_name')
                 ->leftJoin('contacts as c', 't.contact_id', '=', 'c.id')
                 ->leftJoin('users as u', 't.created_by', '=', 'u.id')
                 ->where('t.business_id', $business_id)
                 ->where('t.location_id', $location_id)
-                ->whereIn('t.type', ['sell', 'sell_return'])
+                ->where('t.type', 'sell')
                 ->whereNull('t.hcm_synced_at')
                 ->limit(100)
                 ->get();
@@ -392,14 +392,14 @@ class HcmController extends Controller
 
             $apiService = new HcmApiService($credentials->getCredentialsForApi());
 
-            // Get one unsynced sale or return to test
+            // Get one unsynced sale to test
             $salesData = DB::table('transactions as t')
                 ->select('t.*', 'c.mobile', 'u.username as cashier_name')
                 ->leftJoin('contacts as c', 't.contact_id', '=', 'c.id')
                 ->leftJoin('users as u', 't.created_by', '=', 'u.id')
                 ->where('t.business_id', $business_id)
                 ->where('t.location_id', $location_id)
-                ->whereIn('t.type', ['sell', 'sell_return'])
+                ->where('t.type', 'sell')
                 ->whereNull('t.hcm_synced_at')
                 ->limit(1)
                 ->get();

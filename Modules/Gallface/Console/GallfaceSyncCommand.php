@@ -51,17 +51,17 @@ class GallfaceSyncCommand extends Command
             try {
                 $additionalData = json_decode($credential->additional_data ?? '{}', true);
                 
-                // Get unsynced sales and returns for this specific location
+                // Get unsynced sales for this specific location
                 $salesData = DB::table('transactions')
                     ->where('business_id', $credential->business_id)
                     ->where('location_id', $credential->business_location_id)
-                    ->whereIn('type', ['sell', 'sell_return'])
+                    ->where('type', 'sell')
                     ->whereNull('gallface_synced_at')
                     ->limit(100)
                     ->get();
                 
                 if ($salesData->isEmpty()) {
-                    $this->info("No new sales or returns to sync for this location");
+                    $this->info("No new sales to sync for this location");
                     continue;
                 }
                 
