@@ -1,21 +1,7 @@
 {
     "name": "Hcm",
     "alias": "hcm",
-    "description": "Havelock City Mall (HCM) API integration for POS sales syncing and monitoring",
-    "keywords": ["hcm", "mall", "pos", "sync", "invoice"],
-    "active": 1,
-    "order": 0,
-    "providers": [
-        "Modules\\Hcm\\Providers\\HcmServiceProvider"
-    ],
-    "aliases": [],
-    "files": [],
-    "requires": []
-}
-{
-    "name": "Hcm",
-    "alias": "hcm",
-    "description": "Havelock City Mall (HCM) API integration for POS sales syncing and monitoring",
+    "description": "Havelock City Mall Integration Module",
     "keywords": [],
     "priority": 0,
     "providers": [
