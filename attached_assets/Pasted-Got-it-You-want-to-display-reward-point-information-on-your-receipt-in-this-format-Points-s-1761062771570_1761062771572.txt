@@ -1,0 +1,72 @@
+Got it 👍 You want to display reward point information on your receipt in this format:
+
+**Points status: Before | Used | Earned | Balance**
+
+---
+
+Here’s how you can add that section in your receipt code:
+
+### ✅ Step 1: Find this section in your HTML
+
+Search for this part near the bottom:
+
+```html
+@if(!empty($receipt_details->rp_earned) || !empty($receipt_details->rp_redeemed) || !empty($receipt_details->rp_balance))
+```
+
+---
+
+### ✅ Step 2: Replace that whole block with this:
+
+```html
+@if(
+    !empty($receipt_details->rp_earned) || 
+    !empty($receipt_details->rp_redeemed) || 
+    !empty($receipt_details->rp_balance) ||
+    !empty($receipt_details->rp_before)
+)
+    <div class="border-top textbox-info" style="margin-top: 10px; padding-top: 10px;">
+        <p class="centered"><strong>Points Status</strong></p>
+        <table style="width:100%; text-align:center; font-size:12px;">
+            <thead>
+                <tr>
+                    <th>Before</th>
+                    <th>Used</th>
+                    <th>Earned</th>
+                    <th>Balance</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr>
+                    <td>{{ $receipt_details->rp_before ?? 0 }}</td>
+                    <td>{{ $receipt_details->rp_redeemed ?? 0 }}</td>
+                    <td>{{ $receipt_details->rp_earned ?? 0 }}</td>
+                    <td>{{ $receipt_details->rp_balance ?? 0 }}</td>
+                </tr>
+            </tbody>
+        </table>
+    </div>
+@endif
+```
+
+---
+
+### ✅ Step 3: Add new variable (if needed)
+
+In your backend (controller or data builder for `$receipt_details`), make sure to include:
+
+```php
+$receipt_details->rp_before = $previous_points; // Example variable for previous balance
+```
+
+---
+
+This will make your receipt show a neat table like the image:
+
+| Before | Used | Earned | Balance |
+| :----: | :--: | :----: | :-----: |
+|    0   |   0  |   225  |   225   |
+
+---
+
+Would you like me to adjust it to show this on **one line** instead of a table (like your image)?
