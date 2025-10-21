@@ -288,6 +288,31 @@
 					</p>
 				</div>
 			@endif
+
+			@if(!empty($receipt_details->hcm_points_earned) || !empty($receipt_details->hcm_points_redeemed))
+				<div class="bb-lg mt-15 mb-10"></div>
+				<div class="textbox-info">
+					<p class="centered"><strong>HCM Loyalty Points</strong></p>
+				</div>
+				@if(!empty($receipt_details->hcm_points_earned))
+					<div class="textbox-info">
+						<p class="f-left">Points Earned:</p>
+						<p class="f-right">{{ number_format($receipt_details->hcm_points_earned, 0) }}</p>
+					</div>
+				@endif
+				@if(!empty($receipt_details->hcm_points_redeemed))
+					<div class="textbox-info">
+						<p class="f-left">Points Redeemed:</p>
+						<p class="f-right">-{{ number_format($receipt_details->hcm_points_redeemed, 0) }}</p>
+					</div>
+				@endif
+				@if(!empty($receipt_details->hcm_points_balance))
+					<div class="textbox-info">
+						<p class="f-left"><strong>Points Balance:</strong></p>
+						<p class="f-right"><strong>{{ number_format($receipt_details->hcm_points_balance, 0) }}</strong></p>
+					</div>
+				@endif
+			@endif
 			@if(!empty($receipt_details->shipping_custom_field_1_label))
 				<div class="textbox-info">
 					<p class="f-left"><strong>
