@@ -1420,7 +1420,6 @@ class SellPosController extends Controller
                 //Update Sell lines
                 $deleted_lines = $this->transactionUtil->createOrUpdateSellLines($transaction, $input['products'], $input['location_id'], true, $status_before);
 
-                //Update update lines
                 $is_credit_sale = isset($input['is_credit_sale']) && $input['is_credit_sale'] == 1 ? true : false;
 
                 $new_sales_order_ids = $transaction->sales_order_ids ?? [];
