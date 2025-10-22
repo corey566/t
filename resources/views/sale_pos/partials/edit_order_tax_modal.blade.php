@@ -8,6 +8,9 @@
 			</div>
 			<div class="modal-body">
 				<div class="row">
+					@php
+						$selected_tax = $selected_tax ?? null;
+					@endphp
 					<div class="col-md-6">
 				        <div class="form-group">
 				            {!! Form::label('order_tax_modal', __('sale.order_tax') . ':*' ) !!}
