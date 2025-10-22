@@ -446,6 +446,7 @@ class SellPosController extends Controller
                 // Save HCM loyalty amount
                 if (isset($input['hcm_loyalty_amount'])) {
                     $input['hcm_loyalty_amount'] = $this->transactionUtil->num_uf($input['hcm_loyalty_amount']);
+                    $input['hcm_loyalty_type'] = $request->input('hcm_loyalty_type', 'fixed');
                 } else {
                     $input['hcm_loyalty_amount'] = 0;
                 }
@@ -1548,7 +1549,7 @@ class SellPosController extends Controller
             DB::rollBack();
             \Log::emergency('File:' . $e->getFile() . 'Line:' . $e->getLine() . 'Message:' . $e->getMessage());
             $output = ['success' => 0,
-                'msg' => __('messages.something_went_wrong'),
+                'msg' => trans('messages.something_went_wrong'),
             ];
         }
 

@@ -13,7 +13,17 @@
         @endif
         @php
             $is_discount_enabled = $pos_settings['disable_discount'] != 1 ? true : false;
-            $is_rp_enabled = session('business.enable_rp') == 1 ? true : false;
+            $is_rp_enabled = (session('business.enable_rp') == 1 && !empty($default_location->enable_rp)) ? true : false;
+
+            // Check if current location has HCM configured
+            $is_hcm_location = false;
+            if (!empty($default_location)) {
+                $hcm_credential = \Modules\Gallface\Models\LocationApiCredential::where('business_location_id', $default_location->id)
+                    ->where('mall_code', 'hcm')
+                    ->where('is_active', true)
+                    ->first();
+                $is_hcm_location = !empty($hcm_credential);
+            }
         @endphp
         {!! Form::open([
             'url' => action([\App\Http\Controllers\SellPosController::class, 'store']),
@@ -53,6 +63,12 @@
 
                                     @if (empty($pos_settings['disable_recurring_invoice']))
                                         @include('sale_pos.partials.recurring_invoice_modal')
+                                    @endif
+                                    @include('sale_pos.partials.edit_discount_modal')
+                                    @include('sale_pos.partials.edit_order_tax_modal')
+                                    @include('sale_pos.partials.edit_shipping_modal')
+                                    @if(!empty($business_details->enable_hcm_loyalty) && $is_hcm_location)
+                                        @include('sale_pos.partials.edit_hcm_loyalty_modal')
                                     @endif
                                 </div>
                             {{-- </div> --}}

@@ -544,14 +544,20 @@
 					@endif
 
 					<!-- Discount -->
-					@if( !empty($receipt_details->discount) )
+					@if(!empty($receipt_details->discount))
 						<tr>
-							<th>
-								{!! $receipt_details->discount_label !!}
-							</th>
-
+							<td colspan="2" class="text-right"><strong>{{$receipt_details->discount_label}}</strong></td>
 							<td class="text-right">
 								(-) {{$receipt_details->discount}}
+							</td>
+						</tr>
+					@endif
+
+					@if(!empty($receipt_details->hcm_loyalty_amount) && $receipt_details->hcm_loyalty_amount > 0)
+						<tr>
+							<td colspan="2" class="text-right"><strong>@lang('lang_v1.hcm_loyalty_discount')</strong></td>
+							<td class="text-right">
+								(-) {{$receipt_details->hcm_loyalty_formatted}}
 							</td>
 						</tr>
 					@endif

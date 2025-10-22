@@ -97,12 +97,17 @@
 				</td>
 				@endif
 			</tr>
+			@if(!empty($business_details->enable_hcm_loyalty) && $is_hcm_location)
 			<tr>
 				<td colspan="2">
-					<b class="tw-text-base md:tw-text-lg tw-font-bold">@lang('lang_v1.hcm_loyalty_discount')(-):</b> 
+					<b class="tw-text-base md:tw-text-lg tw-font-bold">@lang('lang_v1.hcm_loyalty_discount')(-):</b>
+					<i class="fas fa-edit cursor-pointer" id="edit-hcm-loyalty" title="@lang('lang_v1.edit_hcm_loyalty')" aria-hidden="true"></i>
 					<span class="tw-text-base md:tw-text-lg tw-font-semibold" id="hcm_loyalty_display">0</span>
+					<input type="hidden" name="hcm_loyalty_amount" id="hcm_loyalty_amount" value="0">
+					<input type="hidden" name="hcm_loyalty_type" id="hcm_loyalty_type" value="fixed">
 				</td>
 			</tr>
+			@endif
 		</table>
 	</div>
 </div>

@@ -152,7 +152,6 @@ class TransactionUtil extends Util
     /**
      * Add Sell transaction
      *
-     * @param  mixed  $transaction_id
      * @param  int  $business_id
      * @param  array  $input
      * @param  float  $invoice_total
@@ -1986,6 +1985,18 @@ class TransactionUtil extends Util
         }
         $output['rp_balance'] = $rp_balance;
 
+        // Add HCM loyalty discount to receipt
+        if (!empty($transaction->hcm_loyalty_amount) && $transaction->hcm_loyalty_amount > 0) {
+            $output['hcm_loyalty_amount'] = $transaction->hcm_loyalty_amount;
+            $output['hcm_loyalty_type'] = $transaction->hcm_loyalty_type ?? 'fixed';
+
+            if ($output['hcm_loyalty_type'] == 'percentage') {
+                $output['hcm_loyalty_formatted'] = $this->num_f($transaction->hcm_loyalty_amount) . '%';
+            } else {
+                $output['hcm_loyalty_formatted'] = $this->num_f($transaction->hcm_loyalty_amount, true);
+            }
+        }
+
         return (object) $output;
     }
 
@@ -2330,6 +2341,7 @@ class TransactionUtil extends Util
                 'unit_price' => $this->num_f($line->unit_price, false, $business_details),
                 'tax' => $this->num_f($line->item_tax, false, $business_details),
                 'tax_name' => ! empty($tax_details) ? $tax_details->name : null,
+                'tax_percent' => ! empty($tax_details) ? $tax_details->amount : null,
 
                 //Field for 3rd column
                 'unit_price_inc_tax' => $this->num_f($line->unit_price_inc_tax, false, $business_details),
@@ -2512,8 +2524,7 @@ class TransactionUtil extends Util
                         ->where('type', 'purchase')
                         ->select(
                             DB::raw('SUM(final_total) as final_total_sum'),
-                            //DB::raw("SUM(final_total - tax_amount) as total_exc_tax"),
-                            DB::raw('SUM((SELECT COALESCE(SUM(tp.amount), 0) FROM transaction_payments as tp WHERE tp.transaction_id=transactions.id)) as total_paid'),
+                            //DB::raw('SUM((SELECT COALESCE(SUM(tp.amount), 0) FROM transaction_payments as tp WHERE tp.transaction_id=transactions.id)) as total_paid'),
                             DB::raw('SUM(total_before_tax) as total_before_tax_sum'),
                             DB::raw('SUM(shipping_charges) as total_shipping_charges'),
                             DB::raw('SUM(additional_expense_value_1 + additional_expense_value_2 + additional_expense_value_3 + additional_expense_value_4) as total_expense')
@@ -2547,13 +2558,12 @@ class TransactionUtil extends Util
 
         $purchase_details = $query->first();
 
-        $output['total_purchase_inc_tax'] = $purchase_details->final_total_sum;
+        $output['total_purchase_inc_tax'] = $purchase_details->final_total_sum ?? 0;
         //$output['total_purchase_exc_tax'] = $purchase_details->sum('total_exc_tax');
-        $output['total_purchase_exc_tax'] = $purchase_details->total_before_tax_sum;
-        $output['purchase_due'] = $purchase_details->final_total_sum -
-                                    $purchase_details->total_paid;
-        $output['total_shipping_charges'] = $purchase_details->total_shipping_charges;
-        $output['total_additional_expense'] = $purchase_details->total_expense;
+        $output['total_purchase_exc_tax'] = $purchase_details->total_before_tax_sum ?? 0;
+        $output['purchase_due'] = ($purchase_details->final_total_sum ?? 0) - ($purchase_details->total_paid ?? 0);
+        $output['total_shipping_charges'] = $purchase_details->total_shipping_charges ?? 0;
+        $output['total_additional_expense'] = $purchase_details->total_expense ?? 0;
 
         return $output;
     }
@@ -2646,7 +2656,7 @@ class TransactionUtil extends Util
                     ->select(
                         DB::raw('SUM(final_total) as total_sell'),
                         DB::raw('SUM(final_total - tax_amount) as total_exc_tax'),
-                        DB::raw('SUM(final_total - (SELECT COALESCE(SUM(IF(tp.is_return = 1, -1*tp.amount, tp.amount)), 0) FROM transaction_payments as tp WHERE tp.transaction_id = transactions.id) )  as total_due'),
+                        DB::raw('SUM(final_total - (SELECT SUM(IF(tp.is_return = 1, -1*tp.amount, tp.amount)) FROM transaction_payments as tp WHERE tp.transaction_id = transactions.id) )  as total_due'),
                         DB::raw('SUM(total_before_tax) as total_before_tax'),
                         DB::raw('SUM(shipping_charges) as total_shipping_charges'),
                         DB::raw('SUM(additional_expense_value_1 + additional_expense_value_2 + additional_expense_value_3 + additional_expense_value_4) as total_expense')
@@ -2679,12 +2689,12 @@ class TransactionUtil extends Util
 
         $sell_details = $query->first();
 
-        $output['total_sell_inc_tax'] = $sell_details->total_sell;
+        $output['total_sell_inc_tax'] = $sell_details->total_sell ?? 0;
         //$output['total_sell_exc_tax'] = $sell_details->sum('total_exc_tax');
-        $output['total_sell_exc_tax'] = $sell_details->total_before_tax;
-        $output['invoice_due'] = $sell_details->total_due;
-        $output['total_shipping_charges'] = $sell_details->total_shipping_charges;
-        $output['total_additional_expense'] = $sell_details->total_expense;
+        $output['total_sell_exc_tax'] = $sell_details->total_before_tax ?? 0;
+        $output['invoice_due'] = $sell_details->total_due ?? 0;
+        $output['total_shipping_charges'] = $sell_details->total_shipping_charges ?? 0;
+        $output['total_additional_expense'] = $sell_details->total_expense ?? 0;
 
         return $output;
     }
@@ -2710,8 +2720,8 @@ class TransactionUtil extends Util
 
         $sell_details = $query->first();
 
-        $output['total_sell_discount'] = $sell_details->total_sell_discount;
-        $output['total_purchase_discount'] = $sell_details->total_purchase_discount;
+        $output['total_sell_discount'] = $sell_details->total_sell_discount ?? 0;
+        $output['total_purchase_discount'] = $sell_details->total_purchase_discount ?? 0;
 
         return $output;
     }
@@ -2811,7 +2821,7 @@ class TransactionUtil extends Util
         }
 
         $output['tax_details'] = $tax_details;
-        $output['total_tax'] = $transaction_tax_details->sum('transaction_tax') + $product_tax_details->sum('product_tax');
+        $output['total_tax'] = ($transaction_tax_details->sum('transaction_tax') ?? 0) + ($product_tax_details->sum('product_tax') ?? 0);
 
         return $output;
     }
@@ -2913,7 +2923,7 @@ class TransactionUtil extends Util
         // }
 
         $output['tax_details'] = $tax_details;
-        $output['total_tax'] = $transaction_tax_details->sum('transaction_tax') + $product_tax_details->sum('product_tax');
+        $output['total_tax'] = ($transaction_tax_details->sum('transaction_tax') ?? 0) + ($product_tax_details->sum('product_tax') ?? 0);
 
         return $output;
     }
@@ -2980,7 +2990,7 @@ class TransactionUtil extends Util
         }
 
         $output['tax_details'] = $tax_details;
-        $output['total_tax'] = $transaction_tax_details->sum('transaction_tax');
+        $output['total_tax'] = $transaction_tax_details->sum('transaction_tax') ?? 0;
 
         return $output;
     }
@@ -3042,6 +3052,8 @@ class TransactionUtil extends Util
         // ->where('payment_status', 'paid');
 
 
+        //Check for permitted locations of a user
+        $permitted_locations = auth()->user()->permitted_locations();
         if(!empty($permitted_locations)){
             if ($permitted_locations != 'all') {
                 $query->whereIn('transactions.location_id', $permitted_locations);
@@ -3981,7 +3993,7 @@ class TransactionUtil extends Util
 
         $details = $query->first();
 
-        return $details->stock;
+        return $details->stock ?? 0;
     }
 
     /**
@@ -4059,7 +4071,7 @@ class TransactionUtil extends Util
 
         $payment_details = $query->first();
 
-        $output['total_payment_with_commission'] = $payment_details->total_paid;
+        $output['total_payment_with_commission'] = $payment_details->total_paid ?? 0;
 
         return $output;
     }
@@ -5550,7 +5562,7 @@ class TransactionUtil extends Util
 
         //Get Overall transaction payment
         $overall_payments = $this->__paymentQuery($contact_id, null, null, $location_id)
-                            ->select('transaction_payments.*', 'bl.name as location_name', 't.type as transaction_type', 'is_advance')
+                            ->select('transaction_payments.*', 'bl.name as location_name', 't.type as transaction_type', 't.ref_no', 't.invoice_no')
                                     ->get();
         $overall_total_invoice_paid = $overall_payments->where('transaction_type', 'sell')->where('is_return', 0)->sum('amount');
         $overall_total_ob_paid = $overall_payments->where('transaction_type', 'opening_balance')->where('is_return', 0)->sum('amount');
@@ -5562,17 +5574,14 @@ class TransactionUtil extends Util
         $overall_total_purchase_return_paid = $overall_payments->where('transaction_type', 'purchase_return')->sum('amount');
 
         $overall_total_advance_payment = $this->__paymentQuery($contact_id, null, null, $location_id)
-                                        ->select('bl.name as location_name',
-                                                't.type as transaction_type',
-                                                'is_advance',
-                                                'transaction_payments.id',
+                                        ->select(
                                                 DB::raw('(transaction_payments.amount - COALESCE((SELECT SUM(amount) from transaction_payments as TP where TP.parent_id = transaction_payments.id), 0)) as amount')
                                         )
                                         ->where('is_advance', 1)
                                         ->get()
                                         ->sum('amount');
 
-        $total_overall_paid_customer = $overall_total_invoice_paid - $overall_total_sell_return_paid + $overall_total_ob_paid; //Add '+ $overall_total_advance_payment'
+        $total_overall_paid_customer = $overall_total_invoice_paid + $overall_total_ob_paid; //Add '+ $overall_total_advance_payment'
         $total_overall_paid_supplier = $overall_total_purchase_paid - $overall_total_purchase_return_paid;
 
         $overall_due = $total_overall_invoice + $total_overall_purchase - $total_overall_paid_customer - $total_overall_paid_supplier;
@@ -6051,7 +6060,7 @@ class TransactionUtil extends Util
         }
 
         $transaction_data['is_recurring'] = $request->has('is_recurring') ? 1 : 0;
-        $transaction_data['recur_interval'] = ! empty($request->input('recur_interval')) ? $request->input('recur_interval') : 0;
+        $transaction_data['recur_interval'] = ! empty($request->input('recur_interval')) ? $request->input('recur_interval') : $transaction->recur_interval;
         $transaction_data['recur_interval_type'] = ! empty($request->input('recur_interval_type')) ? $request->input('recur_interval_type') : $transaction->recur_interval_type;
         $transaction_data['recur_repetitions'] = ! empty($request->input('recur_repetitions')) ? $request->input('recur_repetitions') : $transaction->recur_repetitions;
         $transaction_data['subscription_repeat_on'] = ! empty($request->input('subscription_repeat_on')) ? $request->input('subscription_repeat_on') : $transaction->subscription_repeat_on;

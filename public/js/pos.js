@@ -49,7 +49,7 @@ $(document).ready(function() {
             } else {
                 var invoice_scheme_id =  $(this).find(':selected').data('default_invoice_scheme_id');
             }
-            
+
             $("#invoice_scheme_id").val(invoice_scheme_id).change();
         }
 
@@ -58,7 +58,7 @@ $(document).ready(function() {
             let invoice_layout_id = $(this).find(':selected').data('default_invoice_layout_id');
             $("#invoice_layout_id").val(invoice_layout_id).change();
         }
-        
+
         //Set default price group
         if ($('#default_price_group').length) {
             var dpg = default_price_group ?
@@ -142,7 +142,7 @@ $(document).ready(function() {
             $('#add_sell_form select[name="pay_term_type"]').val('');
             $('#edit_sell_form select[name="pay_term_type"]').val('');
         }
-        
+
         update_shipping_address(data);
         $('#advance_balance_text').text(__currency_trans_from_en(data.balance), true);
         $('#advance_balance').val(data.balance);
@@ -239,7 +239,7 @@ $(document).ready(function() {
                         var is_draft=true;
                     }
 
-                    if (ui.item.enable_stock != 1 || ui.item.qty_available > 0 || is_overselling_allowed || for_so || is_draft) {
+                    if (ui.item.enable_stock == 1 || ui.item.qty_available > 0 || is_overselling_allowed || for_so || is_draft) {
                         $(this).val(null);
 
                         //Pre select lot number only if the searched term is same as the lot number
@@ -261,7 +261,7 @@ $(document).ready(function() {
                     for_so = true;
                 }
                 var is_draft=false;
-                
+
                 if($('#status') && ($('#status').val()=='quotation' || 
                 $('#status').val()=='draft')) {
                     var is_draft=true;
@@ -323,7 +323,7 @@ $(document).ready(function() {
 
         var tr = $(this).parents('tr');
 
-        var unit_price_inc_tax = __read_number(tr.find('input.pos_unit_price_inc_tax'));
+        var unit_price_inc_ tax = __read_number(tr.find('input.pos_unit_price_inc_tax'));
         var line_total = entered_qty * unit_price_inc_tax;
 
         __write_number(tr.find('input.pos_line_total'), line_total, false);
@@ -679,7 +679,7 @@ $(document).ready(function() {
         var payment_method_dropdown = $('#payment_rows_div')
             .find('.payment_types_dropdown')
             .first();
-        
+
             payment_method_dropdown.val(pay_method);
             payment_method_dropdown.change();
         if (pay_method == 'card') {
@@ -1025,7 +1025,7 @@ $(document).ready(function() {
                                     $('#mobile').select();
                                 }
                             });
-                            
+
                         } else {
                             submitQuickContactForm(form);
                         }
@@ -1045,6 +1045,29 @@ $(document).ready(function() {
         input#rp_redeemed_amount').change(function() {
         pos_total_row();
     });
+
+    // HCM Loyalty Edit Modal
+    $(document).on('click', '#edit-hcm-loyalty', function() {
+        var hcm_loyalty_type = $('#hcm_loyalty_type').val();
+        var hcm_loyalty_amount = $('#hcm_loyalty_amount').val();
+
+        $('#modal_hcm_loyalty_type').val(hcm_loyalty_type);
+        $('#modal_hcm_loyalty_amount').val(__number_f(hcm_loyalty_amount));
+
+        $('#posEditHcmLoyaltyModal').modal('show');
+    });
+
+    $(document).on('click', '#save_hcm_loyalty', function() {
+        var hcm_loyalty_type = $('#modal_hcm_loyalty_type').val();
+        var hcm_loyalty_amount = __read_number($('#modal_hcm_loyalty_amount'));
+
+        $('#hcm_loyalty_type').val(hcm_loyalty_type);
+        $('#hcm_loyalty_amount').val(hcm_loyalty_amount);
+
+        pos_total_row();
+        $('#posEditHcmLoyaltyModal').modal('hide');
+    });
+
     $('select#tax_rate_id').change(function() {
         var tax_rate = $(this)
             .find(':selected')
@@ -1156,7 +1179,7 @@ $(document).ready(function() {
         is_enabled_stock,
         device_model_id
     );
-    
+
     $('select#select_location_id').on('change', function(e) {
         $('input#suggestion_page').val(1);
         var location_id = $('input#location_id').val();
@@ -1252,7 +1275,7 @@ $(document).ready(function() {
     });
 
 
-    
+
 
     $(document).on('click', 'div.product_box', function() {
         //Check if location is not set then show error message.
@@ -1699,7 +1722,7 @@ function pos_product_row(variation_id = null, purchase_line_id = null, weighing_
         ) {
             is_serial_no = true;
         }
-        
+
         $.ajax({
             method: 'GET',
             url: '/sells/pos/get_product_row/' + variation_id + '/' + location_id,
@@ -1804,12 +1827,43 @@ function pos_each_row(row_obj) {
     __write_number(row_obj.find('input.item_tax'), unit_price_inc_tax - discounted_unit_price);
 }
 
-function pos_total_row() {
+function pos_total_row(){
     var total_quantity = 0;
-    var price_total = get_subtotal();
-    $('table#pos_table tbody tr').each(function() {
-        total_quantity = total_quantity + __read_number($(this).find('input.pos_quantity'));
+    var price_total = 0;
+
+    $('table#pos_table tbody tr').each( function(){
+        total_quantity = total_quantity + __read_number($(this).find('.pos_quantity'));
+        price_total = price_total + __read_number($(this).find('.pos_line_total'));
     });
+
+    $('span#total_quantity').text(__number_f(total_quantity));
+    $('span.price_total').text(__currency_trans_from_en(price_total, true));
+
+    __write_number($('input#total_quantity_input'), total_quantity);
+
+    var discount_type = $('select#discount_type').val();
+    var discount_amount = __read_number($('input#discount_amount'));
+    var total_discount = 0;
+    if (discount_type == 'fixed') {
+        total_discount = discount_amount;
+    } else if (discount_type == 'percentage') {
+        total_discount = __calculate_amount('percentage', discount_amount, price_total);
+    }
+
+    // Calculate HCM Loyalty Discount
+    var hcm_loyalty_discount = 0;
+    if ($('#hcm_loyalty_amount').length > 0) {
+        var hcm_loyalty_type = $('#hcm_loyalty_type').val();
+        var hcm_loyalty_amount = __read_number($('#hcm_loyalty_amount'));
+
+        if (hcm_loyalty_type == 'fixed') {
+            hcm_loyalty_discount = hcm_loyalty_amount;
+        } else if (hcm_loyalty_type == 'percentage') {
+            hcm_loyalty_discount = __calculate_amount('percentage', hcm_loyalty_amount, price_total);
+        }
+
+        $('span#hcm_loyalty_display').text(__currency_trans_from_en(hcm_loyalty_discount, true));
+    }
 
     //updating shipping charges
     $('span#shipping_charges_amount').text(
@@ -1822,7 +1876,7 @@ function pos_total_row() {
 
     //$('span.unit_price_total').html(unit_price_total);
     $('span.price_total').html(__currency_trans_from_en(price_total, false));
-    calculate_billing_details(price_total);
+    calculate_billing_details(price_total, total_discount, hcm_loyalty_discount);
 
     if (
         $('input[name="is_serial_no"]').length > 0 &&
@@ -1853,21 +1907,21 @@ function get_subtotal() {
     return price_total;
 }
 
-function calculate_billing_details(price_total) {
-    var discount = pos_discount(price_total);
+function calculate_billing_details(price_total, total_discount = 0, hcm_loyalty_discount = 0) {
+    //var discount = pos_discount(price_total);
     if ($('#reward_point_enabled').length) {
         total_customer_reward = $('#rp_redeemed_amount').val();
-        discount = parseFloat(discount) + parseFloat(total_customer_reward);
+        total_discount = parseFloat(total_discount) + parseFloat(total_customer_reward);
 
         if ($('input[name="is_direct_sale"]').length <= 0) {
-            $('span#total_discount').text(__currency_trans_from_en(discount, false));
+            $('span#total_discount').text(__currency_trans_from_en(total_discount, false));
         }
     }
 
-    var order_tax = pos_order_tax(price_total, discount);
+    var order_tax = pos_order_tax(price_total, total_discount);
 
     //Add shipping charges.
-    var shipping_charges = __read_number($('input#shipping_charges'));
+    var shipping_charges = __read_number($('#shipping_charges'));
 
     var additional_expense = 0;
     //calculate additional expenses
@@ -1894,7 +1948,18 @@ function calculate_billing_details(price_total) {
         $('#packing_charge_text').text(__currency_trans_from_en(packing_charge, false));
     }
 
-    var total_payable = price_total + order_tax - discount + shipping_charges + packing_charge + additional_expense;
+    var total_payable = price_total + order_tax - total_discount + shipping_charges + packing_charge + additional_expense;
+
+    var rp_redeemed_amount = 0;
+    if ($('input#rp_redeemed_amount').length > 0) {
+        rp_redeemed_amount = __read_number($('input#rp_redeemed_amount'));
+    }
+    total_payable = total_payable - rp_redeemed_amount;
+
+    // Subtract HCM loyalty discount
+    if ($('#hcm_loyalty_amount').length > 0) {
+        total_payable = total_payable - hcm_loyalty_discount;
+    }
 
     var rounding_multiple = $('#amount_rounding_method').val() ? parseFloat($('#amount_rounding_method').val()) : 0;
     var round_off_data = __round(total_payable, rounding_multiple);
@@ -1979,7 +2044,7 @@ function calculate_balance_due() {
         __write_number($('input#change_return'), 0);
         $('span.change_return_span').text(__currency_trans_from_en(0, true));
         change_return = 0;
-        
+
     }
 
     if (change_return !== 0) {
@@ -2028,7 +2093,7 @@ function reset_pos_form(){
 		}, 4000);
 		return true;
 	}
-	
+
     //reset all repair defects tags
     if ($("#repair_defects").length > 0) {
         tagify_repair_defects.removeAllTags();
@@ -2536,7 +2601,7 @@ $(document).on('change', '#types_of_service_id', function(){
                 }
                 $('#types_of_service_id').val(types_of_service_id);
                 $('.types_of_service_modal').html(result.modal_html);
-                
+
                 if (prev_price_group != result.price_group_id) {
                     if ($('form#edit_pos_sell_form').length > 0) {
                         $('table#pos_table tbody').html('');
@@ -2759,7 +2824,7 @@ function update_shipping_address(data) {
         let shipping_custom_field_5 = data.shipping_custom_field_details != null ? data.shipping_custom_field_details.shipping_custom_field_5 : '';
         $('#shipping_custom_field_5').val(shipping_custom_field_5);
     }
-    
+
     //update export fields
     if (data.is_export) {
         $('#is_export').prop('checked', true);
@@ -2787,7 +2852,7 @@ function update_shipping_address(data) {
         $('#is_export').prop('checked', false);
         $('div.export_div').hide();
     }
-    
+
     $('#shipping_address_modal').val(data.shipping_address);
     $('#shipping_address').val(data.shipping_address);
 }
@@ -2836,7 +2901,7 @@ $("#sales_order_ids").on("select2:select", function (e) {
                     $('table#pos_table tbody')
                     .append($(this))
                     .find('input.pos_quantity');
-                    
+
                     var this_row = $('table#pos_table tbody')
                         .find('tr')
                         .last();
@@ -2861,9 +2926,9 @@ $("#sales_order_ids").on("select2:select", function (e) {
 
                 //increment row count
                 $('input#product_row_count').val(product_row);
-                
+
                 pos_total_row();
-            
+
             } else {
                 toastr.error(result.msg);
                 $('input#search_product')
@@ -2996,7 +3061,7 @@ function submitQuickContactForm(form) {
                 if (result.data.supplier_business_name) {
                     name += result.data.supplier_business_name;
                 }
-                
+
                 $('select#customer_id').append(
                     $('<option>', { value: result.data.id, text: name })
                 );
@@ -3045,7 +3110,7 @@ $(document).on('click', '#send_for_sell_return', function(e) {
                         $('#service_staff_replacement').popover('hide');
                         $('#service_staff_modal').html(result.msg);
                         $('#service_staff_modal').modal('show');
-                       
+
                     } else {
                         toastr.error(result.msg);
                     }
@@ -3211,7 +3276,7 @@ $(document).on('change', '#res_waiter_id', function(e){
                 $("#res_waiter_id").val('');
             }
         });
-        
+
     }
 })
 
@@ -3287,7 +3352,7 @@ function saveFormDataToLocalStorage() {
 
     // Find if "total_paying_input" already exists in the array
     let total_paying_input = formArray.findIndex(item => item.name === "total_paying_input");
-    
+
     if (priceIndex !== -1) {
         // If exists, update the value
         formArray[total_paying_input].value = $("#total_paying_input").val();

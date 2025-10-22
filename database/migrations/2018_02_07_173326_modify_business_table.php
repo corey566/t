@@ -19,6 +19,9 @@ return new class extends Migration
             $table->integer('purchase_currency_id')->unsigned()->nullable()->references('id')->on('currencies')->after('purchase_in_diff_currency');
 
             $table->decimal('p_exchange_rate', 5, 3)->default(1)->after('purchase_currency_id')->comment('1 Purchase currency = ? Base Currency');
+
+            $table->text('pos_settings')->nullable()->after('keyboard_shortcuts');
+            $table->boolean('enable_hcm_loyalty')->default(false)->after('pos_settings');
         });
     }
 

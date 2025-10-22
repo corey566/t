@@ -1592,3 +1592,9 @@ return [
     'invoice_synced_to_zatca_cannot_be_deleted' => 'This invoice has been successfully synced to ZATCA and cannot be deleted.',
     'invoice_synced_to_zatca_cannot_be_edited' => 'This invoice has been successfully synced to ZATCA and cannot be edited.',
 ];
+    'enable_hcm_loyalty_discount' => 'Enable HCM Loyalty Discount',
+    'enable_hcm_loyalty_discount_help' => 'Enable this to allow cashiers to apply HCM loyalty discounts at POS. Only available for locations with HCM integration configured.',
+    'hcm_loyalty_discount' => 'HCM Loyalty Discount',
+    'edit_hcm_loyalty' => 'Edit HCM Loyalty',
+    'hcm_loyalty_type' => 'HCM Loyalty Type',
+    'hcm_loyalty_amount' => 'HCM Loyalty Amount',
