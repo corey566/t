@@ -1,3 +1,4 @@
+
 <div class="row pos_form_totals">
 	<div class="col-md-12">
 		<table class="table table-condensed">
@@ -49,7 +50,7 @@
 						<b class="tw-text-base md:tw-text-lg tw-font-bold">@lang('sale.order_tax')(+): @show_tooltip(__('tooltip.sale_tax'))</b>
 						<i class="fas fa-edit cursor-pointer" title="@lang('sale.edit_order_tax')" aria-hidden="true" data-toggle="modal" data-target="#posEditOrderTaxModal" id="pos-edit-tax" ></i>
 						<span class="tw-text-base md:tw-text-lg tw-font-semibold" id="order_tax">
-							@if(empty($edit))
+							@if(empty($edit) || !isset($transaction))
 								0
 							@else
 								{{$transaction->tax_amount}}
@@ -58,11 +59,11 @@
 
 						<input type="hidden" name="tax_rate_id"
 							id="tax_rate_id"
-							value="@if(empty($edit)) {{$business_details->default_sales_tax}} @else {{$transaction->tax_id}} @endif"
+							value="@if(empty($edit) || !isset($transaction)) {{$business_details->default_sales_tax}} @else {{$transaction->tax_id}} @endif"
 							data-default="{{$business_details->default_sales_tax}}">
 
 						<input type="hidden" name="tax_calculation_amount" id="tax_calculation_amount"
-							value="@if(empty($edit)) {{@num_format($business_details->tax_calculation_amount)}} @else {{@num_format($transaction->tax?->amount)}} @endif" data-default="{{$business_details->tax_calculation_amount}}">
+							value="@if(empty($edit) || !isset($transaction)) {{@num_format($business_details->tax_calculation_amount)}} @else {{@num_format($transaction->tax?->amount)}} @endif" data-default="{{$business_details->tax_calculation_amount}}">
 
 					</span>
 				</td>
@@ -72,17 +73,17 @@
 						<b class="tw-text-base md:tw-text-lg tw-font-bold">@lang('sale.shipping')(+): @show_tooltip(__('tooltip.shipping'))</b>
 						<i class="fas fa-edit cursor-pointer"  title="@lang('sale.shipping')" aria-hidden="true" data-toggle="modal" data-target="#posShippingModal"></i>
 						<span id="shipping_charges_amount">0</span>
-						<input type="hidden" name="shipping_details" id="shipping_details" value="@if(empty($edit)){{''}}@else{{$transaction->shipping_details}}@endif" data-default="">
+						<input type="hidden" name="shipping_details" id="shipping_details" value="@if(empty($edit) || !isset($transaction)){{''}}@else{{$transaction->shipping_details}}@endif" data-default="">
 
-						<input type="hidden" name="shipping_address" id="shipping_address" value="@if(empty($edit)){{''}}@else{{$transaction->shipping_address}}@endif">
+						<input type="hidden" name="shipping_address" id="shipping_address" value="@if(empty($edit) || !isset($transaction)){{''}}@else{{$transaction->shipping_address}}@endif">
 
-						<input type="hidden" name="shipping_status" id="shipping_status" value="@if(empty($edit)){{''}}@else{{$transaction->shipping_status}}@endif">
+						<input type="hidden" name="shipping_status" id="shipping_status" value="@if(empty($edit) || !isset($transaction)){{''}}@else{{$transaction->shipping_status}}@endif">
 
-						<input type="hidden" name="delivered_to" id="delivered_to" value="@if(empty($edit)){{''}}@else{{$transaction->delivered_to}}@endif">
+						<input type="hidden" name="delivered_to" id="delivered_to" value="@if(empty($edit) || !isset($transaction)){{''}}@else{{$transaction->delivered_to}}@endif">
 
-						<input type="hidden" name="delivery_person" id="delivery_person" value="@if(empty($edit)){{''}}@else{{$transaction->delivery_person}}@endif">
+						<input type="hidden" name="delivery_person" id="delivery_person" value="@if(empty($edit) || !isset($transaction)){{''}}@else{{$transaction->delivery_person}}@endif">
 
-						<input type="hidden" name="shipping_charges" id="shipping_charges" value="@if(empty($edit)){{@num_format(0.00)}} @else{{@num_format($transaction->shipping_charges)}} @endif" data-default="0.00">
+						<input type="hidden" name="shipping_charges" id="shipping_charges" value="@if(empty($edit) || !isset($transaction)){{@num_format(0.00)}} @else{{@num_format($transaction->shipping_charges)}} @endif" data-default="0.00">
 					</span>
 				</td>
 				@if(in_array('types_of_service', $enabled_modules))
