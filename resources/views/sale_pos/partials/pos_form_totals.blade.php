@@ -30,8 +30,8 @@
 				@if(!empty($business_details->enable_hcm_loyalty) && $is_hcm_location)
 				<td>
 					<b class="tw-text-base md:tw-text-lg tw-font-bold">@lang('lang_v1.hcm_loyalty_discount') (-):</b>
-					<span class="tw-text-base md:tw-text-lg tw-font-semibold" id="hcm_loyalty_display">@if(empty($edit))0@else{{@num_format($transaction->hcm_loyalty_amount)}}@endif</span>
-					<input type="hidden" name="hcm_loyalty_amount" id="hcm_loyalty_amount" value="@if(empty($edit))0@else{{@num_format($transaction->hcm_loyalty_amount)}}@endif">
+					<span class="tw-text-base md:tw-text-lg tw-font-semibold" id="hcm_loyalty_display">@if(empty($edit) || empty($transaction))0@else{{@num_format($transaction->hcm_loyalty_amount)}}@endif</span>
+					<input type="hidden" name="hcm_loyalty_amount" id="hcm_loyalty_amount" value="@if(empty($edit) || empty($transaction))0@else{{@num_format($transaction->hcm_loyalty_amount)}}@endif">
 					<input type="hidden" name="hcm_loyalty_type" id="hcm_loyalty_type" value="fixed">
 				</td>
 				@endif
@@ -41,7 +41,7 @@
 					<b class="tw-text-base md:tw-text-lg tw-font-bold">
 						{{session('business.rp_name')}} (-):
 					</b>
-					<span class="tw-text-base md:tw-text-lg tw-font-semibold" id="rp_redeemed_amount_text">@if(empty($edit))0@else{{@num_format($transaction->rp_redeemed_amount)}}@endif</span>
+					<span class="tw-text-base md:tw-text-lg tw-font-semibold" id="rp_redeemed_amount_text">@if(empty($edit) || empty($transaction))0@else{{@num_format($transaction->rp_redeemed_amount)}}@endif</span>
 				</td>
 				@endif
 				<td class="@if($pos_settings['disable_order_tax'] != 0) hide @endif">
