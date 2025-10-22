@@ -18,6 +18,10 @@
 					<div class="col-md-12">
 						<h4 class="modal-title">@lang('sale.edit_discount'):</h4>
 					</div>
+					@php
+						$discount_type = $discount_type ?? 'percentage';
+						$sales_discount = $sales_discount ?? 0;
+					@endphp
 					<div class="col-md-6">
 				        <div class="form-group">
 				            {!! Form::label('discount_type_modal', __('sale.discount_type') . ':*' ) !!}
