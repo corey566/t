@@ -35,6 +35,7 @@ $(document).ready(function() {
         var loyalty_amount = __read_number($(this));
         __write_number($('#hcm_loyalty_amount'), loyalty_amount);
         $('#hcm_loyalty_display').text(__currency_trans_from_en(loyalty_amount, true));
+        pos_total_row();
     });
 
     // Update reward points display
@@ -42,6 +43,15 @@ $(document).ready(function() {
         var rp_amount = __read_number($(this));
         $('#rp_redeemed_amount_text').text(__currency_trans_from_en(rp_amount, true));
         pos_total_row();
+    });
+
+    // Calculate reward points amount in modal
+    $(document).on('change', '#rp_redeemed_modal', function() {
+        var rp_redeemed = parseInt($(this).val()) || 0;
+        var amount_per_unit = parseFloat($(this).data('amount_per_unit_point')) || 0;
+        var rp_amount = rp_redeemed * amount_per_unit;
+        
+        $('#rp_redeemed_amount_text').text(__currency_trans_from_en(rp_amount, true));
     });
 
     // Handle discount modal update button
@@ -62,9 +72,13 @@ $(document).ready(function() {
         
         // Update reward points if enabled
         if ($('#rp_redeemed_modal').length) {
-            var rp_redeemed = __read_number($('#rp_redeemed_modal'));
+            var rp_redeemed = parseInt($('#rp_redeemed_modal').val()) || 0;
+            var amount_per_unit = parseFloat($('#rp_redeemed_modal').data('amount_per_unit_point')) || 0;
+            var rp_amount = rp_redeemed * amount_per_unit;
+            
             __write_number($('#rp_redeemed'), rp_redeemed);
-            __write_number($('#rp_redeemed_amount'), rp_redeemed * parseFloat($('#rp_redeemed_modal').data('amount_per_unit_point')));
+            __write_number($('#rp_redeemed_amount'), rp_amount);
+            $('#rp_redeemed_amount_text').text(__currency_trans_from_en(rp_amount, true));
         }
         
         pos_total_row();
