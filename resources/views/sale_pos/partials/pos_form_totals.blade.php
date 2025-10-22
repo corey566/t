@@ -21,10 +21,10 @@
 						</b>
 						<span class="tw-text-base md:tw-text-lg tw-font-semibold" id="total_discount">0</span>
 
-						<input type="hidden" name="discount_type" id="discount_type" value="@if(empty($edit) || empty($transaction)){{'percentage'}}@else{{$transaction->discount_type}}@endif" data-default="percentage">
-						<input type="hidden" name="discount_amount" id="discount_amount" value="@if(empty($edit) || empty($transaction)) {{@num_format($business_details->default_sales_discount)}} @else {{@num_format($transaction->discount_amount)}} @endif" data-default="{{$business_details->default_sales_discount}}">
-						<input type="hidden" name="rp_redeemed" id="rp_redeemed" value="@if(empty($edit) || empty($transaction)){{'0'}}@else{{$transaction->rp_redeemed}}@endif">
-						<input type="hidden" name="rp_redeemed_amount" id="rp_redeemed_amount" value="@if(empty($edit) || empty($transaction)){{'0'}}@else {{$transaction->rp_redeemed_amount}} @endif">
+						<input type="hidden" name="discount_type" id="discount_type" value="@if(empty($edit) || !isset($transaction) || empty($transaction)){{'percentage'}}@else{{$transaction->discount_type}}@endif" data-default="percentage">
+						<input type="hidden" name="discount_amount" id="discount_amount" value="@if(empty($edit) || !isset($transaction) || empty($transaction)) {{@num_format($business_details->default_sales_discount)}} @else {{@num_format($transaction->discount_amount)}} @endif" data-default="{{$business_details->default_sales_discount}}">
+						<input type="hidden" name="rp_redeemed" id="rp_redeemed" value="@if(empty($edit) || !isset($transaction) || empty($transaction)){{'0'}}@else{{$transaction->rp_redeemed}}@endif">
+						<input type="hidden" name="rp_redeemed_amount" id="rp_redeemed_amount" value="@if(empty($edit) || !isset($transaction) || empty($transaction)){{'0'}}@else {{$transaction->rp_redeemed_amount}} @endif">
 					</td>
 
 				@if(!empty($business_details->enable_hcm_loyalty) && $is_hcm_location)
@@ -47,7 +47,7 @@
 				<td class="@if($pos_settings['disable_order_tax'] != 0) hide @endif">
 					<span class="tw-text-base md:tw-text-lg tw-font-semibold">
 						<b class="tw-text-base md:tw-text-lg tw-font-bold">@lang('sale.order_tax')(+): @show_tooltip(__('tooltip.sale_tax'))</b>
-						<i class="fas fa-edit cursor-pointer" title="@lang('sale.edit_order_tax')" aria-hidden="true" data-toggle="modal" data-target="#posEditOrderTaxModal" id="pos-edit-tax" ></i> 
+						<i class="fas fa-edit cursor-pointer" title="@lang('sale.edit_order_tax')" aria-hidden="true" data-toggle="modal" data-target="#posEditOrderTaxModal" id="pos-edit-tax" ></i>
 						<span class="tw-text-base md:tw-text-lg tw-font-semibold" id="order_tax">
 							@if(empty($edit))
 								0
@@ -56,12 +56,12 @@
 							@endif
 						</span>
 
-						<input type="hidden" name="tax_rate_id" 
-							id="tax_rate_id" 
-							value="@if(empty($edit)) {{$business_details->default_sales_tax}} @else {{$transaction->tax_id}} @endif" 
+						<input type="hidden" name="tax_rate_id"
+							id="tax_rate_id"
+							value="@if(empty($edit)) {{$business_details->default_sales_tax}} @else {{$transaction->tax_id}} @endif"
 							data-default="{{$business_details->default_sales_tax}}">
 
-						<input type="hidden" name="tax_calculation_amount" id="tax_calculation_amount" 
+						<input type="hidden" name="tax_calculation_amount" id="tax_calculation_amount"
 							value="@if(empty($edit)) {{@num_format($business_details->tax_calculation_amount)}} @else {{@num_format($transaction->tax?->amount)}} @endif" data-default="{{$business_details->tax_calculation_amount}}">
 
 					</span>
@@ -69,7 +69,7 @@
 				<td>
 					<span class="tw-text-base md:tw-text-lg tw-font-semibold">
 
-						<b class="tw-text-base md:tw-text-lg tw-font-bold">@lang('sale.shipping')(+): @show_tooltip(__('tooltip.shipping'))</b> 
+						<b class="tw-text-base md:tw-text-lg tw-font-bold">@lang('sale.shipping')(+): @show_tooltip(__('tooltip.shipping'))</b>
 						<i class="fas fa-edit cursor-pointer"  title="@lang('sale.shipping')" aria-hidden="true" data-toggle="modal" data-target="#posShippingModal"></i>
 						<span id="shipping_charges_amount">0</span>
 						<input type="hidden" name="shipping_details" id="shipping_details" value="@if(empty($edit)){{''}}@else{{$transaction->shipping_details}}@endif" data-default="">
@@ -88,7 +88,7 @@
 				@if(in_array('types_of_service', $enabled_modules))
 					<td class="col-sm-3 col-xs-6 d-inline-table">
 						<b class="tw-text-base md:tw-text-lg tw-font-bold">@lang('lang_v1.packing_charge')(+):</b>
-						<i class="fas fa-edit cursor-pointer service_modal_btn"></i> 
+						<i class="fas fa-edit cursor-pointer service_modal_btn"></i>
 						<span  class="tw-text-base md:tw-text-lg tw-font-semibold" id="packing_charge_text">
 							0
 						</span>
@@ -96,7 +96,7 @@
 				@endif
 				@if(!empty($pos_settings['amount_rounding_method']) && $pos_settings['amount_rounding_method'] > 0)
 				<td>
-					<b class="tw-text-base md:tw-text-lg tw-font-bold" id="round_off">@lang('lang_v1.round_off'):</b> <span id="round_off_text">0</span>								
+					<b class="tw-text-base md:tw-text-lg tw-font-bold" id="round_off">@lang('lang_v1.round_off'):</b> <span id="round_off_text">0</span>
 					<input type="hidden" name="round_off_amount" id="round_off_amount" value=0>
 				</td>
 				@endif
