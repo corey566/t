@@ -56,6 +56,7 @@ use App\Variation;
 use App\Warranty;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Str;
 use Razorpay\Api\Api;
@@ -171,7 +172,7 @@ class SellPosController extends Controller
         } elseif (!$this->moduleUtil->isQuotaAvailable('invoices', $business_id)) {
             return $this->moduleUtil->quotaExpiredResponse('invoices', $business_id, action([\App\Http\Controllers\SellPosController::class, 'index']));
         }
-        
+
         // Allow sales without cost - always enable
         config(['constants.enable_sell_without_cost' => true]);
         session(['allow_sales_without_cost' => true]);

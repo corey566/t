@@ -27,6 +27,7 @@ use App\VariationLocationDetails;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Str;
 use App\CashRegister;
+use App\ModuleUtil;
 
 
 class TransactionUtil extends Util
@@ -1490,6 +1491,13 @@ class TransactionUtil extends Util
 
         //Shipping charges
         $output['shipping_charges'] = ($transaction->shipping_charges != 0) ? $this->num_f($transaction->shipping_charges, $show_currency, $business_details) : 0;
+
+        //HCM Loyalty amount
+        $output['hcm_loyalty_amount'] = $this->num_f($transaction->hcm_loyalty_amount ?? 0, true);
+
+        //Reward points redeemed
+        $output['reward_point_label'] = null;
+
         $output['shipping_charges_label'] = trans('sale.shipping_charges');
         //Shipping details
         $output['shipping_details'] = $transaction->shipping_details;
@@ -2574,7 +2582,7 @@ class TransactionUtil extends Util
 
     public function getTotalPurchaseReturnPaid($business_id, $start_date = null, $end_date = null, $location_id = null, $created_by = null)
     {
-        $query = TransactionPayment::join('transactions as t', 't.id', 'transaction_payments.transaction_id')
+        $query = TransactionPayment::join('transactions as t', 'transaction_payments.transaction_id', '=', 't.id')
                                 ->where('t.type', 'purchase_return')
                                 ->where('t.business_id', $business_id)
                                 ->select(
@@ -5570,10 +5578,6 @@ class TransactionUtil extends Util
                                     ->get();
         $overall_total_invoice_paid = $overall_payments->where('transaction_type', 'sell')->where('is_return', 0)->sum('amount');
         $overall_total_ob_paid = $overall_payments->where('transaction_type', 'opening_balance')->where('is_return', 0)->sum('amount');
-        $overall_total_sell_change_return = $overall_payments->where('transaction_type', 'sell')->where('is_return', 1)->sum('amount');
-        $overall_total_sell_change_return = ! empty($overall_total_sell_change_return) ? $overall_total_sell_change_return : 0;
-        $overall_total_invoice_paid -= $overall_total_sell_change_return;
-        $overall_total_purchase_paid = $overall_payments->where('transaction_type', 'purchase')->where('is_return', 0)->sum('amount');
         $overall_total_sell_return_paid = $overall_payments->where('transaction_type', 'sell_return')->sum('amount');
         $overall_total_purchase_return_paid = $overall_payments->where('transaction_type', 'purchase_return')->sum('amount');
 
@@ -6198,7 +6202,7 @@ class TransactionUtil extends Util
     {
         $discount = [
             'discount_type' => $input['discount_type'] ?? 'fixed',
-            'discount_amount' => $input['discount_amount'] ?? 0,
+            'discountamount' => $input['discount_amount'] ?? 0,
         ];
 
         $business = Business::with(['currency'])->findOrFail($business_id);
