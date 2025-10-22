@@ -942,8 +942,8 @@ return [
     'round_to_nearest_whole_number' => 'Round to nearest whole number',
     'round_to_nearest_decimal' => 'Round to nearest decimal (multiple of :multiple)',
     'amount_rounding_method_help' => 'Example: <br><b>Round to nearest
-    whole number:</b> 2.23 => 2, 2.50 => 3, 2.73 => 3 <br><b>Round to nearest
-    decimal (multiple of 0.05):</b> 2.11 => 2.10, 2.12 => 2.10, 2.13 => 2.15',
+945:    whole number:</b> 2.23 => 2, 2.50 => 3, 2.73 => 3 <br><b>Round to nearest
+946:    decimal (multiple of 0.05):</b> 2.11 => 2.10, 2.12 => 2.10, 2.13 => 2.15',
     'round_off' => 'Round Off',
     'round_off_label' => 'Round off label',
     'total_sell_round_off' => 'Total sell round off',
@@ -1361,4 +1361,20 @@ return [
     'hcm_loyalty_independent_discount' => 'HCM Loyalty as Independent Discount',
     'hcm_loyalty_independent_discount_help' => 'When enabled, HCM loyalty discount will be tracked separately and sent to HCM API as a separate discount record',
     'hcm_loyalty_discount_help' => 'This discount is provided by Havelock City Mall and tracked separately from regular discounts',
+    'gift_card' => 'Gift Card',
+    'gift_cards' => 'Gift Cards',
+    'gift_card_number' => 'Gift Card Number',
+    'gift_card_serial' => 'Gift Card Serial',
+    'gift_card_value' => 'Gift Card Value',
+    'gift_card_settings' => 'Gift Card Settings',
+    'enable_gift_cards' => 'Enable Gift Cards',
+    'gift_card_product_prefix' => 'Gift Card Product Prefix',
+    'gift_card_serial_prefix' => 'Gift Card Serial Prefix',
+    'generate_gift_cards' => 'Generate Gift Cards',
+    'gift_card_quantity' => 'Gift Card Quantity',
+    'redeem_gift_card' => 'Redeem Gift Card',
+    'gift_card_redeemed' => 'Gift Card Redeemed Successfully',
+    'gift_card_not_found' => 'Gift Card Not Found',
+    'gift_card_already_used' => 'Gift Card Already Used',
+    'scan_gift_card' => 'Scan Gift Card',
 ];

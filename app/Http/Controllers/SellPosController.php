@@ -172,7 +172,8 @@ class SellPosController extends Controller
             return $this->moduleUtil->quotaExpiredResponse('invoices', $business_id, action([\App\Http\Controllers\SellPosController::class, 'index']));
         }
         
-        // Allow sales without cost
+        // Allow sales without cost - always enable
+        config(['constants.enable_sell_without_cost' => true]);
         session(['allow_sales_without_cost' => true]);
 
         //like:repair

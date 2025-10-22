@@ -118,3 +118,55 @@
         });
     });
 </script>
+<!-- HCM Loyalty Modal -->
+<div class="modal fade" id="posEditHcmLoyaltyModal" tabindex="-1" role="dialog" aria-labelledby="posEditHcmLoyaltyModalLabel">
+    <div class="modal-dialog" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+                <h4 class="modal-title" id="posEditHcmLoyaltyModalLabel">@lang('lang_v1.hcm_loyalty')</h4>
+            </div>
+            <div class="modal-body">
+                <div class="row">
+                    <div class="col-sm-12">
+                        <div class="form-group">
+                            <label>@lang('lang_v1.hcm_loyalty_amount'):</label>
+                            <input type="text" class="form-control input_number" id="hcm_loyalty_amount_modal" value="0">
+                        </div>
+                    </div>
+                </div>
+                <div class="row">
+                    <div class="col-sm-12">
+                        <p class="help-block">
+                            <i class="fa fa-info-circle"></i> @lang('lang_v1.hcm_loyalty_help_text')
+                        </p>
+                    </div>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-default" data-dismiss="modal">@lang('messages.close')</button>
+                <button type="button" class="btn btn-primary" id="save_hcm_loyalty">@lang('messages.save')</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script type="text/javascript">
+    $(document).ready(function() {
+        // Open HCM Loyalty modal
+        $(document).on('click', '#pos-edit-hcm-loyalty', function() {
+            var hcm_loyalty_amount = __read_number($('#hcm_loyalty_amount'));
+            $('#hcm_loyalty_amount_modal').val(__currency_trans_from_en(hcm_loyalty_amount, true));
+        });
+
+        // Save HCM Loyalty
+        $(document).on('click', '#save_hcm_loyalty', function() {
+            var hcm_loyalty_amount = __read_number($('#hcm_loyalty_amount_modal'));
+            $('#hcm_loyalty_amount').val(__currency_trans_from_en(hcm_loyalty_amount, true)).change();
+            $('#posEditHcmLoyaltyModal').modal('hide');
+            pos_total_row();
+        });
+    });
+</script>

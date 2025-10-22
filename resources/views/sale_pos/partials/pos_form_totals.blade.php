@@ -27,6 +27,8 @@
 						<input type="hidden" name="rp_redeemed_amount" id="rp_redeemed_amount" value="@if(!empty($edit) && isset($transaction)){{$transaction->rp_redeemed_amount ?? 0}}@else 0 @endif">
 						<input type="hidden" name="hcm_loyalty_amount" id="hcm_loyalty_amount" value="@if(!empty($edit) && isset($transaction)){{@num_format($transaction->hcm_loyalty_amount ?? 0)}}@else 0 @endif" data-default="0">
 						<input type="hidden" name="hcm_loyalty_type" id="hcm_loyalty_type" value="fixed">
+						<input type="hidden" name="gift_card_amount" id="gift_card_amount" value="0">
+						<input type="hidden" name="gift_card_number" id="gift_card_number" value="">
 					</td>
 
 				@if($is_rp_enabled)
