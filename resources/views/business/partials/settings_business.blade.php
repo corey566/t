@@ -149,107 +149,27 @@
                             </div>
                         </div>
                     </div>
-    </div>
-
-    {{-- HCM Loyalty Settings Section --}}
-    <div class="row">
-        <div class="col-sm-12">
-            <h4>@lang('lang_v1.hcm_loyalty_discount')</h4>
-            <hr>
-        </div>
-    </div>
-    <div class="row">
-        <div class="col-sm-12">
-            <div class="form-group">
-                <div class="checkbox">
-                    <label>
-                        {!! Form::checkbox('enable_hcm_loyalty', 1, !empty($business->enable_hcm_loyalty), ['class' => 'input-icheck']); !!}
-                        @lang('lang_v1.enable_hcm_loyalty_discount')
-                    </label>
-                    @show_tooltip(__('lang_v1.enable_hcm_loyalty_discount_help'))
-                </div>
-            </div>
-        </div>
-    </div>
-    
-    {{-- Reward Points Settings Section --}}
-    <div class="row">
-        <div class="col-sm-12">
-            <h4>@lang('lang_v1.reward_point_settings')</h4>
-            <hr>
-        </div>
-    </div>
-    <div class="row">
-        <div class="col-sm-12">
-            <div class="form-group">
-                <div class="checkbox">
-                    <label>
-                        {!! Form::checkbox('enable_rp', 1, !empty($business->enable_rp), ['class' => 'input-icheck']); !!}
-                        @lang('lang_v1.enable_reward_points')
-                    </label>
-                    @show_tooltip(__('lang_v1.enable_reward_points_help'))
-                </div>
-            </div>
-        </div>
-    </div>
-    <div class="row">
-        <div class="col-sm-4">
-            <div class="form-group">
-                {!! Form::label('redeem_amount_per_unit_rp', __('lang_v1.redeem_amount_per_unit_point') . ':') !!}
-                <div class="input-group">
-                    <span class="input-group-addon">
-                        <i class="fa fa-gift"></i>
-                    </span>
-                    {!! Form::number('redeem_amount_per_unit_rp', $business->redeem_amount_per_unit_rp, ['class' => 'form-control', 'step' => '0.01']); !!}
-                </div>
-            </div>
-        </div>
-        <div class="col-sm-4">
-            <div class="form-group">
-                {!! Form::label('min_order_total_for_redeem', __('lang_v1.minimum_order_total_to_redeem_points') . ':') !!}
-                <div class="input-group">
-                    <span class="input-group-addon">
-                        <i class="fa fa-money"></i>
-                    </span>
-                    {!! Form::number('min_order_total_for_redeem', $business->min_order_total_for_redeem, ['class' => 'form-control', 'step' => '0.01']); !!}
-                </div>
-            </div>
-        </div>
-        <div class="col-sm-4">
-            <div class="form-group">
-                {!! Form::label('rp_name', __('lang_v1.reward_point_display_name') . ':') !!}
-                <div class="input-group">
-                    <span class="input-group-addon">
-                        <i class="fa fa-info"></i>
-                    </span>
-                    {!! Form::text('rp_name', $business->rp_name, ['class' => 'form-control', 'placeholder' => __('lang_v1.reward_point_display_name')]); !!}
-                </div>
-            </div>
-        </div>
-    </div>
-    <div class="row">
-        <div class="col-sm-4">
-            <div class="form-group">
-                {!! Form::label('min_redeem_point', __('lang_v1.minimum_redeem_point') . ':') !!}
-                <div class="input-group">
-                    <span class="input-group-addon">
-                        <i class="fa fa-gift"></i>
-                    </span>
-                    {!! Form::number('min_redeem_point', $business->min_redeem_point, ['class' => 'form-control']); !!}
-                </div>
-            </div>
-        </div>
-        <div class="col-sm-4">
-            <div class="form-group">
-                {!! Form::label('max_rp_per_order', __('lang_v1.maximum_redeem_point_per_order') . ':') !!}
-                <div class="input-group">
-                    <span class="input-group-addon">
-                        <i class="fa fa-gift"></i>
-                    </span>
-                    {!! Form::number('max_rp_per_order', $business->max_rp_per_order, ['class' => 'form-control']); !!}
-                </div>
-            </div>
-        </div>
+                    <div class="col-sm-4">
+                        <div class="form-group">
+                            <div class="checkbox">
+                                <label>
+                                    {!! Form::checkbox('enable_hcm_loyalty', 1, !empty($business->enable_hcm_loyalty), ['class' => 'input-icheck']); !!}
+                                    @lang('lang_v1.enable_hcm_loyalty_discount')
+                                </label>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-sm-4">
+                        <div class="form-group">
+                            <div class="checkbox">
+                                <label>
+                                    {!! Form::checkbox('enable_rp', 1, !empty($business->enable_rp), ['class' => 'input-icheck']); !!}
+                                    @lang('lang_v1.enable_reward_points')
+                                </label>
+                                @show_tooltip(__('lang_v1.enable_reward_points_help'))
+                            </div>
+                        </div>
+                    </div>
     </div>
      {{-- code --}}
     <div class="row hide">

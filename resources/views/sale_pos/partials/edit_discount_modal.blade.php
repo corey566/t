@@ -14,7 +14,6 @@
 				</h4>
 			</div>
 			<div class="modal-body">
-				{{-- Regular Discount Section --}}
 				<div class="row @if(!$is_discount_enabled) hide @endif">
 					<div class="col-md-12">
 						<h4 class="modal-title">@lang('sale.edit_discount'):</h4>
@@ -25,8 +24,6 @@
 						$rp_redeemed = $rp_redeemed ?? 0;
 						$rp_redeemed_amount = $rp_redeemed_amount ?? 0;
 						$max_available = $max_available ?? 0;
-						$hcm_loyalty_type = $hcm_loyalty_type ?? 'fixed';
-						$hcm_loyalty_amount = $hcm_loyalty_amount ?? 0;
 					@endphp
 					<div class="col-md-6">
 				        <div class="form-group">
@@ -57,42 +54,6 @@
 				        </div>
 				    </div>
 				</div>
-				
-				{{-- HCM Loyalty Discount Section --}}
-				@if(session('business.enable_hcm_loyalty'))
-				<br>
-				<div class="row">
-					<div class="well well-sm bg-light-blue col-md-12">
-						<div class="col-md-12">
-							<h4 class="modal-title">@lang('lang_v1.hcm_loyalty_discount'):</h4>
-						</div>
-						<div class="col-md-6">
-							<div class="form-group">
-								{!! Form::label('hcm_loyalty_type_modal', __('lang_v1.hcm_loyalty_type') . ':' ) !!}
-								<div class="input-group">
-									<span class="input-group-addon">
-										<i class="fa fa-info"></i>
-									</span>
-									{!! Form::select('hcm_loyalty_type_modal', ['fixed' => __('lang_v1.fixed'), 'percentage' => __('lang_v1.percentage')], $hcm_loyalty_type, ['class' => 'form-control']); !!}
-								</div>
-							</div>
-						</div>
-						<div class="col-md-6">
-							<div class="form-group">
-								{!! Form::label('hcm_loyalty_amount_modal', __('lang_v1.hcm_loyalty_amount') . ':' ) !!}
-								<div class="input-group">
-									<span class="input-group-addon">
-										<i class="fa fa-money"></i>
-									</span>
-									{!! Form::text('hcm_loyalty_amount_modal', @num_format($hcm_loyalty_amount), ['class' => 'form-control input_number']); !!}
-								</div>
-							</div>
-						</div>
-					</div>
-				</div>
-				@endif
-				
-				{{-- Reward Points Section --}}
 				<br>
 				<div class="row @if(!$is_rp_enabled) hide @endif">
 					<div class="well well-sm bg-light-gray col-md-12">
