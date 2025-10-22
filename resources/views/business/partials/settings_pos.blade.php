@@ -108,19 +108,6 @@
                 </div>
             </div>
         </div>
-        <div class="col-sm-4">
-            <div class="form-group">
-                <div class="checkbox">
-                <br>
-                  <label>
-                    {!! Form::checkbox('enable_hcm_loyalty', 1,  
-                        $business_details->enable_hcm_loyalty ?? 0 , 
-                    [ 'class' => 'input-icheck']); !!} {{ __( 'lang_v1.enable_hcm_loyalty_discount' ) }}
-                  </label>
-                  @show_tooltip(__('lang_v1.enable_hcm_loyalty_discount_help'))
-                </div>
-            </div>
-        </div>
 
         <div class="col-sm-4">
             <div class="form-group">

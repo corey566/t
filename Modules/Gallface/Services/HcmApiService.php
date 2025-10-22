@@ -168,28 +168,6 @@ class HcmApiService
 
                     $formattedInvoice = $this->formatInvoiceForHcm($saleObj);
 
-                    // Add HCM loyalty amount to sync data - this must equal the discount value given
-                    if (isset($saleObj->hcm_loyalty_amount) && $saleObj->hcm_loyalty_amount > 0) {
-                        $loyalty_amount = (float) $saleObj->hcm_loyalty_amount;
-
-                        // If percentage type, calculate the actual amount from the total
-                        if (isset($saleObj->hcm_loyalty_type) && $saleObj->hcm_loyalty_type == 'percentage') {
-                            $loyalty_amount = ((float) $saleObj->final_total * $loyalty_amount) / 100;
-                        }
-
-                        // HCM loyalty must equal the discount value given
-                        $formattedInvoice['hcmLoyalty'] = number_format($loyalty_amount, 2, '.', '');
-                        
-                        Log::info('HCM Loyalty Applied', [
-                            'invoice_no' => $saleObj->invoice_no ?? 'Unknown',
-                            'hcm_loyalty_amount' => $loyalty_amount,
-                            'hcm_loyalty_type' => $saleObj->hcm_loyalty_type ?? 'fixed'
-                        ]);
-                    } else {
-                        // Ensure hcmLoyalty is always present, even if 0
-                        $formattedInvoice['hcmLoyalty'] = 0.00;
-                    }
-
                     // Submit invoice directly to /api/invoices with Bearer token
                     Log::info('HCM Invoice Submission Request', [
                         'url' => $this->apiUrl . '/api/invoices',

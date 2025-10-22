@@ -16,13 +16,6 @@ class Transaction extends Model
      * @var array
      */
     protected $guarded = ['id'];
-    
-    /**
-     * The attributes that should be appended to model.
-     *
-     * @var array
-     */
-    protected $appends = [];
 
     /**
      * The attributes that should be cast to native types.

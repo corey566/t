@@ -56,7 +56,6 @@ use App\Variation;
 use App\Warranty;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
-use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Str;
 use Razorpay\Api\Api;
@@ -172,10 +171,6 @@ class SellPosController extends Controller
         } elseif (!$this->moduleUtil->isQuotaAvailable('invoices', $business_id)) {
             return $this->moduleUtil->quotaExpiredResponse('invoices', $business_id, action([\App\Http\Controllers\SellPosController::class, 'index']));
         }
-
-        // Allow sales without cost - always enable
-        config(['constants.enable_sell_without_cost' => true]);
-        session(['allow_sales_without_cost' => true]);
 
         //like:repair
         $sub_type = request()->get('sub_type');
@@ -447,17 +442,8 @@ class SellPosController extends Controller
                 $price_group_id = $price_group_id == 0 && $request->has('default_price_group') ? $request->input('default_price_group') : $price_group_id;
 
                 $input['is_suspend'] = isset($input['is_suspend']) && 1 == $input['is_suspend'] ? 1 : 0;
-
-                // Save HCM loyalty amount
-                if (isset($input['hcm_loyalty_amount'])) {
-                    $input['hcm_loyalty_amount'] = $this->transactionUtil->num_uf($input['hcm_loyalty_amount']);
-                    $input['hcm_loyalty_type'] = $request->input('hcm_loyalty_type', 'fixed');
-                } else {
-                    $input['hcm_loyalty_amount'] = 0;
-                }
-
-                if ($pos_settings['enable_transaction_date']) {
-                    $input['transaction_date'] = $this->productUtil->uf_date($input['transaction_date'], true);
+                if ($input['is_suspend']) {
+                    $input['sale_note'] = !empty($input['additional_notes']) ? $input['additional_notes'] : null;
                 }
 
                 //Generate reference number
@@ -1124,7 +1110,7 @@ class SellPosController extends Controller
         $waiters = [];
         if ($this->productUtil->isModuleEnabled('service_staff') && !empty($pos_settings['inline_service_staff'])) {
             $waiters_enabled = true;
-            $waiters = $this->productUtil->serviceStaffDropdown($business_id, $location_id);
+            $waiters = $this->productUtil->serviceStaffDropdown($business_id);
         }
         $redeem_details = [];
         if (request()->session()->get('business.enable_rp') == 1) {
@@ -1426,6 +1412,7 @@ class SellPosController extends Controller
                 //Update Sell lines
                 $deleted_lines = $this->transactionUtil->createOrUpdateSellLines($transaction, $input['products'], $input['location_id'], true, $status_before);
 
+                //Update update lines
                 $is_credit_sale = isset($input['is_credit_sale']) && $input['is_credit_sale'] == 1 ? true : false;
 
                 $new_sales_order_ids = $transaction->sales_order_ids ?? [];
@@ -1554,7 +1541,7 @@ class SellPosController extends Controller
             DB::rollBack();
             \Log::emergency('File:' . $e->getFile() . 'Line:' . $e->getLine() . 'Message:' . $e->getMessage());
             $output = ['success' => 0,
-                'msg' => trans('messages.something_went_wrong'),
+                'msg' => __('messages.something_went_wrong'),
             ];
         }
 
@@ -2404,21 +2391,17 @@ class SellPosController extends Controller
                 )
                 ->removeColumn('id')
                 ->editColumn('transaction_date', '{{@format_date($transaction_date)}}')
-               ->editColumn('recur_interval', function ($row) {
-    $type = $row->recur_interval == 1
-        ? Str::singular(__('lang_v1.' . $row->recur_interval_type))
-        : __('lang_v1.' . $row->recur_interval_type);
+                ->editColumn('recur_interval', function ($row) {
+                    $type = $row->recur_interval == 1 ? Str::singular(__('lang_v1.' . $row->recur_interval_type)) : __('lang_v1.' . $row->recur_interval_type);
+                    $recur_interval = $row->recur_interval . $type;
 
-    $recur_interval = $row->recur_interval . $type;
+                    if ($row->recur_interval_type == 'months' && !empty($row->subscription_repeat_on)) {
+                        $recur_interval .= '<br><small class="text-muted">' .
+                        __('lang_v1.repeat_on') . ': ' . str_ordinal($row->subscription_repeat_on);
+                    }
 
-    if ($row->recur_interval_type == 'months' && !empty($row->subscription_repeat_on)) {
-        $recur_interval .= '<br><small class="text-muted">' .
-            __('lang_v1.repeat_on') . ': ' . str_ordinal($row->subscription_repeat_on);
-    }
-
-    return $recur_interval;
-})
-
+                    return $recur_interval;
+                })
                 ->editColumn('recur_repetitions', function ($row) {
                     return !empty($row->recur_repetitions) ? $row->recur_repetitions : '-';
                 })

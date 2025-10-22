@@ -480,13 +480,7 @@ class BusinessController extends Controller
             //Enabled modules
             $enabled_modules = $request->input('enabled_modules');
             $business_details['enabled_modules'] = ! empty($enabled_modules) ? $enabled_modules : null;
-
             $business->fill($business_details);
-
-            // Handle checkbox fields that may not be present in request
-            // These must be set after fill() to ensure they're not overwritten
-            $business->enable_hcm_loyalty = !empty($request->input('enable_hcm_loyalty')) ? 1 : 0;
-
             $business->save();
 
             //update session data

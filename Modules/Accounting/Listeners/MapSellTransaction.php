@@ -47,14 +47,8 @@ class MapSellTransaction
                 $user_id = request()->session()->get('user.id');
                 $business_id = $event->transaction->business_id;
                 
-                // Add note about loyalty discount if present
-                $note = null;
-                if ($event->transaction->hcm_loyalty_amount > 0) {
-                    $note = 'HCM Loyalty Discount: ' . $event->transaction->hcm_loyalty_amount;
-                }
-                
                 $accountingUtil = new \Modules\Accounting\Utils\AccountingUtil();
-                $accountingUtil->saveMap($type, $id, $user_id, $business_id, $deposit_to, $payment_account, $note);
+                $accountingUtil->saveMap($type, $id, $user_id, $business_id, $deposit_to, $payment_account);
             }
         }
     }

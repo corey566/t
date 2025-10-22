@@ -544,20 +544,14 @@
 					@endif
 
 					<!-- Discount -->
-					@if(!empty($receipt_details->discount))
+					@if( !empty($receipt_details->discount) )
 						<tr>
-							<td colspan="2" class="text-right"><strong>{{$receipt_details->discount_label}}</strong></td>
+							<th>
+								{!! $receipt_details->discount_label !!}
+							</th>
+
 							<td class="text-right">
 								(-) {{$receipt_details->discount}}
-							</td>
-						</tr>
-					@endif
-
-					@if(!empty($receipt_details->hcm_loyalty_amount) && $receipt_details->hcm_loyalty_amount > 0)
-						<tr>
-							<td colspan="2" class="text-right"><strong>@lang('lang_v1.hcm_loyalty_discount')</strong></td>
-							<td class="text-right">
-								(-) {{$receipt_details->hcm_loyalty_formatted}}
 							</td>
 						</tr>
 					@endif
@@ -688,37 +682,12 @@
 	@endif
 
 	@if(!empty($receipt_details->footer_text))
-		<div class="row">
-			<div class="col-xs-12">
-				{!! $receipt_details->footer_text !!}
-			</div>
-		</div>
-	@endif
-</div>
-
-@if(!empty($receipt_details->hcm_loyalty_amount) && $receipt_details->hcm_loyalty_amount > 0)
-		<div class="row" style="margin-top: 10px; padding: 10px; background-color: #f0f0f0; border: 2px dashed #333;">
-			<div class="col-xs-12 text-center">
-				<p style="margin: 0; font-size: 14px;">
-					<strong>🎉 HCM LOYALTY DISCOUNT APPLIED 🎉</strong>
-				</p>
-				<p style="margin: 5px 0; font-size: 16px; font-weight: bold;">
-					You saved: {{$receipt_details->hcm_loyalty_amount}}
-				</p>
-				<p style="margin: 0; font-size: 12px;">
-					Thank you for being a valued customer!
-				</p>
-			</div>
+		<br/>
+		<div class="col-xs-12">
+			{!! $receipt_details->footer_text !!}
 		</div>
 	@endif
 
-	@if(!empty($receipt_details->footer_text))
-		<div class="row">
-			<div class="col-xs-12">
-				{!! $receipt_details->footer_text !!}
-			</div>
-		</div>
-	@endif
 </div>
 <div class="row" style="color: #000000 !important;">
 	@if(!empty($receipt_details->footer_text))

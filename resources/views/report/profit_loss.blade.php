@@ -13,7 +13,6 @@
     <section class="content">
         <div class="print_section">
             <h2>{{ session()->get('business.name') }} - @lang('report.profit_loss')</h2>
-            <p class="text-muted">@lang('lang_v1.includes_hcm_loyalty_discounts')</p>
         </div>
 
         <div class="row no-print">

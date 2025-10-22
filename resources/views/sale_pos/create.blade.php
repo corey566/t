@@ -13,14 +13,7 @@
         @endif
         @php
             $is_discount_enabled = $pos_settings['disable_discount'] != 1 ? true : false;
-            $is_rp_enabled = (session('business.enable_rp') == 1 && !empty($default_location->enable_rp)) ? true : false;
-
-            // Check if current location has HCM loyalty enabled
-            $is_hcm_location = false;
-            if (!empty($default_location) && !empty($business_details->enable_hcm_loyalty)) {
-                $hcm_locations = !empty($business_details->hcm_loyalty_locations) ? json_decode($business_details->hcm_loyalty_locations, true) : [];
-                $is_hcm_location = in_array($default_location->id, $hcm_locations);
-            }
+            $is_rp_enabled = session('business.enable_rp') == 1 ? true : false;
         @endphp
         {!! Form::open([
             'url' => action([\App\Http\Controllers\SellPosController::class, 'store']),
@@ -60,12 +53,6 @@
 
                                     @if (empty($pos_settings['disable_recurring_invoice']))
                                         @include('sale_pos.partials.recurring_invoice_modal')
-                                    @endif
-                                    @include('sale_pos.partials.edit_discount_modal')
-                                    @include('sale_pos.partials.edit_order_tax_modal')
-                                    @include('sale_pos.partials.edit_shipping_modal')
-                                    @if(!empty($business_details->enable_hcm_loyalty) && $is_hcm_location)
-                                        @include('sale_pos.partials.edit_hcm_loyalty_modal')
                                     @endif
                                 </div>
                             {{-- </div> --}}
