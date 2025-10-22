@@ -138,7 +138,10 @@ return [
     'hcm_loyalty_discount_help' => 'Enter loyalty discount amount for this customer',
     'hcm_loyalty_amount' => 'Loyalty Amount',
     'enable_hcm_loyalty_discount' => 'Enable HCM Loyalty Discount',
+    'enable_hcm_loyalty_discount_help' => 'Enable this to allow cashiers to apply HCM loyalty discounts at POS. Only available for locations with HCM integration configured.',
     'edit_hcm_loyalty' => 'Edit HCM Loyalty Discount',
+    'hcm_loyalty_type' => 'HCM Loyalty Type',
+    'hcm_loyalty_amount' => 'HCM Loyalty Amount',
     'total_paying' => 'Total Paying',
     'balance' => 'Balance',
     'payment_method' => 'Payment Method',
@@ -189,10 +192,8 @@ return [
     'show_time_with_date' => 'Show time with date',
     'show_sale_description' => 'Show sale description',
     'product_imei_or_sn' => '(Product IMEI or Serial Number)',
-    'purchase_already_exist' => "Product can't be deleted because purchases related to 
-								this product exist",
-    'sale_already_exist' => "Product can't be deleted because sale related to 
-								this product exist",
+    'purchase_already_exist' => "Product can't be deleted because purchases related to \n\t\t\t\t\tthis product exist",
+    'sale_already_exist' => "Product can't be deleted because sale related to \n\t\t\t\t\tthis product exist",
     'opening_stock_sold' => "Product can't be deleted because some stocks are sold",
     'stock_adjusted' => "Product can't be deleted because some stocks are adjusted",
     'product_delete_success' => 'Product deleted successfully',
@@ -693,7 +694,8 @@ return [
     'allow_selected_contacts_tooltip' => 'Only allow access to selected contacts in sells/purchase customer/supplier search box',
     'allowed_contacts' => 'Allowed Contacts',
     'view_purchase_price' => 'View Purchase Price',
-    'view_purchase_price_tooltip' => 'Permission to view purchase price in product details, stock transfer and stock adjustment',    'created' => 'Created',
+    'view_purchase_price_tooltip' => 'Permission to view purchase price in product details, stock transfer and stock adjustment',
+    'created' => 'Created',
     'updated' => 'Updated',
     'deleted' => 'Deleted',
     'day' => 'Day',
@@ -935,9 +937,7 @@ return [
     'amount_rounding_method' => 'Amount rounding method',
     'round_to_nearest_whole_number' => 'Round to nearest whole number',
     'round_to_nearest_decimal' => 'Round to nearest decimal (multiple of :multiple)',
-    'amount_rounding_method_help' => 'Example: <br><b>Round to nearest 
-    whole number:</b> 2.23 => 2, 2.50 => 3, 2.73 => 3 <br><b>Round to nearest 
-    decimal (multiple of 0.05):</b> 2.11 => 2.10, 2.12 => 2.10, 2.13 => 2.15',
+    'amount_rounding_method_help' => 'Example: <br><b>Round to nearest \n    whole number:</b> 2.23 => 2, 2.50 => 3, 2.73 => 3 <br><b>Round to nearest \n    decimal (multiple of 0.05):</b> 2.11 => 2.10, 2.12 => 2.10, 2.13 => 2.15',
     'round_off' => 'Round Off',
     'round_off_label' => 'Round off label',
     'total_sell_round_off' => 'Total sell round off',
@@ -1505,8 +1505,7 @@ return [
     'select_variation_values' => 'Select variation values',
     'show_letter_head' => 'Show letter head',
     'letter_head' => 'Letter Head',
-    'letter_head_help' => 'Upload a letterhead image containing all details of your business.
-    Letterhead will be added at the top of the invoices.',
+    'letter_head_help' => 'Upload a letterhead image containing all details of your business.\n    Letterhead will be added at the top of the invoices.',
     'letter_head_help2' => 'Upload only if you want to replace previous letterhead',
     'copy_quotation' => 'Copy Quotation',
     'selling_price_help_text' => 'Set multiple price for products. Name different price and then update price from "Update Price" or List Products -> Actions -> Add or edit Group prices',
@@ -1528,7 +1527,6 @@ return [
     'cogs' => 'COGS:',
     'cogs_help_text' => 'Cost of Goods Sold = Starting inventory(opening stock) + purchases − ending inventory(closing stock)',
     'overall_summary' => 'Overall Summary',
-
     'update_product_price' => 'Update Price',
     'signed_in_as' => 'Signed in as',
     'field_type' => 'Field Type',
@@ -1594,9 +1592,3 @@ return [
     'invoice_synced_to_zatca_cannot_be_deleted' => 'This invoice has been successfully synced to ZATCA and cannot be deleted.',
     'invoice_synced_to_zatca_cannot_be_edited' => 'This invoice has been successfully synced to ZATCA and cannot be edited.',
 ];
-    'enable_hcm_loyalty_discount' => 'Enable HCM Loyalty Discount',
-    'enable_hcm_loyalty_discount_help' => 'Enable this to allow cashiers to apply HCM loyalty discounts at POS. Only available for locations with HCM integration configured.',
-    'hcm_loyalty_discount' => 'HCM Loyalty Discount',
-    'edit_hcm_loyalty' => 'Edit HCM Loyalty',
-    'hcm_loyalty_type' => 'HCM Loyalty Type',
-    'hcm_loyalty_amount' => 'HCM Loyalty Amount',
