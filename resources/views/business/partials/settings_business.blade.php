@@ -153,7 +153,7 @@
                         <div class="form-group">
                             <div class="checkbox">
                                 <label>
-                                    {!! Form::checkbox('enable_hcm_loyalty', 1, $business->enable_hcm_loyalty == 1, ['class' => 'input-icheck']); !!}
+                                    {!! Form::checkbox('enable_hcm_loyalty', 1, !empty($business->enable_hcm_loyalty) && $business->enable_hcm_loyalty == 1, ['class' => 'input-icheck']); !!}
                                     Enable HCM Loyalty Discount
                                 </label>
                             </div>
