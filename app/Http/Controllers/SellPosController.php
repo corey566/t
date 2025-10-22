@@ -2398,17 +2398,21 @@ class SellPosController extends Controller
                 )
                 ->removeColumn('id')
                 ->editColumn('transaction_date', '{{@format_date($transaction_date)}}')
-                ->editColumn('recur_interval', function ($row) {
-                    $type = $row->recur_interval == 1 ? Str::singular(__('lang_v1.' . $row->recur_interval_type)) : __('lang_v1.' . $row->recur_interval_type);
-                    $recur_interval = $row->recur_interval . $type;
+               ->editColumn('recur_interval', function ($row) {
+    $type = $row->recur_interval == 1
+        ? Str::singular(__('lang_v1.' . $row->recur_interval_type))
+        : __('lang_v1.' . $row->recur_interval_type);
 
-                    if ($row->recur_interval_type == 'months' && !empty($row->subscription_repeat_on')) {
-                        $recur_interval .= '<br><small class="text-muted">' .
-                        __('lang_v1.repeat_on') . ': ' . str_ordinal($row->subscription_repeat_on);
-                    }
+    $recur_interval = $row->recur_interval . $type;
 
-                    return $recur_interval;
-                })
+    if ($row->recur_interval_type == 'months' && !empty($row->subscription_repeat_on)) {
+        $recur_interval .= '<br><small class="text-muted">' .
+            __('lang_v1.repeat_on') . ': ' . str_ordinal($row->subscription_repeat_on);
+    }
+
+    return $recur_interval;
+})
+
                 ->editColumn('recur_repetitions', function ($row) {
                     return !empty($row->recur_repetitions) ? $row->recur_repetitions : '-';
                 })
