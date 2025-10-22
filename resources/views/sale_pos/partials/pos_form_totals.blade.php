@@ -21,10 +21,10 @@
 						</b>
 						<span class="tw-text-base md:tw-text-lg tw-font-semibold" id="total_discount">0</span>
 
-						<input type="hidden" name="discount_type" id="discount_type" value="@if(empty($edit)){{'percentage'}}@else{{$transaction->discount_type}}@endif" data-default="percentage">
-						<input type="hidden" name="discount_amount" id="discount_amount" value="@if(empty($edit)) {{@num_format($business_details->default_sales_discount)}} @else {{@num_format($transaction->discount_amount)}} @endif" data-default="{{$business_details->default_sales_discount}}">
-						<input type="hidden" name="rp_redeemed" id="rp_redeemed" value="@if(empty($edit)){{'0'}}@else{{$transaction->rp_redeemed}}@endif">
-						<input type="hidden" name="rp_redeemed_amount" id="rp_redeemed_amount" value="@if(empty($edit)){{'0'}}@else {{$transaction->rp_redeemed_amount}} @endif">
+						<input type="hidden" name="discount_type" id="discount_type" value="@if(empty($edit) || empty($transaction)){{'percentage'}}@else{{$transaction->discount_type}}@endif" data-default="percentage">
+						<input type="hidden" name="discount_amount" id="discount_amount" value="@if(empty($edit) || empty($transaction)) {{@num_format($business_details->default_sales_discount)}} @else {{@num_format($transaction->discount_amount)}} @endif" data-default="{{$business_details->default_sales_discount}}">
+						<input type="hidden" name="rp_redeemed" id="rp_redeemed" value="@if(empty($edit) || empty($transaction)){{'0'}}@else{{$transaction->rp_redeemed}}@endif">
+						<input type="hidden" name="rp_redeemed_amount" id="rp_redeemed_amount" value="@if(empty($edit) || empty($transaction)){{'0'}}@else {{$transaction->rp_redeemed_amount}} @endif">
 					</td>
 
 				@if(!empty($business_details->enable_hcm_loyalty) && $is_hcm_location)
@@ -35,7 +35,7 @@
 					<input type="hidden" name="hcm_loyalty_type" id="hcm_loyalty_type" value="fixed">
 				</td>
 				@endif
-				
+
 				@if($is_rp_enabled)
 				<td>
 					<b class="tw-text-base md:tw-text-lg tw-font-bold">
