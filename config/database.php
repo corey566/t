@@ -79,7 +79,12 @@ return [
             'prefix' => '',
             'prefix_indexes' => true,
             'search_path' => 'public',
-            'sslmode' => 'prefer',
+            'sslmode' => 'require',
+            'options' => extension_loaded('pdo_pgsql') ? [
+                PDO::ATTR_TIMEOUT => env('DB_TIMEOUT', 30),
+                PDO::ATTR_PERSISTENT => false,
+                PDO::ATTR_ERRMODE => PDO::ERRMODE_EXCEPTION,
+            ] : [],
         ],
 
         'sqlsrv' => [
