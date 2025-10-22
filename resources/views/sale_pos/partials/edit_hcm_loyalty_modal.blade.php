@@ -1,4 +1,3 @@
-
 <div class="modal fade" id="posEditHcmLoyaltyModal" tabindex="-1" role="dialog" aria-labelledby="posEditHcmLoyaltyModalLabel">
     <div class="modal-dialog" role="document">
         <div class="modal-content">
