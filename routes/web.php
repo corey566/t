@@ -3,7 +3,7 @@
 use App\Http\Controllers\AccountController;
 use App\Http\Controllers\AccountReportsController;
 use App\Http\Controllers\AccountTypeController;
-// use App\Http\Controllers\Auth;
+use App\Http\Controllers\Auth;
 use App\Http\Controllers\BackUpController;
 use App\Http\Controllers\BarcodeController;
 use App\Http\Controllers\BrandController;
