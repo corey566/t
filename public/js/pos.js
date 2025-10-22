@@ -30,6 +30,18 @@ $(document).ready(function() {
         pos_total_row();
     });
 
+    // Handle HCM loyalty discount edit button click
+    $(document).on('click', '#edit-hcm-loyalty', function() {
+        $('#posEditHcmLoyaltyModal').modal('show');
+    });
+
+    // Update reward points display
+    $(document).on('change', '#rp_redeemed_amount', function() {
+        var rp_amount = __read_number($(this));
+        $('#rp_redeemed_amount_text').text(__currency_trans_from_en(rp_amount, true));
+        pos_total_row();
+    });
+
     $('select#select_location_id').change(function() {
         reset_pos_form();
 

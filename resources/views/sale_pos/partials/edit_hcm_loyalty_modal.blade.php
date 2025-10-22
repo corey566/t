@@ -60,3 +60,62 @@
         </div>
     </div>
 </div>
+<div class="modal fade" id="posEditHcmLoyaltyModal" tabindex="-1" role="dialog">
+    <div class="modal-dialog" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+                <h4 class="modal-title">@lang('lang_v1.hcm_loyalty_discount')</h4>
+            </div>
+            <div class="modal-body">
+                <div class="row">
+                    <div class="col-sm-6">
+                        <div class="form-group">
+                            <label>@lang('sale.discount_type'):*</label>
+                            <select class="form-control" id="hcm_loyalty_type_modal">
+                                <option value="fixed">@lang('lang_v1.fixed')</option>
+                                <option value="percentage">@lang('lang_v1.percentage')</option>
+                            </select>
+                        </div>
+                    </div>
+                    <div class="col-sm-6">
+                        <div class="form-group">
+                            <label>@lang('sale.discount_amount'):*</label>
+                            <input type="text" class="form-control input_number" id="hcm_loyalty_amount_modal" value="0">
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-primary" id="update-hcm-loyalty">@lang('messages.update')</button>
+                <button type="button" class="btn btn-default" data-dismiss="modal">@lang('messages.close')</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script type="text/javascript">
+    $(document).ready(function() {
+        // When modal opens, populate current values
+        $('#posEditHcmLoyaltyModal').on('show.bs.modal', function() {
+            var current_type = $('#hcm_loyalty_type').val();
+            var current_amount = $('#hcm_loyalty_amount').val();
+            
+            $('#hcm_loyalty_type_modal').val(current_type);
+            $('#hcm_loyalty_amount_modal').val(current_amount);
+        });
+
+        // Update HCM loyalty discount
+        $(document).on('click', '#update-hcm-loyalty', function() {
+            var loyalty_type = $('#hcm_loyalty_type_modal').val();
+            var loyalty_amount = __read_number($('#hcm_loyalty_amount_modal'));
+            
+            $('#hcm_loyalty_type').val(loyalty_type);
+            $('#hcm_loyalty_amount').val(loyalty_amount).trigger('change');
+            
+            $('#posEditHcmLoyaltyModal').modal('hide');
+        });
+    });
+</script>

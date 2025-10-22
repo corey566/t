@@ -137,6 +137,8 @@ return [
     'hcm_loyalty_discount' => 'HCM Loyalty Discount',
     'hcm_loyalty_discount_help' => 'Enter loyalty discount amount for this customer',
     'hcm_loyalty_amount' => 'Loyalty Amount',
+    'enable_hcm_loyalty_discount' => 'Enable HCM Loyalty Discount',
+    'edit_hcm_loyalty' => 'Edit HCM Loyalty Discount',
     'total_paying' => 'Total Paying',
     'balance' => 'Balance',
     'payment_method' => 'Payment Method',
