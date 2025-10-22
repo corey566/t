@@ -23,6 +23,13 @@ $(document).ready(function() {
         initialize_printer();
     }
 
+    // Update loyalty display when loyalty amount changes
+    $(document).on('change', '#hcm_loyalty_amount', function() {
+        var loyalty_amount = __read_number($(this));
+        $('#hcm_loyalty_display').text(__currency_trans_from_en(loyalty_amount, true));
+        pos_total_row();
+    });
+
     $('select#select_location_id').change(function() {
         reset_pos_form();
 

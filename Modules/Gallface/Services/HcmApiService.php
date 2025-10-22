@@ -167,6 +167,11 @@ class HcmApiService
                     $saleObj = is_array($sale) ? (object)$sale : $sale;
 
                     $formattedInvoice = $this->formatInvoiceForHcm($saleObj);
+                    
+                    // Add loyalty amount if present
+                    if (isset($saleObj->hcm_loyalty_amount) && $saleObj->hcm_loyalty_amount > 0) {
+                        $formattedInvoice['loyalty_discount'] = (float) $saleObj->hcm_loyalty_amount;
+                    }
 
                     // Submit invoice directly to /api/invoices with Bearer token
                     Log::info('HCM Invoice Submission Request', [

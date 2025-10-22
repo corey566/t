@@ -96,6 +96,9 @@ class SellController extends Controller
             $sale_type = ! empty(request()->input('sale_type')) ? request()->input('sale_type') : 'sell';
 
             $sells = $this->transactionUtil->getListSells($business_id, $sale_type);
+            
+            // Add loyalty amount to select
+            $sells->addSelect('transactions.hcm_loyalty_amount');
 
             // only display sell invoice we add it because project invoive show in sell list
             if($sale_type == 'sell'){

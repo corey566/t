@@ -111,7 +111,23 @@
                             </div>
                         </div>
                         <div class="row">
-                            <div class="col-md-6">
+                            <div class="col-md-4">
+                                <div class="form-group">
+                                    {!! Form::label('hcm_loyalty_amount', __('lang_v1.hcm_loyalty_discount') . ':') !!}
+                                    <div class="input-group">
+                                        <span class="input-group-addon">
+                                            <i class="fas fa-gift"></i>
+                                        </span>
+                                        {!! Form::text('hcm_loyalty_amount', !empty($transaction) ? $transaction->hcm_loyalty_amount : 0, [
+                                            'class' => 'form-control input_number',
+                                            'placeholder' => __('lang_v1.hcm_loyalty_discount'),
+                                            'id' => 'hcm_loyalty_amount'
+                                        ]) !!}
+                                    </div>
+                                    <small class="text-muted">@lang('lang_v1.hcm_loyalty_discount_help')</small>
+                                </div>
+                            </div>
+                            <div class="col-md-4">
                                 <div class="form-group">
                                     {!! Form::label('sale_note', __('sale.sell_note') . ':') !!}
                                     {!! Form::textarea('sale_note', !empty($transaction) ? $transaction->additional_notes : null, [
@@ -121,7 +137,7 @@
                                     ]) !!}
                                 </div>
                             </div>
-                            <div class="col-md-6">
+                            <div class="col-md-4">
                                 <div class="form-group">
                                     {!! Form::label('staff_note', __('sale.staff_note') . ':') !!}
                                     {!! Form::textarea('staff_note', !empty($transaction) ? $transaction->staff_note : null, [

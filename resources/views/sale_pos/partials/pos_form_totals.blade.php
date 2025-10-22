@@ -97,6 +97,12 @@
 				</td>
 				@endif
 			</tr>
+			<tr>
+				<td colspan="2">
+					<b class="tw-text-base md:tw-text-lg tw-font-bold">@lang('lang_v1.hcm_loyalty_discount')(-):</b> 
+					<span class="tw-text-base md:tw-text-lg tw-font-semibold" id="hcm_loyalty_display">0</span>
+				</td>
+			</tr>
 		</table>
 	</div>
 </div>
