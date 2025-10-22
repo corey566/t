@@ -21,6 +21,9 @@
 					@php
 						$discount_type = $discount_type ?? 'percentage';
 						$sales_discount = $sales_discount ?? 0;
+						$rp_redeemed = $rp_redeemed ?? 0;
+						$rp_redeemed_amount = $rp_redeemed_amount ?? 0;
+						$max_available = $max_available ?? 0;
 					@endphp
 					<div class="col-md-6">
 				        <div class="form-group">
