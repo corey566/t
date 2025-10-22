@@ -1,0 +1,323 @@
+Stack
+Context
+Debug
+Flare
+Share
+Share with Flare
+Docs
+
+Stack
+
+Context
+
+Debug
+Create Share
+Docs
+
+Ignition Settings
+Docs
+Editor
+
+PhpStorm
+Theme
+auto
+Save settings
+Settings will be saved locally in ~/.ignition.json.
+
+syntax error, unexpected single-quoted string ")) {"
+ParseError
+PHP 8.4.13
+9.52.16
+syntax error, unexpected single-quoted string ")) {"
+
+Expand vendor frames
+app
+ / 
+Http
+ / 
+Controllers
+ / 
+SellPosController
+.php
+ 
+: 2406
+Composer\Autoload\includeFile
+1 vendor frame
+.unknown
+0
+is_a
+29 vendor frames
+app
+ / 
+Http
+ / 
+Controllers
+ / 
+SellPosController
+.php
+ 
+: 2406
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+                            if (auth()->user()->can('direct_sell.delete') || auth()->user()->can('sell.delete')) {
+
+                                $html .= '&nbsp;<a href="' . action([\App\Http\Controllers\SellPosController::class, 'destroy'], [$row->id]) . '" class="delete-sale tw-dw-btn tw-dw-btn-outline tw-dw-btn-xs tw-dw-btn-error"><i class="fas fa-trash"></i
+
+                            }
+
+                        }
+
+
+
+                        return $html;
+
+                    }
+
+                )
+
+                ->removeColumn('id')
+
+                ->editColumn('transaction_date', '{{@format_date($transaction_date)}}')
+
+                ->editColumn('recur_interval', function ($row) {
+
+                    $type = $row->recur_interval == 1 ? Str::singular(__('lang_v1.' . $row->recur_interval_type)) : __('lang_v1.' . $row->recur_interval_type);
+
+                    $recur_interval = $row->recur_interval . $type;
+
+
+
+                    if ($row->recur_interval_type == 'months' && !empty($row->subscription_repeat_on')) {
+
+                        $recur_interval .= '<br><small class="text-muted">' .
+
+                        __('lang_v1.repeat_on') . ': ' . str_ordinal($row->subscription_repeat_on);
+
+                    }
+
+
+
+                    return $recur_interval;
+
+                })
+
+                ->editColumn('recur_repetitions', function ($row) {
+
+                    return !empty($row->recur_repetitions) ? $row->recur_repetitions : '-';
+
+                })
+
+                ->addColumn('subscription_invoices', function ($row) {
+
+                    $invoices = [];
+
+                    if (!empty($row->subscription_invoices)) {
+
+                        $invoices = $row->subscription_invoices->pluck('invoice_no')->toArray();
+
+                    }
+
+Request
+Browser
+Headers
+Body
+App
+Routing
+Context
+Versions
+Request
+https://zimozo.com/pos
+GET
+curl "https://zimozo.com/pos" \
+   -X GET \
+   -H 'cookie: XSRF-TOKEN=eyJpdiI6ImJST1plT0k2RC9iQVQyTy9YTi9tekE9PSIsInZhbHVlIjoidERIcWxSREtIM2NUazJNakptVXl4OW9wWWlUUHlCRHV3SFQwU2FERHRyaG9IUUhqQWl4Q3dzNUc5Z2pZcThpaU5qYXNIQ1JWR1BLV1dPL0JtbnFMTUdZRkdWOHNDUEJ5dHJRYlBpMk15NlVUb2tMdk11ZjhySEs5SUpMMDZMeFAiLCJtYWMiOiI4N2RhZDhhY2Q5NDRlNTMwNjJjZjA0MTMzOTQ3ODNhOWZjN2I1ZTkzYWQ3ODU5ZWM0YmFmYmM3NzJhN2VlMDllIiwidGFnIjoiIn0%3D; zimozo_pos_session=eyJpdiI6InlzMEFGSS9zaEdEZGF3cmVYQ1pNZ3c9PSIsInZhbHVlIjoiUlF4K1A0WWx6aTlvNHZYNVk2NWV3YzAwSXhZWlpjTnpxOTBqOHZRSFZNeSs1emJYaCsrQ0VIaDNHZnNmVVVMOG5wZE9IWWhGVkxhejF1clFtek9lNEt0d20xelNrZmY2OUV0M09Heng3Y0VYUjk4ajhCd3V4ckhkTFNLRG94QXciLCJtYWMiOiJkOWI3MDZjZDc2YWZkNDBkODdiZjkwMjhjMjk3YjZiODg1MjllOTAwNzlkODI3ZTJkZGEyOGE0MjE2ZGQ1MDQ0IiwidGFnIjoiIn0%3D' \
+   -H 'priority: u=0, i' \
+   -H 'accept-language: en-US,en;q=0.9' \
+   -H 'accept-encoding: gzip, deflate, br, zstd' \
+   -H 'referer: https://zimozo.com/pos/create' \
+   -H 'sec-fetch-dest: document' \
+   -H 'sec-fetch-user: ?1' \
+   -H 'sec-fetch-mode: navigate' \
+   -H 'sec-fetch-site: same-origin' \
+   -H 'accept: text/html,application/xhtml+xml,application/xml;q=0.9,image/avif,image/webp,image/apng,*/*;q=0.8,application/signed-exchange;v=b3;q=0.7' \
+   -H 'user-agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/141.0.0.0 Safari/537.36' \
+   -H 'upgrade-insecure-requests: 1' \
+   -H 'sec-ch-ua-platform: "Windows"' \
+   -H 'sec-ch-ua-mobile: ?0' \
+   -H 'sec-ch-ua: "Google Chrome";v="141", "Not?A_Brand";v="8", "Chromium";v="141"' \
+   -H 'cache-control: max-age=0' \
+   -H 'connection: close' \
+   -H 'x-accel-internal: /internal-nginx-static-location' \
+   -H 'x-real-ip: 112.134.210.149' \
+   -H 'host: zimozo.com';
+
+
+Browser
+Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/141.0.0.0 Safari/537.36
+
+Headers
+cookie
+XSRF-TOKEN=eyJpdiI6ImJST1plT0k2RC9iQVQyTy9YTi9tekE9PSIsInZhbHVlIjoidERIcWxSREtIM2NUazJNakptVXl4OW9wWWlUUHlCRHV3SFQwU2FERHRyaG9IUUhqQWl4Q3dzNUc5Z2pZcThpaU5qYXNIQ1JWR1BLV1dPL0JtbnFMTUdZRkdWOHNDUEJ5dHJRYlBpMk15NlVUb2tMdk11ZjhySEs5SUpMMDZMeFAiLCJtYWMiOiI4N2RhZDhhY2Q5NDRlNTMwNjJjZjA0MTMzOTQ3ODNhOWZjN2I1ZTkzYWQ3ODU5ZWM0YmFmYmM3NzJhN2VlMDllIiwidGFnIjoiIn0%3D; zimozo_pos_session=eyJpdiI6InlzMEFGSS9zaEdEZGF3cmVYQ1pNZ3c9PSIsInZhbHVlIjoiUlF4K1A0WWx6aTlvNHZYNVk2NWV3YzAwSXhZWlpjTnpxOTBqOHZRSFZNeSs1emJYaCsrQ0VIaDNHZnNmVVVMOG5wZE9IWWhGVkxhejF1clFtek9lNEt0d20xelNrZmY2OUV0M09Heng3Y0VYUjk4ajhCd3V4ckhkTFNLRG94QXciLCJtYWMiOiJkOWI3MDZjZDc2YWZkNDBkODdiZjkwMjhjMjk3YjZiODg1MjllOTAwNzlkODI3ZTJkZGEyOGE0MjE2ZGQ1MDQ0IiwidGFnIjoiIn0%3D
+
+priority
+u=0, i
+
+accept-language
+en-US,en;q=0.9
+
+accept-encoding
+gzip, deflate, br, zstd
+
+referer
+https://zimozo.com/pos/create
+
+sec-fetch-dest
+document
+
+sec-fetch-user
+?1
+
+sec-fetch-mode
+navigate
+
+sec-fetch-site
+same-origin
+
+accept
+text/html,application/xhtml+xml,application/xml;q=0.9,image/avif,image/webp,image/apng,*/*;q=0.8,application/signed-exchange;v=b3;q=0.7
+
+user-agent
+Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/141.0.0.0 Safari/537.36
+
+upgrade-insecure-requests
+1
+
+sec-ch-ua-platform
+"Windows"
+
+sec-ch-ua-mobile
+?0
+
+sec-ch-ua
+"Google Chrome";v="141", "Not?A_Brand";v="8", "Chromium";v="141"
+
+cache-control
+max-age=0
+
+connection
+close
+
+x-accel-internal
+/internal-nginx-static-location
+
+x-real-ip
+112.134.210.149
+
+host
+zimozo.com
+
+Body
+[]
+
+App
+Routing
+Controller
+App\Http\Controllers\SellPosController@index
+
+Route name
+pos.index
+
+Middleware
+Context
+Versions
+Php Version
+8.4.13
+
+Laravel Version
+9.52.16
+
+Laravel Locale
+en
+
+Laravel Config Cached
+false
+App Debug
+true
+App Env
+live
+
+
+5
+Queries
+
+28
+Logs
+2:01:33 PM
+1.94ms
+mysql
+select * from `system` where `key` = crm_version limit 1
+
+
+1 query parameter
+2:01:33 PM
+0.55ms
+mysql
+select * from `system` where `key` = woocommerce_version limit 1
+
+
+1 query parameter
+2:01:33 PM
+0.5ms
+mysql
+select * from `business` where `woocommerce_api_settings` is not null
+
+
+2:01:33 PM
+0.31ms
+mysql
+select * from `system` where `key` = woocommerce_version limit 1
+
+
+1 query parameter
+2:01:33 PM
+0.51ms
+mysql
+select * from `business` where `woocommerce_api_settings` is not null
+
+
+·
+Source
+·
+Docs
+·
+Laravel
+Ignition is built byFlare, the Laravel error reporting service.
