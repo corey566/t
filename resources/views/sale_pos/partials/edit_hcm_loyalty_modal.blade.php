@@ -32,3 +32,31 @@
         </div>
     </div>
 </div>
+<div class="modal-dialog" role="document">
+    <div class="modal-content">
+        <div class="modal-header">
+            <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+            <h4 class="modal-title">@lang('HCM Loyalty Discount')</h4>
+        </div>
+        <div class="modal-body">
+            <div class="row">
+                <div class="col-sm-6">
+                    <div class="form-group">
+                        {!! Form::label('hcm_loyalty_modal_type', __('sale.discount_type') . ':*') !!}
+                        {!! Form::select('hcm_loyalty_modal_type', ['fixed' => __('lang_v1.fixed'), 'percentage' => __('lang_v1.percentage')], 'fixed', ['class' => 'form-control', 'required', 'id' => 'hcm_loyalty_modal_type']); !!}
+                    </div>
+                </div>
+                <div class="col-sm-6">
+                    <div class="form-group">
+                        {!! Form::label('hcm_loyalty_modal_amount', __('sale.discount_amount') . ':*') !!}
+                        {!! Form::text('hcm_loyalty_modal_amount', 0, ['class' => 'form-control input_number', 'required', 'id' => 'hcm_loyalty_modal_amount']); !!}
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="modal-footer">
+            <button type="button" class="btn btn-primary" id="hcm_loyalty_modal_update">@lang('messages.update')</button>
+            <button type="button" class="btn btn-default" data-dismiss="modal">@lang('messages.close')</button>
+        </div>
+    </div>
+</div>

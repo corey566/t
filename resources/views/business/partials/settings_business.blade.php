@@ -14,7 +14,7 @@
                     <span class="input-group-addon">
                         <i class="fa fa-calendar"></i>
                     </span>
-                    
+
                     {!! Form::text('start_date', @format_date($business->start_date), ['class' => 'form-control start-date-picker','placeholder' => __('business.start_date'), 'readonly']); !!}
                 </div>
             </div>
@@ -138,6 +138,27 @@
                 {!! Form::select('quantity_precision', [0 =>0, 1=>1, 2=>2, 3=>3,4=>4], $business->quantity_precision, ['class' => 'form-control select2', 'required']); !!}
             </div>
         </div>
+        <div class="col-sm-4">
+                        <div class="form-group">
+                            <div class="checkbox">
+                                <label>
+                                    {!! Form::checkbox('enable_tooltip', 1, !empty($business->enable_tooltip), ['class' => 'input-icheck']); !!}
+                                    @lang('lang_v1.enable_tooltip')
+                                </label>
+                                @show_tooltip(__('lang_v1.tooltip_help'))
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-sm-4">
+                        <div class="form-group">
+                            <div class="checkbox">
+                                <label>
+                                    {!! Form::checkbox('enable_hcm_loyalty', 1, !empty($business->enable_hcm_loyalty), ['class' => 'input-icheck']); !!}
+                                    Enable HCM Loyalty Discount
+                                </label>
+                            </div>
+                        </div>
+                    </div>
     </div>
      {{-- code --}}
     <div class="row hide">

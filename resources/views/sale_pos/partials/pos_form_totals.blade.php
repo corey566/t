@@ -10,7 +10,7 @@
 				</td>
 			</tr>
 			<tr>
-				
+
 					<td @if(!Gate::check('disable_discount') || auth()->user()->can('superadmin') || auth()->user()->can('admin')) class="" @else class="hide" @endif>
 						<b class="tw-text-base md:tw-text-lg tw-font-bold">
 							@if($is_discount_enabled)
@@ -25,7 +25,7 @@
 								@if($edit_discount)
 								<i class="fas fa-edit cursor-pointer" id="pos-edit-discount" title="@lang('sale.edit_discount')" aria-hidden="true" data-toggle="modal" data-target="#posEditDiscountModal"></i>
 								@endif
-							
+
 								<span class="tw-text-base md:tw-text-lg tw-font-semibold" id="total_discount">0</span>
 							@endif
 								<input type="hidden" name="discount_type" id="discount_type" value="@if(empty($edit)){{'percentage'}}@else{{$transaction->discount_type}}@endif" data-default="percentage">
@@ -39,7 +39,7 @@
 								</span>
 						</b> 
 					</td>
-				
+
 				<td class="@if($pos_settings['disable_order_tax'] != 0) hide @endif">
 					<span class="tw-text-base md:tw-text-lg tw-font-semibold">
 						<b class="tw-text-base md:tw-text-lg tw-font-bold">@lang('sale.order_tax')(+): @show_tooltip(__('tooltip.sale_tax'))</b>

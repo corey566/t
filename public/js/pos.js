@@ -870,28 +870,34 @@ $(document).ready(function() {
 
     //Update discount
     $('button#posEditDiscountModalUpdate').click(function() {
-
-        //if discount amount is not valid return false
-        if (!$("#discount_amount_modal").valid()) {
-            return false;
-        }
         //Close modal
         $('div#posEditDiscountModal').modal('hide');
 
         //Update values
         $('input#discount_type').val($('select#discount_type_modal').val());
-        __write_number($('input#discount_amount'), __read_number($('input#discount_amount_modal')));
+        $('input#discount_amount').val(__read_number($('input#discount_amount_modal')));
+        pos_total_row();
+    });
 
-        if ($('#reward_point_enabled').length) {
-            var reward_validation = isValidatRewardPoint();
-            if (!reward_validation['is_valid']) {
-                toastr.error(reward_validation['msg']);
-                $('#rp_redeemed_modal').val(0);
-                $('#rp_redeemed_modal').change();
-            }
-            updateRedeemedAmount();
-        }
+    //Edit HCM Loyalty
+    $(document).on('click', 'button#pos-edit-hcm-loyalty', function() {
+        var hcm_loyalty_amount = __read_number($('input#hcm_loyalty_amount'));
+        var hcm_loyalty_type = $('input#hcm_loyalty_type').val();
 
+        $('input#hcm_loyalty_modal_amount').val(hcm_loyalty_amount);
+        $('select#hcm_loyalty_modal_type').val(hcm_loyalty_type).change();
+
+        $('div#posEditHcmLoyaltyModal').modal('show');
+    });
+
+    //Update HCM Loyalty
+    $(document).on('click', 'button#hcm_loyalty_modal_update', function() {
+        //Close modal
+        $('div#posEditHcmLoyaltyModal').modal('hide');
+
+        //Update values
+        $('input#hcm_loyalty_type').val($('select#hcm_loyalty_modal_type').val());
+        $('input#hcm_loyalty_amount').val(__read_number($('input#hcm_loyalty_modal_amount')));
         pos_total_row();
     });
 
@@ -1194,7 +1200,7 @@ $(document).ready(function() {
         get_featured_products();
     });
 
-// on click sub category in category drawer
+// on click sub category in category drawer 
     $('.product_category').on('click', function(e) {
         global_p_category_id = $(this).data('value');
         $('input#suggestion_page').val(1);
@@ -1822,7 +1828,7 @@ function pos_each_row(row_obj) {
         __write_number(row_obj.find('input.pos_line_total'), line_total);
     }
 
-    //var unit_price_inc_tax = __read_number(row_obj.find('input.pos_unit_price_inc_tax'));
+    //var unit_price_inc_ tax = __read_number(row_obj.find('input.pos_unit_price_inc_tax'));
 
     __write_number(row_obj.find('input.item_tax'), unit_price_inc_tax - discounted_unit_price);
 }
@@ -1844,25 +1850,28 @@ function pos_total_row(){
     var discount_type = $('select#discount_type').val();
     var discount_amount = __read_number($('input#discount_amount'));
     var total_discount = 0;
-    if (discount_type == 'fixed') {
-        total_discount = discount_amount;
-    } else if (discount_type == 'percentage') {
-        total_discount = __calculate_amount('percentage', discount_amount, price_total);
+    if (discount_amount) {
+        if (discount_type == 'fixed') {
+            total_discount = discount_amount;
+        } else if (discount_type == 'percentage') {
+            total_discount = __calculate_amount('percentage', discount_amount, price_total);
+        }
     }
 
-    // Calculate HCM Loyalty Discount
-    var hcm_loyalty_discount = 0;
-    if ($('#hcm_loyalty_amount').length > 0) {
-        var hcm_loyalty_type = $('#hcm_loyalty_type').val();
-        var hcm_loyalty_amount = __read_number($('#hcm_loyalty_amount'));
-
+    // HCM Loyalty calculation
+    var hcm_loyalty_type = $('input#hcm_loyalty_type').val();
+    var hcm_loyalty_amount = __read_number($('input#hcm_loyalty_amount'));
+    var total_hcm_loyalty = 0;
+    if (hcm_loyalty_amount) {
         if (hcm_loyalty_type == 'fixed') {
-            hcm_loyalty_discount = hcm_loyalty_amount;
+            total_hcm_loyalty = hcm_loyalty_amount;
         } else if (hcm_loyalty_type == 'percentage') {
-            hcm_loyalty_discount = __calculate_amount('percentage', hcm_loyalty_amount, price_total);
+            total_hcm_loyalty = __calculate_amount('percentage', hcm_loyalty_amount, price_total);
         }
-
-        $('span#hcm_loyalty_display').text(__currency_trans_from_en(hcm_loyalty_discount, true));
+        $('#hcm_loyalty_row').removeClass('hide');
+        $('#hcm_loyalty_amount_text').text(__currency_trans_from_en(total_hcm_loyalty, true));
+    } else {
+        $('#hcm_loyalty_row').addClass('hide');
     }
 
     //updating shipping charges
@@ -1876,7 +1885,7 @@ function pos_total_row(){
 
     //$('span.unit_price_total').html(unit_price_total);
     $('span.price_total').html(__currency_trans_from_en(price_total, false));
-    calculate_billing_details(price_total, total_discount, hcm_loyalty_discount);
+    calculate_billing_details(price_total, total_discount, total_hcm_loyalty);
 
     if (
         $('input[name="is_serial_no"]').length > 0 &&
@@ -1948,21 +1957,22 @@ function calculate_billing_details(price_total, total_discount = 0, hcm_loyalty_
         $('#packing_charge_text').text(__currency_trans_from_en(packing_charge, false));
     }
 
-    var total_payable = price_total + order_tax - total_discount + shipping_charges + packing_charge + additional_expense;
+    //calculate net total
+    var net_total = price_total - total_discount - hcm_loyalty_discount + order_tax + packing_charge + shipping_charges + additional_expense;
 
     var rp_redeemed_amount = 0;
     if ($('input#rp_redeemed_amount').length > 0) {
         rp_redeemed_amount = __read_number($('input#rp_redeemed_amount'));
     }
-    total_payable = total_payable - rp_redeemed_amount;
+    net_total = net_total - rp_redeemed_amount;
 
     // Subtract HCM loyalty discount
-    if ($('#hcm_loyalty_amount').length > 0) {
-        total_payable = total_payable - hcm_loyalty_discount;
-    }
+    // if ($('#hcm_loyalty_amount').length > 0) {
+    //     net_total = net_total - hcm_loyalty_discount;
+    // }
 
     var rounding_multiple = $('#amount_rounding_method').val() ? parseFloat($('#amount_rounding_method').val()) : 0;
-    var round_off_data = __round(total_payable, rounding_multiple);
+    var round_off_data = __round(net_total, rounding_multiple);
     var total_payable_rounded = round_off_data.number;
 
     var round_off_amount = round_off_data.diff;
