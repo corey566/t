@@ -26,7 +26,6 @@ use App\Warranty;
 use DB;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Artisan;
-use Illuminate\Support\Facades\Schema;
 use Spatie\Activitylog\Models\Activity;
 use Yajra\DataTables\Facades\DataTables;
 
@@ -98,10 +97,8 @@ class SellController extends Controller
 
             $sells = $this->transactionUtil->getListSells($business_id, $sale_type);
             
-            // Add loyalty amount to select if column exists
-            if (Schema::hasColumn('transactions', 'hcm_loyalty_amount')) {
-                $sells->addSelect('transactions.hcm_loyalty_amount');
-            }
+            // Add loyalty amount to select
+            $sells->addSelect('transactions.hcm_loyalty_amount');
 
             // only display sell invoice we add it because project invoive show in sell list
             if($sale_type == 'sell'){

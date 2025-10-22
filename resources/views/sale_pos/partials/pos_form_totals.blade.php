@@ -25,8 +25,6 @@
 						<input type="hidden" name="discount_amount" id="discount_amount" value="@if(!empty($edit) && isset($transaction)){{@num_format($transaction->discount_amount ?? 0)}}@else{{@num_format($business_details->default_sales_discount)}}@endif" data-default="{{$business_details->default_sales_discount}}">
 						<input type="hidden" name="rp_redeemed" id="rp_redeemed" value="@if(!empty($edit) && isset($transaction)){{$transaction->rp_redeemed ?? 0}}@else 0 @endif">
 						<input type="hidden" name="rp_redeemed_amount" id="rp_redeemed_amount" value="@if(!empty($edit) && isset($transaction)){{$transaction->rp_redeemed_amount ?? 0}}@else 0 @endif">
-						<input type="hidden" name="hcm_loyalty_amount" id="hcm_loyalty_amount" value="@if(!empty($edit) && isset($transaction)){{@num_format($transaction->hcm_loyalty_amount ?? 0)}}@else 0 @endif" data-default="0">
-						<input type="hidden" name="hcm_loyalty_type" id="hcm_loyalty_type" value="fixed">
 					</td>
 
 				@if($is_rp_enabled)
