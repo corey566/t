@@ -209,7 +209,7 @@ $(document).ready(function() {
                                 (ui.item.enable_stock == 0) || is_overselling_allowed || for_so) {
                             $(this)
                                 .data('ui-autocomplete')
-                                ._trigger('select', 'autocompleteselect', ui);
+                               ._trigger('select', 'autocompleteselect', ui);
                             $(this).autocomplete('close');
                         }
                     } else if (ui.content.length == 0) {
@@ -1847,31 +1847,36 @@ function pos_total_row(){
 
     __write_number($('input#total_quantity_input'), total_quantity);
 
+    //Discount
     var discount_type = $('select#discount_type').val();
     var discount_amount = __read_number($('input#discount_amount'));
     var total_discount = 0;
     if (discount_amount) {
         if (discount_type == 'fixed') {
             total_discount = discount_amount;
-        } else if (discount_type == 'percentage') {
+        } else {
             total_discount = __calculate_amount('percentage', discount_amount, price_total);
         }
     }
 
-    // HCM Loyalty calculation
-    var hcm_loyalty_type = $('input#hcm_loyalty_type').val();
-    var hcm_loyalty_amount = __read_number($('input#hcm_loyalty_amount'));
+    $('span#discount_type_text').text(discount_type);
+    $('span#discount_amount_text').text(__currency_trans_from_en(discount_amount, true));
+
+    // HCM Loyalty Discount
+    var hcm_loyalty_amount = __read_number($('#hcm_loyalty_amount'));
+    var hcm_loyalty_type = $('#hcm_loyalty_type').val();
     var total_hcm_loyalty = 0;
-    if (hcm_loyalty_amount) {
+    if (hcm_loyalty_amount && $('#hcm_loyalty_amount').length) {
         if (hcm_loyalty_type == 'fixed') {
             total_hcm_loyalty = hcm_loyalty_amount;
-        } else if (hcm_loyalty_type == 'percentage') {
+        } else {
             total_hcm_loyalty = __calculate_amount('percentage', hcm_loyalty_amount, price_total);
         }
-        $('#hcm_loyalty_row').removeClass('hide');
-        $('#hcm_loyalty_amount_text').text(__currency_trans_from_en(total_hcm_loyalty, true));
-    } else {
-        $('#hcm_loyalty_row').addClass('hide');
+        total_discount += total_hcm_loyalty;
+    }
+
+    if ($('#hcm_loyalty_display').length) {
+        $('#hcm_loyalty_display').text(__currency_trans_from_en(hcm_loyalty_amount, true));
     }
 
     //updating shipping charges
@@ -1885,7 +1890,7 @@ function pos_total_row(){
 
     //$('span.unit_price_total').html(unit_price_total);
     $('span.price_total').html(__currency_trans_from_en(price_total, false));
-    calculate_billing_details(price_total, total_discount, total_hcm_loyalty);
+    calculate_billing_details(price_total, total_discount);
 
     if (
         $('input[name="is_serial_no"]').length > 0 &&
@@ -1916,7 +1921,7 @@ function get_subtotal() {
     return price_total;
 }
 
-function calculate_billing_details(price_total, total_discount = 0, hcm_loyalty_discount = 0) {
+function calculate_billing_details(price_total, total_discount = 0) {
     //var discount = pos_discount(price_total);
     if ($('#reward_point_enabled').length) {
         total_customer_reward = $('#rp_redeemed_amount').val();
@@ -1958,7 +1963,7 @@ function calculate_billing_details(price_total, total_discount = 0, hcm_loyalty_
     }
 
     //calculate net total
-    var net_total = price_total - total_discount - hcm_loyalty_discount + order_tax + packing_charge + shipping_charges + additional_expense;
+    var net_total = price_total - total_discount + order_tax + packing_charge + shipping_charges + additional_expense;
 
     var rp_redeemed_amount = 0;
     if ($('input#rp_redeemed_amount').length > 0) {
@@ -3001,10 +3006,6 @@ $(document).on('click', '#add_expense', function(){
 });
 
 $(document).on('shown.bs.modal', '#expense_modal', function(){
-    $('#expense_transaction_date').datetimepicker({
-        format: moment_date_format + ' ' + moment_time_format,
-        ignoreReadonly: true,
-    });
     $('#expense_modal .paid_on').datetimepicker({
         format: moment_date_format + ' ' + moment_time_format,
         ignoreReadonly: true,
