@@ -883,23 +883,20 @@ $(document).ready(function() {
     //Update discount
     $('button#posEditDiscountModalUpdate').click(function() {
         //Close modal
-        $('#posEditDiscountModal').modal('hide');
+        $('div#posEditDiscountModal').modal('hide');
 
         //Update values
         $('input#discount_type').val($('select#discount_type_modal').val());
         __write_number($('input#discount_amount'), __read_number($('input#discount_amount_modal')));
 
-        // Update reward points if enabled
-        if ($('#rp_redeemed_modal').length) {
-            var rp_points = __read_number($('#rp_redeemed_modal'));
-            var rp_amount = __read_number($('#rp_redeemed_amount_modal'));
-            $('#rp_redeemed').val(rp_points);
-            $('#rp_redeemed_amount').val(rp_amount);
-            $('#rp_redeemed_amount_text').text(__currency_trans_from_en(rp_amount, true));
+        // Update HCM Loyalty if enabled
+        if ($('#hcm_loyalty_type_modal').length) {
+            $('input#hcm_loyalty_type').val($('select#hcm_loyalty_type_modal').val());
+            __write_number($('input#hcm_loyalty_amount'), __read_number($('input#hcm_loyalty_amount_modal')));
         }
 
         pos_total_row();
-    });
+});
 
     //Edit HCM Loyalty
     $(document).on('click', 'button#pos-edit-hcm-loyalty', function() {
@@ -1840,7 +1837,7 @@ function pos_each_row(row_obj) {
 
     var unit_price_inc_ tax =
         discounted_unit_price + __calculate_amount('percentage', tax_rate, discounted_unit_price);
-    __write_number(row_obj.find('input.pos_unit_price_inc_tax'), unit_price_inc_tax);
+    __write_number(row_obj.find('input.pos_unit_price_inc_tax'), unit_price_inc_ tax);
 
     var discount = __read_number(row_obj.find('input.row_discount_amount'));
 
@@ -1852,7 +1849,7 @@ function pos_each_row(row_obj) {
 
     //var unit_price_inc_ tax = __read_number(row_obj.find('input.pos_unit_price_inc_tax'));
 
-    __write_number(row_obj.find('input.item_tax'), unit_price_inc_tax - discounted_unit_price);
+    __write_number(row_obj.find('input.item_tax'), unit_price_inc_ tax - discounted_unit_price);
 }
 
 function pos_total_row(){
@@ -2279,7 +2276,7 @@ function set_location() {
         );
 
         $('input#location_id').attr(
-            'data-default_price_group',
+            'data-default-price-group',
             $('select#select_location_id')
                 .find(':selected')
                 .data('default_price_group')

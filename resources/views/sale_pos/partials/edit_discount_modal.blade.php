@@ -14,6 +14,7 @@
 				</h4>
 			</div>
 			<div class="modal-body">
+				{{-- Regular Discount Section --}}
 				<div class="row @if(!$is_discount_enabled) hide @endif">
 					<div class="col-md-12">
 						<h4 class="modal-title">@lang('sale.edit_discount'):</h4>
@@ -54,6 +55,42 @@
 				        </div>
 				    </div>
 				</div>
+				
+				{{-- HCM Loyalty Discount Section --}}
+				@if(session('business.enable_hcm_loyalty'))
+				<br>
+				<div class="row">
+					<div class="well well-sm bg-light-blue col-md-12">
+						<div class="col-md-12">
+							<h4 class="modal-title">@lang('lang_v1.hcm_loyalty_discount'):</h4>
+						</div>
+						<div class="col-md-6">
+							<div class="form-group">
+								{!! Form::label('hcm_loyalty_type_modal', __('lang_v1.hcm_loyalty_type') . ':*' ) !!}
+								<div class="input-group">
+									<span class="input-group-addon">
+										<i class="fa fa-info"></i>
+									</span>
+									{!! Form::select('hcm_loyalty_type_modal', ['fixed' => __('lang_v1.fixed'), 'percentage' => __('lang_v1.percentage')], 'fixed', ['class' => 'form-control']); !!}
+								</div>
+							</div>
+						</div>
+						<div class="col-md-6">
+							<div class="form-group">
+								{!! Form::label('hcm_loyalty_amount_modal', __('lang_v1.hcm_loyalty_amount') . ':*' ) !!}
+								<div class="input-group">
+									<span class="input-group-addon">
+										<i class="fa fa-money"></i>
+									</span>
+									{!! Form::text('hcm_loyalty_amount_modal', 0, ['class' => 'form-control input_number']); !!}
+								</div>
+							</div>
+						</div>
+					</div>
+				</div>
+				@endif
+				
+				{{-- Reward Points Section --}}
 				<br>
 				<div class="row @if(!$is_rp_enabled) hide @endif">
 					<div class="well well-sm bg-light-gray col-md-12">
