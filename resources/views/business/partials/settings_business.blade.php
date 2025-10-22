@@ -159,6 +159,17 @@
                             </div>
                         </div>
                     </div>
+                    <div class="col-sm-4">
+                        <div class="form-group">
+                            <div class="checkbox">
+                                <label>
+                                    {!! Form::checkbox('enable_rp', 1, !empty($business->enable_rp), ['class' => 'input-icheck']); !!}
+                                    @lang('lang_v1.enable_reward_points')
+                                </label>
+                                @show_tooltip(__('lang_v1.enable_reward_points_help'))
+                            </div>
+                        </div>
+                    </div>
     </div>
      {{-- code --}}
     <div class="row hide">

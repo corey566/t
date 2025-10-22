@@ -221,7 +221,7 @@ $(document).ready(function() {
                                 (ui.item.enable_stock == 0) || is_overselling_allowed || for_so) {
                             $(this)
                                 .data('ui-autocomplete')
-                               ._trigger('select', 'autocompleteselect', ui);
+                                . _trigger('select', 'autocompleteselect', ui);
                             $(this).autocomplete('close');
                         }
                     } else if (ui.content.length == 0) {
@@ -883,11 +883,21 @@ $(document).ready(function() {
     //Update discount
     $('button#posEditDiscountModalUpdate').click(function() {
         //Close modal
-        $('div#posEditDiscountModal').modal('hide');
+        $('#posEditDiscountModal').modal('hide');
 
         //Update values
         $('input#discount_type').val($('select#discount_type_modal').val());
-        $('input#discount_amount').val(__read_number($('input#discount_amount_modal')));
+        __write_number($('input#discount_amount'), __read_number($('input#discount_amount_modal')));
+
+        // Update reward points if enabled
+        if ($('#rp_redeemed_modal').length) {
+            var rp_points = __read_number($('#rp_redeemed_modal'));
+            var rp_amount = __read_number($('#rp_redeemed_amount_modal'));
+            $('#rp_redeemed').val(rp_points);
+            $('#rp_redeemed_amount').val(rp_amount);
+            $('#rp_redeemed_amount_text').text(__currency_trans_from_en(rp_amount, true));
+        }
+
         pos_total_row();
     });
 
@@ -1828,7 +1838,7 @@ function pos_each_row(row_obj) {
         .find(':selected')
         .data('rate');
 
-    var unit_price_inc_tax =
+    var unit_price_inc_ tax =
         discounted_unit_price + __calculate_amount('percentage', tax_rate, discounted_unit_price);
     __write_number(row_obj.find('input.pos_unit_price_inc_tax'), unit_price_inc_tax);
 
