@@ -1118,7 +1118,7 @@ class SellPosController extends Controller
         $waiters = [];
         if ($this->productUtil->isModuleEnabled('service_staff') && !empty($pos_settings['inline_service_staff'])) {
             $waiters_enabled = true;
-            $waiters = $this->productUtil->serviceStaffDropdown($business_id);
+            $waiters = $this->productUtil->serviceStaffDropdown($business_id, $location_id);
         }
         $redeem_details = [];
         if (request()->session()->get('business.enable_rp') == 1) {
