@@ -887,16 +887,21 @@ $(document).ready(function() {
 
         //Update values
         $('input#discount_type').val($('select#discount_type_modal').val());
-        __write_number($('input#discount_amount'), __read_number($('input#discount_amount_modal')));
 
-        // Update HCM Loyalty if enabled
-        if ($('#hcm_loyalty_type_modal').length) {
+        $('input#discount_amount').val(
+            __read_number($('input#discount_amount_modal'))
+        );
+
+        // Update HCM loyalty discount if enabled
+        if ($('select#hcm_loyalty_type_modal').length) {
             $('input#hcm_loyalty_type').val($('select#hcm_loyalty_type_modal').val());
-            __write_number($('input#hcm_loyalty_amount'), __read_number($('input#hcm_loyalty_amount_modal')));
+            $('input#hcm_loyalty_amount').val(
+                __read_number($('input#hcm_loyalty_amount_modal'))
+            );
         }
 
         pos_total_row();
-});
+    });
 
     //Edit HCM Loyalty
     $(document).on('click', 'button#pos-edit-hcm-loyalty', function() {

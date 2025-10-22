@@ -25,6 +25,8 @@
 						$rp_redeemed = $rp_redeemed ?? 0;
 						$rp_redeemed_amount = $rp_redeemed_amount ?? 0;
 						$max_available = $max_available ?? 0;
+						$hcm_loyalty_type = $hcm_loyalty_type ?? 'fixed';
+						$hcm_loyalty_amount = $hcm_loyalty_amount ?? 0;
 					@endphp
 					<div class="col-md-6">
 				        <div class="form-group">
@@ -66,23 +68,23 @@
 						</div>
 						<div class="col-md-6">
 							<div class="form-group">
-								{!! Form::label('hcm_loyalty_type_modal', __('lang_v1.hcm_loyalty_type') . ':*' ) !!}
+								{!! Form::label('hcm_loyalty_type_modal', __('lang_v1.hcm_loyalty_type') . ':' ) !!}
 								<div class="input-group">
 									<span class="input-group-addon">
 										<i class="fa fa-info"></i>
 									</span>
-									{!! Form::select('hcm_loyalty_type_modal', ['fixed' => __('lang_v1.fixed'), 'percentage' => __('lang_v1.percentage')], 'fixed', ['class' => 'form-control']); !!}
+									{!! Form::select('hcm_loyalty_type_modal', ['fixed' => __('lang_v1.fixed'), 'percentage' => __('lang_v1.percentage')], $hcm_loyalty_type, ['class' => 'form-control']); !!}
 								</div>
 							</div>
 						</div>
 						<div class="col-md-6">
 							<div class="form-group">
-								{!! Form::label('hcm_loyalty_amount_modal', __('lang_v1.hcm_loyalty_amount') . ':*' ) !!}
+								{!! Form::label('hcm_loyalty_amount_modal', __('lang_v1.hcm_loyalty_amount') . ':' ) !!}
 								<div class="input-group">
 									<span class="input-group-addon">
 										<i class="fa fa-money"></i>
 									</span>
-									{!! Form::text('hcm_loyalty_amount_modal', 0, ['class' => 'form-control input_number']); !!}
+									{!! Form::text('hcm_loyalty_amount_modal', @num_format($hcm_loyalty_amount), ['class' => 'form-control input_number']); !!}
 								</div>
 							</div>
 						</div>

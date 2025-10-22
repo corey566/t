@@ -149,34 +149,47 @@
                             </div>
                         </div>
                     </div>
-                    <div class="col-sm-4">
-                        <div class="form-group">
-                            <div class="checkbox">
-                                <label>
-                                    {!! Form::checkbox('enable_hcm_loyalty', 1, !empty($business->enable_hcm_loyalty), ['class' => 'input-icheck']); !!}
-                                    @lang('lang_v1.enable_hcm_loyalty_discount')
-                                </label>
-                                @show_tooltip(__('lang_v1.enable_hcm_loyalty_discount_help'))
-                            </div>
-                        </div>
-                    </div>
-                    <div class="col-sm-4">
-                        <div class="form-group">
-                            <div class="checkbox">
-                                <label>
-                                    {!! Form::checkbox('enable_rp', 1, !empty($business->enable_rp), ['class' => 'input-icheck']); !!}
-                                    @lang('lang_v1.enable_reward_points')
-                                </label>
-                                @show_tooltip(__('lang_v1.enable_reward_points_help'))
-                            </div>
-                        </div>
-                    </div>
+    </div>
+
+    {{-- HCM Loyalty Settings Section --}}
+    <div class="row">
+        <div class="col-sm-12">
+            <h4>@lang('lang_v1.hcm_loyalty_discount')</h4>
+            <hr>
+        </div>
+    </div>
+    <div class="row">
+        <div class="col-sm-12">
+            <div class="form-group">
+                <div class="checkbox">
+                    <label>
+                        {!! Form::checkbox('enable_hcm_loyalty', 1, !empty($business->enable_hcm_loyalty), ['class' => 'input-icheck']); !!}
+                        @lang('lang_v1.enable_hcm_loyalty_discount')
+                    </label>
+                    @show_tooltip(__('lang_v1.enable_hcm_loyalty_discount_help'))
+                </div>
+            </div>
+        </div>
     </div>
     
     {{-- Reward Points Settings Section --}}
     <div class="row">
         <div class="col-sm-12">
             <h4>@lang('lang_v1.reward_point_settings')</h4>
+            <hr>
+        </div>
+    </div>
+    <div class="row">
+        <div class="col-sm-12">
+            <div class="form-group">
+                <div class="checkbox">
+                    <label>
+                        {!! Form::checkbox('enable_rp', 1, !empty($business->enable_rp), ['class' => 'input-icheck']); !!}
+                        @lang('lang_v1.enable_reward_points')
+                    </label>
+                    @show_tooltip(__('lang_v1.enable_reward_points_help'))
+                </div>
+            </div>
         </div>
     </div>
     <div class="row">
