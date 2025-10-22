@@ -1,3 +1,4 @@
+
 <!-- Edit discount Modal -->
 <div class="modal fade" tabindex="-1" role="dialog" id="posEditDiscountModal">
 	<div class="modal-dialog" role="document">
@@ -53,11 +54,13 @@
 				</div>
 
 				<!-- HCM Loyalty Discount Section -->
-				@if($is_hcm_enabled)
+				@if($is_hcm_enabled && $is_hcm_location)
 				<div class="row" style="margin-top: 15px;">
 					<div class="col-md-12">
 						<div class="well well-sm" style="background-color: #f5f5f5; padding: 15px;">
-							<h4 style="margin-top: 0; margin-bottom: 15px; color: #333;">@lang('lang_v1.hcm_loyalty_discount'):</h4>
+							<h4 style="margin-top: 0; margin-bottom: 15px; color: #333;">
+								<i class="fa fa-gift"></i> @lang('lang_v1.hcm_loyalty_discount'):
+							</h4>
 							<div class="row">
 								<div class="col-md-6">
 									<div class="form-group">
@@ -83,10 +86,15 @@
 								</div>
 							</div>
 							<p class="help-block" style="margin-bottom: 0;"><i class="fa fa-info-circle"></i> @lang('lang_v1.hcm_loyalty_discount_help')</p>
+							<!-- Hidden fields to store HCM loyalty data -->
+							<input type="hidden" name="hcm_loyalty_amount" id="hcm_loyalty_amount" value="{{@num_format($hcm_loyalty_amount)}}" data-default="0">
+							<input type="hidden" name="hcm_loyalty_type" id="hcm_loyalty_type" value="fixed">
 						</div>
 					</div>
 				</div>
 				@endif
+
+				<!-- Reward Points Section -->
 				<div class="row @if(!$is_rp_enabled) hide @endif" style="margin-top: 15px;">
 					<div class="col-md-12">
 						<div class="well well-sm" style="background-color: #f0f8ff; padding: 15px;">
@@ -132,3 +140,20 @@
 		</div><!-- /.modal-content -->
 	</div><!-- /.modal-dialog -->
 </div><!-- /.modal -->
+
+<script type="text/javascript">
+$(document).ready(function() {
+	// Update HCM loyalty when modal updates
+	$('#posEditDiscountModalUpdate').on('click', function() {
+		@if($is_hcm_enabled && $is_hcm_location)
+		var hcm_loyalty_amount = __read_number($('#hcm_loyalty_amount_modal'));
+		$('#hcm_loyalty_amount').val(hcm_loyalty_amount).trigger('change');
+		@endif
+	});
+	
+	// Calculate HCM loyalty on amount change
+	$('#hcm_loyalty_amount_modal').on('change', function() {
+		pos_total_row();
+	});
+});
+</script>

@@ -35,7 +35,12 @@
                     <a href="#" class="list-group-item text-center tw-font-bold tw-text-sm md:tw-text-base">@lang('lang_v1.prefixes')</a>
                     <a href="#" class="list-group-item text-center tw-font-bold tw-text-sm md:tw-text-base">@lang('lang_v1.email_settings')</a>
                     <a href="#" class="list-group-item text-center tw-font-bold tw-text-sm md:tw-text-base">@lang('lang_v1.sms_settings')</a>
-                    <a href="#" class="list-group-item text-center tw-font-bold tw-text-sm md:tw-text-base">@lang('lang_v1.reward_point_settings')</a>
+                    <li>
+                        <a href="#settings_reward_point" data-toggle="tab" aria-expanded="true"><i class="fa fa-gift"></i> @lang('lang_v1.reward_point_settings')</a>
+                    </li>
+                    <li>
+                        <a href="#settings_hcm_loyalty" data-toggle="tab" aria-expanded="true"><i class="fa fa-building"></i> @lang('lang_v1.hcm_loyalty')</a>
+                    </li>
                     <a href="#" class="list-group-item text-center tw-font-bold tw-text-sm md:tw-text-base">@lang('lang_v1.modules')</a>
                     <a href="#" class="list-group-item text-center tw-font-bold tw-text-sm md:tw-text-base">@lang('lang_v1.custom_labels')</a>
                 </div>
@@ -81,6 +86,10 @@
                 @include('business.partials.settings_reward_point')
                 <!-- tab 11 end -->
                 <!-- tab 12 start -->
+                <div class="tab-pane" id="settings_hcm_loyalty">
+                    @include('business.partials.settings_hcm_loyalty')
+                </div>
+                <!-- tab 12 end -->
                 @include('business.partials.settings_modules')
                 <!-- tab 12 end -->
                 @include('business.partials.settings_custom_labels')
@@ -115,7 +124,7 @@
 
     $(document).ready(function(){
 
-    
+
         $('#test_email_btn').click( function() {
             var data = {
                 mail_driver: $('#mail_driver').val(),

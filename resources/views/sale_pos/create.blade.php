@@ -15,14 +15,11 @@
             $is_discount_enabled = $pos_settings['disable_discount'] != 1 ? true : false;
             $is_rp_enabled = (session('business.enable_rp') == 1 && !empty($default_location->enable_rp)) ? true : false;
 
-            // Check if current location has HCM configured
+            // Check if current location has HCM loyalty enabled
             $is_hcm_location = false;
-            if (!empty($default_location)) {
-                $hcm_credential = \Modules\Gallface\Models\LocationApiCredential::where('business_location_id', $default_location->id)
-                    ->where('mall_code', 'hcm')
-                    ->where('is_active', true)
-                    ->first();
-                $is_hcm_location = !empty($hcm_credential);
+            if (!empty($default_location) && !empty($business_details->enable_hcm_loyalty)) {
+                $hcm_locations = !empty($business_details->hcm_loyalty_locations) ? json_decode($business_details->hcm_loyalty_locations, true) : [];
+                $is_hcm_location = in_array($default_location->id, $hcm_locations);
             }
         @endphp
         {!! Form::open([
