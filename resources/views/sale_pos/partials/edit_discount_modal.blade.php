@@ -4,27 +4,24 @@
 		<div class="modal-content">
 			<div class="modal-header">
 				<button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
-				<h4 class="modal-title">
-					@if($is_discount_enabled)
-						@lang('sale.discount')
-					@endif
-					@if($is_rp_enabled)
-						{{session('business.rp_name')}}
-					@endif
-				</h4>
+				<h4 class="modal-title">@lang('sale.discount')</h4>
 			</div>
 			<div class="modal-body">
+				@php
+					$discount_type = $discount_type ?? 'percentage';
+					$sales_discount = $sales_discount ?? 0;
+					$rp_redeemed = $rp_redeemed ?? 0;
+					$rp_redeemed_amount = $rp_redeemed_amount ?? 0;
+					$max_available = $max_available ?? 0;
+					$hcm_loyalty_amount = $hcm_loyalty_amount ?? 0;
+					$is_hcm_enabled = !empty(session('business.enable_hcm_loyalty'));
+				@endphp
+				
+				<!-- Regular Discount Section -->
 				<div class="row @if(!$is_discount_enabled) hide @endif">
 					<div class="col-md-12">
 						<h4 class="modal-title">@lang('sale.edit_discount'):</h4>
 					</div>
-					@php
-						$discount_type = $discount_type ?? 'percentage';
-						$sales_discount = $sales_discount ?? 0;
-						$rp_redeemed = $rp_redeemed ?? 0;
-						$rp_redeemed_amount = $rp_redeemed_amount ?? 0;
-						$max_available = $max_available ?? 0;
-					@endphp
 					<div class="col-md-6">
 				        <div class="form-group">
 				            {!! Form::label('discount_type_modal', __('sale.discount_type') . ':*' ) !!}
@@ -54,6 +51,30 @@
 				        </div>
 				    </div>
 				</div>
+
+				<!-- HCM Loyalty Discount Section -->
+				@if($is_hcm_enabled)
+				<br>
+				<div class="row">
+					<div class="well well-sm bg-light-gray col-md-12">
+						<div class="col-md-12">
+							<h4 class="modal-title">@lang('lang_v1.hcm_loyalty_discount'):</h4>
+						</div>
+						<div class="col-md-12">
+							<div class="form-group">
+								{!! Form::label('hcm_loyalty_amount_modal', __('lang_v1.hcm_loyalty_amount') . ':' ) !!}
+								<div class="input-group">
+									<span class="input-group-addon">
+										<i class="fa fa-money"></i>
+									</span>
+									{!! Form::text('hcm_loyalty_amount_modal', @num_format($hcm_loyalty_amount), ['class' => 'form-control input_number', 'placeholder' => __('lang_v1.hcm_loyalty_amount')]); !!}
+								</div>
+								<span class="help-block">@lang('lang_v1.hcm_loyalty_discount_help')</span>
+							</div>
+						</div>
+					</div>
+				</div>
+				@endif
 				<br>
 				<div class="row @if(!$is_rp_enabled) hide @endif">
 					<div class="well well-sm bg-light-gray col-md-12">

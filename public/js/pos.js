@@ -30,9 +30,11 @@ $(document).ready(function() {
         pos_total_row();
     });
 
-    // Handle HCM loyalty discount edit button click
-    $(document).on('click', '#edit-hcm-loyalty', function() {
-        $('#posEditHcmLoyaltyModal').modal('show');
+    // Update HCM loyalty amount from modal
+    $(document).on('change', '#hcm_loyalty_amount_modal', function() {
+        var loyalty_amount = __read_number($(this));
+        __write_number($('#hcm_loyalty_amount'), loyalty_amount);
+        $('#hcm_loyalty_display').text(__currency_trans_from_en(loyalty_amount, true));
     });
 
     // Update reward points display
@@ -40,6 +42,33 @@ $(document).ready(function() {
         var rp_amount = __read_number($(this));
         $('#rp_redeemed_amount_text').text(__currency_trans_from_en(rp_amount, true));
         pos_total_row();
+    });
+
+    // Handle discount modal update button
+    $(document).on('click', '#posEditDiscountModalUpdate', function() {
+        // Update regular discount
+        var discount_amount = __read_number($('#discount_amount_modal'));
+        var discount_type = $('#discount_type_modal').val();
+        
+        __write_number($('#discount_amount'), discount_amount);
+        $('#discount_type').val(discount_type);
+        
+        // Update HCM loyalty if enabled
+        if ($('#hcm_loyalty_amount_modal').length) {
+            var hcm_amount = __read_number($('#hcm_loyalty_amount_modal'));
+            __write_number($('#hcm_loyalty_amount'), hcm_amount);
+            $('#hcm_loyalty_display').text(__currency_trans_from_en(hcm_amount, true));
+        }
+        
+        // Update reward points if enabled
+        if ($('#rp_redeemed_modal').length) {
+            var rp_redeemed = __read_number($('#rp_redeemed_modal'));
+            __write_number($('#rp_redeemed'), rp_redeemed);
+            __write_number($('#rp_redeemed_amount'), rp_redeemed * parseFloat($('#rp_redeemed_modal').data('amount_per_unit_point')));
+        }
+        
+        pos_total_row();
+        $('#posEditDiscountModal').modal('hide');
     });
 
     $('select#select_location_id').change(function() {

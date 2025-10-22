@@ -153,9 +153,21 @@
                         <div class="form-group">
                             <div class="checkbox">
                                 <label>
+                                    {!! Form::checkbox('enable_tooltip', 1, !empty($business->enable_tooltip), ['class' => 'input-icheck']); !!}
+                                    @lang('lang_v1.enable_tooltip')
+                                </label>
+                                @show_tooltip(__('lang_v1.tooltip_help'))
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-sm-4">
+                        <div class="form-group">
+                            <div class="checkbox">
+                                <label>
                                     {!! Form::checkbox('enable_hcm_loyalty', 1, !empty($business->enable_hcm_loyalty), ['class' => 'input-icheck']); !!}
                                     @lang('lang_v1.enable_hcm_loyalty_discount')
                                 </label>
+                                @show_tooltip(__('lang_v1.enable_hcm_loyalty_discount_help'))
                             </div>
                         </div>
                     </div>
