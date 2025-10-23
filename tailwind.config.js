@@ -1,2 +1,3 @@
 
-// Tailwind configuration removed
+// Tailwind config removed
+module.exports = {}
