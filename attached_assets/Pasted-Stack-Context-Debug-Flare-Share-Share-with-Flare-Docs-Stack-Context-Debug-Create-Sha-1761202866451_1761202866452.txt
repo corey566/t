@@ -1,0 +1,327 @@
+Stack
+Context
+Debug
+Flare
+Share
+Share with Flare
+Docs
+
+Stack
+
+Context
+
+Debug
+Create Share
+Docs
+
+Ignition Settings
+Docs
+Editor
+
+PhpStorm
+Theme
+auto
+Save settings
+Settings will be saved locally in ~/.ignition.json.
+
+Cannot redeclare App\Utils\TransactionUtil::deleteSale()
+Symfony
+ \ 
+Component
+ \ 
+ErrorHandler
+ \ 
+Error
+ \ 
+FatalError
+PHP 8.4.13
+9.52.21
+Cannot redeclare App\Utils\TransactionUtil::deleteSale()
+
+Collapse vendor frames
+app
+ / 
+Utils
+ / 
+TransactionUtil
+.php
+ 
+: 5250
+[top]
+app
+ / 
+Utils
+ / 
+TransactionUtil
+.php
+ 
+: 5250
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+        if ($sale_type == 'sell') {
+
+            $sells->where('transactions.status', 'final');
+
+        }
+
+
+
+        return $sells;
+
+    }
+
+
+
+    /**
+
+     * Function to delete sale
+
+     *
+
+     * @param  int  $business_id
+
+     * @param  int  $transaction_id
+
+     * @return array
+
+     */
+
+    public function deleteSale($business_id, $transaction_id)
+
+    {
+
+        //Check if return exist then not allowed
+
+        if ($this->isReturnExist($transaction_id)) {
+
+            $output = [
+
+                'success' => false,
+
+                'msg' => __('lang_v1.return_exist'),
+
+            ];
+
+
+
+            return $output;
+
+        }
+
+
+
+        $transaction = Transaction::where('id', $transaction_id)
+
+                    ->where('business_id', $business_id)
+
+                    ->whereIn('type', ['sell', 'sales_order'])
+App
+Routing
+Request
+Browser
+Headers
+Body
+Context
+Versions
+App
+Routing
+Controller
+App\Http\Controllers\SellPosController@create
+
+Route name
+pos.create
+
+Middleware
+Request
+https://zimozo.com/pos/create
+GET
+curl "https://zimozo.com/pos/create" \
+   -X GET \
+   -H 'cookie: XSRF-TOKEN=eyJpdiI6IlRTbWpXLy9DV2R5SWt5V2hRRERrbGc9PSIsInZhbHVlIjoiUk5yUkVBd2RkMUFSbklPV1J6OHhyNnFsZnhzNkp0cUlhU2NPNnV6anNKQVd3Qm9EaXRSamFWOEJqOWFUb20wQ0M3ZzJ2ZWNXQ0tSaGx2M3RJeW1lWGltS3ROMHRQdWFKOVhNZlQ2RWY5WCtvRC9YSTA0WHE1T004UzZ4cjJtVXUiLCJtYWMiOiIyMWUxNTI1NjViYmFjN2JkZjY3NTc3ZmYzZDRiYjM3OGZkY2M3YTBjNGY1ZDYzNmY0Nzc0MGQ4YzYwY2U5MGQwIiwidGFnIjoiIn0%3D; zimozo_pos_session=eyJpdiI6ImsxOTM3cXp0bWdNSy82eElOM1NWRHc9PSIsInZhbHVlIjoiSHUvZklDU0g4dHlrYUs0UE9WL0VSUlhZT1RZYy9GOVFxcEIvMzhYWFQ2MkYzZXRUTWZCRUtmdzVGc25LdldNVTYrU2l6NE9NMCtsTjZEMngyYjdNL2xuOFlwT3pSWWV3MVNXZHVNdmJDd0hOaFdPa1FCMkNDU2I4YzRnaDBrTEoiLCJtYWMiOiIxZjcxYzFiZGExOWMxNjQ0ZDg4MWUxZjRjNzRjM2YwMjY2ZmQ5MGIzMjllMmI5NmI3NDhhMTU1YWU3NWIxMThmIiwidGFnIjoiIn0%3D' \
+   -H 'priority: u=0, i' \
+   -H 'accept-language: en-US,en;q=0.9' \
+   -H 'accept-encoding: gzip, deflate, br, zstd' \
+   -H 'referer: https://zimozo.com/business/settings' \
+   -H 'sec-fetch-dest: document' \
+   -H 'sec-fetch-user: ?1' \
+   -H 'sec-fetch-mode: navigate' \
+   -H 'sec-fetch-site: same-origin' \
+   -H 'accept: text/html,application/xhtml+xml,application/xml;q=0.9,image/avif,image/webp,image/apng,*/*;q=0.8,application/signed-exchange;v=b3;q=0.7' \
+   -H 'user-agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/141.0.0.0 Safari/537.36' \
+   -H 'upgrade-insecure-requests: 1' \
+   -H 'dnt: 1' \
+   -H 'sec-ch-ua-platform: "Windows"' \
+   -H 'sec-ch-ua-mobile: ?0' \
+   -H 'sec-ch-ua: "Google Chrome";v="141", "Not?A_Brand";v="8", "Chromium";v="141"' \
+   -H 'cache-control: max-age=0' \
+   -H 'connection: close' \
+   -H 'x-accel-internal: /internal-nginx-static-location' \
+   -H 'x-real-ip: 112.134.210.149' \
+   -H 'host: zimozo.com';
+
+
+Browser
+Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/141.0.0.0 Safari/537.36
+
+Headers
+cookie
+XSRF-TOKEN=eyJpdiI6IlRTbWpXLy9DV2R5SWt5V2hRRERrbGc9PSIsInZhbHVlIjoiUk5yUkVBd2RkMUFSbklPV1J6OHhyNnFsZnhzNkp0cUlhU2NPNnV6anNKQVd3Qm9EaXRSamFWOEJqOWFUb20wQ0M3ZzJ2ZWNXQ0tSaGx2M3RJeW1lWGltS3ROMHRQdWFKOVhNZlQ2RWY5WCtvRC9YSTA0WHE1T004UzZ4cjJtVXUiLCJtYWMiOiIyMWUxNTI1NjViYmFjN2JkZjY3NTc3ZmYzZDRiYjM3OGZkY2M3YTBjNGY1ZDYzNmY0Nzc0MGQ4YzYwY2U5MGQwIiwidGFnIjoiIn0%3D; zimozo_pos_session=eyJpdiI6ImsxOTM3cXp0bWdNSy82eElOM1NWRHc9PSIsInZhbHVlIjoiSHUvZklDU0g4dHlrYUs0UE9WL0VSUlhZT1RZYy9GOVFxcEIvMzhYWFQ2MkYzZXRUTWZCRUtmdzVGc25LdldNVTYrU2l6NE9NMCtsTjZEMngyYjdNL2xuOFlwT3pSWWV3MVNXZHVNdmJDd0hOaFdPa1FCMkNDU2I4YzRnaDBrTEoiLCJtYWMiOiIxZjcxYzFiZGExOWMxNjQ0ZDg4MWUxZjRjNzRjM2YwMjY2ZmQ5MGIzMjllMmI5NmI3NDhhMTU1YWU3NWIxMThmIiwidGFnIjoiIn0%3D
+
+priority
+u=0, i
+
+accept-language
+en-US,en;q=0.9
+
+accept-encoding
+gzip, deflate, br, zstd
+
+referer
+https://zimozo.com/business/settings
+
+sec-fetch-dest
+document
+
+sec-fetch-user
+?1
+
+sec-fetch-mode
+navigate
+
+sec-fetch-site
+same-origin
+
+accept
+text/html,application/xhtml+xml,application/xml;q=0.9,image/avif,image/webp,image/apng,*/*;q=0.8,application/signed-exchange;v=b3;q=0.7
+
+user-agent
+Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/141.0.0.0 Safari/537.36
+
+upgrade-insecure-requests
+1
+
+dnt
+1
+
+sec-ch-ua-platform
+"Windows"
+
+sec-ch-ua-mobile
+?0
+
+sec-ch-ua
+"Google Chrome";v="141", "Not?A_Brand";v="8", "Chromium";v="141"
+
+cache-control
+max-age=0
+
+connection
+close
+
+x-accel-internal
+/internal-nginx-static-location
+
+x-real-ip
+112.134.210.149
+
+host
+zimozo.com
+
+Body
+[]
+
+Context
+Versions
+Php Version
+8.4.13
+
+Laravel Version
+9.52.21
+
+Laravel Locale
+en
+
+Laravel Config Cached
+false
+App Debug
+true
+App Env
+live
+
+
+5
+Queries
+
+4
+Logs
+12:30:42 PM
+2ms
+mysql
+select * from `system` where `key` = crm_version limit 1
+
+
+1 query parameter
+12:30:42 PM
+0.64ms
+mysql
+select * from `system` where `key` = woocommerce_version limit 1
+
+
+1 query parameter
+12:30:42 PM
+0.67ms
+mysql
+select * from `business` where `woocommerce_api_settings` is not null
+
+
+12:30:42 PM
+0.24ms
+mysql
+select * from `system` where `key` = woocommerce_version limit 1
+
+
+1 query parameter
+12:30:42 PM
+0.35ms
+mysql
+select * from `business` where `woocommerce_api_settings` is not null
+
+
+·
+Source
+·
+Docs
+·
+Laravel
+Ignition is built byFlare, the Laravel error reporting service.

@@ -1,6 +1,3 @@
-` tags.
-
-<replit_final_file>
 <?php
 
 namespace App\Utils;
