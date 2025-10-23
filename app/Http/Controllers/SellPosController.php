@@ -336,6 +336,9 @@ class SellPosController extends Controller
         $business_id = $request->session()->get('user.business_id');
         $business_details = $this->businessUtil->getDetails($business_id);
         $pos_settings = empty($business_details->pos_settings) ? $this->businessUtil->defaultPosSettings() : json_decode($business_details->pos_settings, true);
+        
+        // Merge with defaults to ensure all keys exist
+        $pos_settings = array_merge($this->businessUtil->defaultPosSettings(), $pos_settings);
 
         try {
             $input = $request->except('_token');
