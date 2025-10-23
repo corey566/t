@@ -16,6 +16,10 @@ class UserLoggedInListener
             $user = $event->user ?? auth()->user();
             
             if (!$user || !isset($user->location_id)) {
+                Log::info('HCM Ping Skipped - No user or location_id', [
+                    'has_user' => isset($user),
+                    'has_location' => isset($user->location_id ?? null)
+                ]);
                 return;
             }
 
@@ -25,6 +29,14 @@ class UserLoggedInListener
             $username = $user->username ?? $user->first_name ?? 'Unknown';
             $ipAddress = request()->ip();
 
+            Log::info('User Login Detected', [
+                'user_id' => $userId,
+                'username' => $username,
+                'location_id' => $locationId,
+                'business_id' => $businessId,
+                'ip_address' => $ipAddress
+            ]);
+
             // Check for HCM credentials at this location
             $hcmCredential = LocationApiCredential::where('business_id', $businessId)
                 ->where('business_location_id', $locationId)
@@ -33,18 +45,19 @@ class UserLoggedInListener
                 ->first();
 
             if ($hcmCredential) {
-                Log::info('User logged in - Starting HCM ping', [
+                Log::info('HCM Credentials Found - Sending ping', [
                     'location_id' => $locationId,
                     'user_id' => $userId,
                     'username' => $username,
-                    'ip_address' => $ipAddress
+                    'tenant_id' => $hcmCredential->username,
+                    'pos_id' => $hcmCredential->pos_id
                 ]);
                 
                 // Send immediate ping
                 $apiService = new HcmApiService($hcmCredential->getCredentialsForApi());
                 $pingResult = $apiService->sendPing($userId, $username, $ipAddress);
                 
-                // Log the ping
+                // Log the ping to database
                 DB::table('hcm_ping_logs')->insert([
                     'location_id' => $locationId,
                     'user_id' => $userId,
@@ -60,9 +73,14 @@ class UserLoggedInListener
                     'updated_at' => now()
                 ]);
                 
-                Log::info('HCM Login Ping Result', [
+                Log::info('HCM Login Ping Completed', [
                     'success' => $pingResult['success'],
                     'message' => $pingResult['message']
+                ]);
+            } else {
+                Log::info('No HCM credentials found for location', [
+                    'location_id' => $locationId,
+                    'business_id' => $businessId
                 ]);
             }
 
