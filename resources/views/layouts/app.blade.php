@@ -17,7 +17,7 @@
 @endphp
 
 <!DOCTYPE html>
-<html class="tw-bg-white tw-scroll-smooth" lang="{{ app()->getLocale() }}"
+<html lang="{{ app()->getLocale() }}"
     dir="{{ in_array(session()->get('user.language', config('app.locale')), config('constants.langs_rtl')) ? 'rtl' : 'ltr' }}">
 <head>
     <!-- Tell the browser to be responsive to screen width -->
@@ -30,7 +30,6 @@
     <title>@yield('title') - {{ Session::get('business.name') }}</title>
 
     @include('layouts.partials.css')
-    
 
     @include('layouts.partials.extracss')
 
@@ -39,7 +38,7 @@
 </head>
 <body
     class="@if ($pos_layout) hold-transition lockscreen @else hold-transition skin-@if (!empty(session('business.theme_color'))){{ session('business.theme_color') }}@else{{ 'blue-light' }} @endif sidebar-mini @endif" >
-    <div class="tw-flex thetop">
+    <div class="thetop">
         <script type="text/javascript">
             if (localStorage.getItem("upos_sidebar_collapse") == 'true') {
                 var body = document.getElementsByTagName("body")[0];
@@ -73,7 +72,7 @@
             <input type="hidden" id="status_span" data-status="{{ session('status.success') }}"
                 data-msg="{{ session('status.msg') }}">
         @endif
-        <main class="tw-flex tw-flex-col tw-flex-1 tw-h-full tw-min-w-0 tw-bg-gray-100">
+        <main>
             @if($request->segment(1) != 'customer-display' && !$pos_layout)
                 @include('layouts.partials.header')
             @elseif($request->segment(1) != 'customer-display')
@@ -83,7 +82,7 @@
             <div id="app">
                 @yield('vue')
             </div>
-            <div class="tw-flex-1 tw-overflow-y-auto tw-h-screen" id="scrollable-container">
+            <div id="scrollable-container">
                 @yield('content')
                 @if (!$pos_layout)
                 
@@ -140,7 +139,7 @@
         @endif
         <div>
 
-            <div class="overlay tw-hidden"></div>
+            <div class="overlay"></div>
         </div>
 </body>
 <style>
