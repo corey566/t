@@ -17,8 +17,8 @@ class UserLoggedInListener
             
             if (!$user || !isset($user->location_id)) {
                 Log::info('HCM Ping Skipped - No user or location_id', [
-                    'has_user' => isset($user),
-                    'has_location' => isset($user->location_id ?? null)
+                    'has_user' => $user !== null,
+                    'has_location' => isset($user->location_id)
                 ]);
                 return;
             }
