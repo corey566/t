@@ -5,8 +5,8 @@
 BACKUP_DIR="changed_files_backup_$(date +%Y%m%d_%H%M%S)"
 mkdir -p "$BACKUP_DIR"
 
-# Get list of changed files since October 20, 2025
-git log --since="2025-10-20" --name-only --pretty=format: | sort -u | grep -v '^$' > /tmp/changed_files.txt
+# Get list of changed files since October 21, 2025
+git log --since="2025-10-21" --name-only --pretty=format: | sort -u | grep -v '^$' > /tmp/changed_files.txt
 
 # Read each file and copy it to the backup directory
 while IFS= read -r file; do
