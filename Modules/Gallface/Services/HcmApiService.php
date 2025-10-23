@@ -345,12 +345,17 @@ class HcmApiService
 
         $cashierId = substr((string)($sale->cashier_id ?? $sale->created_by ?? 'CASH-01'), 0, 50);
 
-        // Set customer mobile to blank if not available (don't send random numbers)
+        // Set customer mobile to blank if customer name is not available
         $customerMobile = '';
-        if (!empty($sale->mobile)) {
-            $customerMobile = substr((string)$sale->mobile, 0, 15);
-        } elseif (!empty($sale->customer_mobile)) {
-            $customerMobile = substr((string)$sale->customer_mobile, 0, 15);
+        $customerName = $sale->name ?? $sale->customer_name ?? '';
+        
+        // Only set mobile number if customer name exists
+        if (!empty(trim($customerName))) {
+            if (!empty($sale->mobile)) {
+                $customerMobile = substr((string)$sale->mobile, 0, 15);
+            } elseif (!empty($sale->customer_mobile)) {
+                $customerMobile = substr((string)$sale->customer_mobile, 0, 15);
+            }
         }
 
         // Get payment details
