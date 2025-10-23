@@ -442,8 +442,16 @@ class SellPosController extends Controller
                 $price_group_id = $price_group_id == 0 && $request->has('default_price_group') ? $request->input('default_price_group') : $price_group_id;
 
                 $input['is_suspend'] = isset($input['is_suspend']) && 1 == $input['is_suspend'] ? 1 : 0;
-                if ($input['is_suspend']) {
-                    $input['sale_note'] = !empty($input['additional_notes']) ? $input['additional_notes'] : null;
+
+                // Save HCM loyalty amount
+                if (isset($input['hcm_loyalty_amount'])) {
+                    $input['hcm_loyalty_amount'] = $this->transactionUtil->num_uf($input['hcm_loyalty_amount']);
+                } else {
+                    $input['hcm_loyalty_amount'] = 0;
+                }
+
+                if ($pos_settings['enable_transaction_date']) {
+                    $input['transaction_date'] = $this->productUtil->uf_date($input['transaction_date'], true);
                 }
 
                 //Generate reference number
@@ -1412,7 +1420,6 @@ class SellPosController extends Controller
                 //Update Sell lines
                 $deleted_lines = $this->transactionUtil->createOrUpdateSellLines($transaction, $input['products'], $input['location_id'], true, $status_before);
 
-                //Update update lines
                 $is_credit_sale = isset($input['is_credit_sale']) && $input['is_credit_sale'] == 1 ? true : false;
 
                 $new_sales_order_ids = $transaction->sales_order_ids ?? [];
@@ -2395,7 +2402,7 @@ class SellPosController extends Controller
                     $type = $row->recur_interval == 1 ? Str::singular(__('lang_v1.' . $row->recur_interval_type)) : __('lang_v1.' . $row->recur_interval_type);
                     $recur_interval = $row->recur_interval . $type;
 
-                    if ($row->recur_interval_type == 'months' && !empty($row->subscription_repeat_on)) {
+                    if ($row->recur_interval_type == 'months' && !empty($row->subscription_repeat_on')) {
                         $recur_interval .= '<br><small class="text-muted">' .
                         __('lang_v1.repeat_on') . ': ' . str_ordinal($row->subscription_repeat_on);
                     }
