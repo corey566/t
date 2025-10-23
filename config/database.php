@@ -79,12 +79,7 @@ return [
             'prefix' => '',
             'prefix_indexes' => true,
             'search_path' => 'public',
-            'sslmode' => 'require',
-            'options' => [
-                PDO::ATTR_TIMEOUT => env('DB_TIMEOUT', 30),
-                PDO::ATTR_PERSISTENT => false,
-                PDO::ATTR_ERRMODE => PDO::ERRMODE_EXCEPTION,
-            ],
+            'sslmode' => 'prefer',
         ],
 
         'sqlsrv' => [

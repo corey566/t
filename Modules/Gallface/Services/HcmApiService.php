@@ -345,17 +345,12 @@ class HcmApiService
 
         $cashierId = substr((string)($sale->cashier_id ?? $sale->created_by ?? 'CASH-01'), 0, 50);
 
-        // Set customer mobile to blank if customer name is not available
+        // Set customer mobile to blank if not available (don't send random numbers)
         $customerMobile = '';
-        $customerName = $sale->name ?? $sale->customer_name ?? '';
-        
-        // Only set mobile number if customer name exists
-        if (!empty(trim($customerName))) {
-            if (!empty($sale->mobile)) {
-                $customerMobile = substr((string)$sale->mobile, 0, 15);
-            } elseif (!empty($sale->customer_mobile)) {
-                $customerMobile = substr((string)$sale->customer_mobile, 0, 15);
-            }
+        if (!empty($sale->mobile)) {
+            $customerMobile = substr((string)$sale->mobile, 0, 15);
+        } elseif (!empty($sale->customer_mobile)) {
+            $customerMobile = substr((string)$sale->customer_mobile, 0, 15);
         }
 
         // Get payment details
@@ -368,20 +363,13 @@ class HcmApiService
         $tenantLoyalty = 0.00;
         $creditNotes = 0.00;
         $otherPayments = 0.00;
-        $havelockCityVoucher = 0.00; // This variable will no longer be used for mapping
+        $havelockCityVoucher = 0.00;
 
         if (isset($sale->payment_lines) && (is_array($sale->payment_lines) || is_object($sale->payment_lines))) {
             foreach ($sale->payment_lines as $payment) {
                 $paymentObj = is_array($payment) ? (object)$payment : $payment;
                 $amount = floatval($paymentObj->amount ?? 0);
                 $method = strtolower($paymentObj->method ?? '');
-
-                // Log payment method for debugging
-                Log::info('HCM Payment Method Detection', [
-                    'invoice_no' => $sale->invoice_no ?? 'Unknown',
-                    'method' => $method,
-                    'amount' => $amount
-                ]);
 
                 if ($method === 'cash') {
                     $paidByCash += $amount;
@@ -390,13 +378,14 @@ class HcmApiService
                     $cardBank = $paymentObj->card_bank ?? '';
                     $cardCategory = $paymentObj->card_category ?? '';
                     $cardType = $paymentObj->card_type ?? '';
-                } elseif ($method === 'hcm_loyalty' || $method === 'havelock city loyalty' || $method === 'havelock_city_voucher' || $method === 'havelock city voucher' || (stripos($method, 'havelock') !== false && (stripos($method, 'loyalty') !== false || stripos($method, 'voucher') !== false))) {
-                    // Map both Havelock City Loyalty and Havelock City Voucher to hcmLoyalty
+                } elseif ($method === 'hcm_loyalty') {
                     $hcmLoyalty += $amount;
                 } elseif ($method === 'tenant_loyalty' || $method === 'loyalty') {
                     $tenantLoyalty += $amount;
                 } elseif ($method === 'credit_note') {
                     $creditNotes += $amount;
+                } elseif ($method === 'havelock_city_voucher' || $method === 'havelock city voucher') {
+                    $havelockCityVoucher += $amount;
                 } else {
                     $otherPayments += $amount;
                 }
@@ -426,8 +415,8 @@ class HcmApiService
         }
 
         // Format date exactly as API expects: dd/MM/yyyy HH:mm:ss
-        $invoiceDate = isset($sale->transaction_date) ?
-            Carbon::parse($sale->transaction_date)->format('d/m/Y H:i:s') :
+        $invoiceDate = isset($sale->transaction_date) ? 
+            Carbon::parse($sale->transaction_date)->format('d/m/Y H:i:s') : 
             Carbon::now()->format('d/m/Y H:i:s');
 
         // Return array in exact order as per API specification
@@ -457,7 +446,7 @@ class HcmApiService
             'hcmLoyalty' => round($hcmLoyalty, 2),
             'tenantLoyalty' => round($tenantLoyalty, 2),
             'creditNotes' => round($creditNotes, 2),
-            'havelockCityVoucher' => round($havelockCityVoucher, 2), // This field will remain 0 if not explicitly mapped elsewhere
+            'havelockCityVoucher' => round($havelockCityVoucher, 2),
             'otherPayments' => round($otherPayments, 2)
         ];
     }

@@ -15,20 +15,6 @@ class GallfaceSaleCreatedListener
         try {
             $transaction = $event->transaction;
             
-            Log::info('Gallface: Sale event received', [
-                'transaction_id' => $transaction->id,
-                'invoice_no' => $transaction->invoice_no,
-                'type' => $transaction->type
-            ]);
-            
-            // Only sync sell transactions
-            if ($transaction->type !== 'sell') {
-                Log::info('Gallface: Skipping non-sell transaction', [
-                    'type' => $transaction->type
-                ]);
-                return;
-            }
-            
             // Check if this location has Gallface integration enabled with auto-sync
             $credential = LocationApiCredential::where('business_id', $transaction->business_id)
                 ->where('business_location_id', $transaction->location_id)
@@ -38,25 +24,13 @@ class GallfaceSaleCreatedListener
                 ->first();
             
             if (!$credential) {
-                Log::info('Gallface: No auto-sync credentials found', [
-                    'business_id' => $transaction->business_id,
-                    'location_id' => $transaction->location_id
-                ]);
                 return;
             }
             
             // Check if already synced
             if (!empty($transaction->gallface_synced_at)) {
-                Log::info('Gallface: Transaction already synced', [
-                    'invoice_no' => $transaction->invoice_no,
-                    'synced_at' => $transaction->gallface_synced_at
-                ]);
                 return;
             }
-            
-            Log::info('Gallface: Starting auto-sync', [
-                'invoice_no' => $transaction->invoice_no
-            ]);
             
             $additionalData = json_decode($credential->additional_data ?? '{}', true);
             
