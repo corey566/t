@@ -1,0 +1,3 @@
+#!/bin/bash
+unset DATABASE_URL
+DB_CONNECTION=sqlite DB_DATABASE=/home/runner/workspace/database/database.sqlite php artisan "$@"

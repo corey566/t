@@ -1,0 +1,27 @@
+
+{
+    "name": "ultimateforester/hcm",
+    "description": "Havelock City Mall Integration Module for Ultimate Forester POS",
+    "authors": [
+        {
+            "name": "Ultimate Forester Team",
+            "email": "dev@ultimateforester.com"
+        }
+    ],
+    "extra": {
+        "laravel": {
+            "providers": [
+                "Modules\\Hcm\\Providers\\HcmServiceProvider"
+            ],
+            "aliases": {}
+        }
+    },
+    "autoload": {
+        "psr-4": {
+            "Modules\\Hcm\\": ""
+        }
+    },
+    "require": {
+        "guzzlehttp/guzzle": "^7.0"
+    }
+}
