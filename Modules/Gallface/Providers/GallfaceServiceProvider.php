@@ -19,6 +19,18 @@ class GallfaceServiceProvider extends ServiceProvider
     protected $moduleNameLower = 'gallface';
 
     /**
+     * @var string[] $commands
+     */
+    protected $commands = [
+        \Modules\Gallface\Console\GallfaceSyncCommand::class,
+        \Modules\Gallface\Console\HcmSyncCommand::class,
+        \Modules\Gallface\Console\HcmPingCommand::class,
+        \Modules\Gallface\Console\HcmActivityPingCommand::class,
+        \Modules\Gallface\Console\HcmTestPingCommand::class,
+        \Modules\Gallface\Console\TestEventCommand::class,
+    ];
+
+    /**
      * Boot the application events.
      *
      * @return void
@@ -30,15 +42,15 @@ class GallfaceServiceProvider extends ServiceProvider
         $this->registerViews();
         $this->loadMigrationsFrom(module_path('Gallface', 'Database/Migrations'));
 
-        // Register event listeners for auto-sync
-        $this->app['events']->listen(
-            \App\Events\SellCreatedOrModified::class,
-            \Modules\Gallface\Listeners\GallfaceSaleCreatedListener::class
-        );
-        
-        $this->app['events']->listen(
+        // Register event listeners for real-time sync
+        \Event::listen(
             \App\Events\SellCreatedOrModified::class,
             \Modules\Gallface\Listeners\HcmSaleCreatedListener::class
+        );
+
+        \Event::listen(
+            \App\Events\SellCreatedOrModified::class,
+            \Modules\Gallface\Listeners\GallfaceSaleCreatedListener::class
         );
     }
 
@@ -47,12 +59,7 @@ class GallfaceServiceProvider extends ServiceProvider
      */
     public function registerCommands()
     {
-        $this->commands([
-            \Modules\Gallface\Console\GallfaceSyncCommand::class,
-            \Modules\Gallface\Console\HcmSyncCommand::class,
-            \Modules\Gallface\Console\HcmTestPingCommand::class,
-            \Modules\Gallface\Console\HcmActivityPingCommand::class,
-        ]);
+        $this->commands($this->commands);
     }
 
     /**
